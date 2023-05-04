@@ -52,6 +52,47 @@
 			let tag = document.getElementById("debug-message");
 			tag.textContent = var1 + " / " + var2;
 		}
+
+		const get_event_log = () => {
+			let base = document.getElementById("log_body");
+			base.innerHTML = "";
+
+			let machine_name = wri.win.MachineName;
+			let logs = wri.win.GetLogOnOffEventLogList(machine_name, 10);
+			
+			// 
+			for (let i = 0; i < logs.length; i++) {
+				let log = logs[i];
+				let row = document.createElement("tr");
+				// ID作成
+				let tag_id = document.createElement("td");
+				tag_id.textContent = log.EventId;
+				// Message作成
+				let tag_content = document.createElement("td");
+				tag_content.textContent = log.Message;
+				// DateTime作成
+				let tag_dt = document.createElement("td");
+				let dt = new Date(log.TimeGenerated.Year, log.TimeGenerated.Month-1, log.TimeGenerated.Day, log.TimeGenerated.Hour, log.TimeGenerated.Minute, log.TimeGenerated.Second, log.TimeGenerated.Millisecond);
+				tag_dt.textContent = dt.toLocaleString();
+				//
+				row.appendChild(tag_id);
+				row.appendChild(tag_content);
+				row.appendChild(tag_dt);
+				base.appendChild(row);
+			}
+			//
+			if (logs.length === 0) {
+				let row = document.createElement("tr");
+				let tag_1 = document.createElement("td");
+				tag_1.textContent = "Log Result 0."
+				let tag_2 = document.createElement("td");
+				let tag_3 = document.createElement("td");
+				row.appendChild(tag_1);
+				row.appendChild(tag_2);
+				row.appendChild(tag_3);
+				base.appendChild(row);
+			}
+		}
     </script>
 </head>
 <body>
@@ -60,5 +101,19 @@
 
 	<button onclick="debug()">Debug</button>
 	<div id="debug-message">ここにデバッグ用メッセージ表示</div>
+
+	<p1>EventLog Output</p1>
+	<button onclick="get_event_log()">Get EventLog</button>
+	<table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Message</th>
+            <th>DateTime</th>
+          </tr>
+        </thead>
+        <tbody id="log_body">
+        </tbody>
+	</table>
 </body>
 </html>

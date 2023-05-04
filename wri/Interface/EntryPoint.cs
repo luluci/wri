@@ -20,9 +20,15 @@ namespace wri.Interface
         public int TestVar1 = 11;
         public int TestVar2 { get; set; } = 22;
 
+        // Interfaceクラスインスタンス
+        public WindowsApi win { get; set; }
+
         public EntryPoint()
         {
+            win = new WindowsApi();
 
+            // test
+            //win.GetLogOnOffEventLogList(win.MachineName);
         }
 
         public void MessageBox(string msg)

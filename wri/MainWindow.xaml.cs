@@ -44,10 +44,5 @@ namespace wri
             }
         }
 
-        private void WebView2_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
-        {
-            int i;
-            i = 0;
-        }
     }
 }
