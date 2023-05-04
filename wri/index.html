@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+    <script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				//
+				let tag = document.getElementById("init-message");
+				tag.textContent = "初期化完了";
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		const zeroPadding = (value, len) => {
+			return value.padStart(len, '0');
+		}
+		const toHex = (value, len) => {
+			return zeroPadding(value.toString(16), len);
+		}
+		const sleepThread = (msec) => {
+			var e = new Date().getTime() + (msec);
+			while (new Date().getTime() <= e) {}
+		}
+
+		// 
+
+
+		const test_func = () => {
+			let hoge = "str";
+			//hoge.sonzai_sinai_kannsuu();
+			return 0;
+		}
+
+		const debug = () => {
+			//const val = test_func_async();
+			//return "debug"
+			let var1 = wri.TestVar1;
+			let var2 = wri.TestVar2;
+
+			let tag = document.getElementById("debug-message");
+			tag.textContent = var1 + " / " + var2;
+		}
+    </script>
+</head>
+<body>
+    <script></script>
+	<div id="init-message">初期化メッセージ表示</div>
+
+	<button onclick="debug()">Debug</button>
+	<div id="debug-message">ここにデバッグ用メッセージ表示</div>
+</body>
+</html>
