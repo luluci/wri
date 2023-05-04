@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 15 for Windows Desktop
+VisualStudioVersion = 15.0.33423.255
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wri", "wri\wri.csproj", "{15C837C1-0406-4715-A7C4-D6D1ECE31ACB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15C837C1-0406-4715-A7C4-D6D1ECE31ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15C837C1-0406-4715-A7C4-D6D1ECE31ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15C837C1-0406-4715-A7C4-D6D1ECE31ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15C837C1-0406-4715-A7C4-D6D1ECE31ACB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14D171DC-F988-41BB-A65D-81CE0DB33F26}
+	EndGlobalSection
+EndGlobal
