@@ -53,12 +53,24 @@
 			tag.textContent = var1 + " / " + var2;
 		}
 
+		const afk = () => {
+			wri.win.LockPC();
+			wri.win.MonitorOff();
+		}
+
 		const get_event_log = () => {
 			let base = document.getElementById("log_body");
 			base.innerHTML = "";
 
+			let input_elem = document.getElementById("get_event_log_size");
+			let size = input_elem.value;
+
+			let wm = wri.win.WM_SYSCOMMAND;
+
 			let machine_name = wri.win.MachineName;
-			let logs = wri.win.GetLogOnOffEventLogList(machine_name, 10);
+			//let logs = wri.win.GetLogOnOffEventLogList(machine_name, size);
+			let filter = [6005,6006,6008,6009,7001,7002,1,12,13,42];
+			let logs = wri.win.GetEventLogList("System", machine_name, filter, size);
 			
 			// 
 			for (let i = 0; i < logs.length; i++) {
@@ -94,26 +106,108 @@
 			}
 		}
     </script>
+	<style type="text/css">
+		.container {
+			display: flex;
+			flex-direction: column;
+		}
+		.container .c_item {
+			width: 80%;
+			margin: 10px auto;
+			padding: 20px;
+			background-color: rgba(0, 65, 139, 0.918);
+			border-radius: 20px;
+			color: aliceblue;
+		}
+		.container .c_item .header {
+			border-bottom: 1px solid #fff;
+			margin-bottom: 10px;
+			padding: 1px 10px;
+		}
+		.container .c_item .form {
+			border: 1px dashed rgba(163, 169, 177, 0.918);
+			border-radius: 10px;
+			margin: 0 10px;
+			padding: 5px 10px;
+			background-color: rgba(11, 51, 97, 0.918);
+		}
+		#event_log {
+			margin: 10px 10px;
+			border-collapse: collapse;
+		}
+		#event_log thead th {
+			border-bottom: 2px solid #fff;
+			padding: 2px 10px;
+			font-size: 15px;
+		}
+		#event_log thead th.id {
+			width: 50px;
+		}
+		#event_log thead th.message {
+			width: auto;
+		}
+		#event_log thead th.datetime {
+			width: 130px;
+		}
+		#event_log tbody tr {
+			border-bottom: 1px dashed #fff;
+			padding: 2px 10px;
+			font-size: 12px;
+		}
+		#event_log tbody tr td {
+			padding: 2px 10px;
+		}
+	</style>
 </head>
 <body>
-    <script></script>
+	<div class="container">
+		<div class="c_item">
+			<div class="header">
+				PCロック→モニタOFF
+			</div>
+			<div class="form">
+				<button onclick="afk()">AFK</button>
+			</div>
+		</div>
+		<div class="c_item">
+			<div class="header">
+				Windows EventLog 取得
+			</div>
+			<div class="form">
+				<span>取得ログ数</span>
+				<input id="get_event_log_size" type="number" value="20"/>
+				<button onclick="get_event_log()">Get EventLog</button>
+			</div>
+			<div style="margin-top: 10px; border-bottom: 2px solid #fff;">EventLog Output</div>
+			<table id="event_log">
+				<thead>
+					<tr>
+						<th class="id">ID</th>
+						<th class="message">Message</th>
+						<th class="datetime">DateTime</th>
+					</tr>
+				</thead>
+				<tbody id="log_body">
+					<tr>
+						<td>-</td><td>-</td><td>-</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="c_item">
+			<div class="header">
+				Do nanika
+			</div>
+			<div class="form">
+				<button onclick="get_event_log()">nanika</button>
+			</div>
+		</div>
+	</div>
+
 	<div id="init-message">初期化メッセージ表示</div>
 
 	<button onclick="debug()">Debug</button>
 	<div id="debug-message">ここにデバッグ用メッセージ表示</div>
 
-	<p1>EventLog Output</p1>
-	<button onclick="get_event_log()">Get EventLog</button>
-	<table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Message</th>
-            <th>DateTime</th>
-          </tr>
-        </thead>
-        <tbody id="log_body">
-        </tbody>
-	</table>
 </body>
 </html>

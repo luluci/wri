@@ -11,6 +11,8 @@ namespace wri.Interface
     [ComVisible(true)]
     public class WindowsApi
     {
+        // static, constはWebView2側から参照不可
+
         // I/F情報
         public string Error { get; set; } = string.Empty;
 
@@ -19,7 +21,13 @@ namespace wri.Interface
         public string UserName;
         public string UserDomainName;
 
+        // WindowsAPI
+        public int WM_SYSCOMMAND = Utility.WindowsApi.WM_SYSCOMMAND;
+        public int SC_MONITORPOWER = Utility.WindowsApi.SC_MONITORPOWER;
+        public int MONITOR_OFF = Utility.WindowsApi.MONITOR_OFF;
+
         // EventLog
+        static private int[] emptyFilter = { };
         // 最後に取得したログリスト
         public EventLog[] LatestGetEventLog = { };
 
@@ -28,6 +36,98 @@ namespace wri.Interface
             MachineName = Environment.MachineName;
             UserName = Environment.UserName;
             UserDomainName = Environment.UserDomainName;
+        }
+
+        public int SendMessage(int hWnd, int hMsg, int wParam, int lParam)
+        {
+            return Utility.WindowsApi.SendMessage(hWnd, hMsg, wParam, lParam);
+        }
+
+        public void LockPC()
+        {
+            Utility.WindowsApi.LockWorkStation();
+        }
+
+        public void MonitorOff()
+        {
+            Utility.WindowsApi.SendMessage(-1, WM_SYSCOMMAND, SC_MONITORPOWER, MONITOR_OFF);
+        }
+
+        public EventLog[] GetEventLogList(string logName, string machineName, object[] filter, int log_max = 100)
+        {
+            int log_count = 0;
+            bool log_flag = true;
+            var logs = new List<EventLog>();
+
+            bool enable_filter = false;
+            var filter_dict = new Dictionary<int, bool>();
+            if (filter.Length != 0)
+            {
+                foreach (var item in filter)
+                {
+                    try
+                    {
+                        filter_dict.Add((int)item, true);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                enable_filter = true;
+            }
+
+            try
+            {
+                if (System.Diagnostics.EventLog.Exists(logName, machineName))
+                {
+                    using (var log = new System.Diagnostics.EventLog(logName, machineName))
+                    {
+                        int max = log.Entries.Count;
+                        for (int idx = max - 1; idx >= 0; idx--)
+                        //foreach (System.Diagnostics.EventLogEntry entry in log.Entries)
+                        {
+                            var entry = log.Entries[idx];
+
+                            // filter
+                            log_flag = true;
+                            if (enable_filter)
+                            {
+                                if (!filter_dict.ContainsKey((int)entry.InstanceId))
+                                {
+                                    log_flag = false;
+                                }
+                            }
+
+                            if (log_flag)
+                            {
+                                logs.Add(new EventLog
+                                {
+                                    EventId = entry.InstanceId,
+                                    Message = entry.Message,
+                                    TimeGenerated = new DateTime(entry.TimeGenerated),
+                                });
+                                log_count++;
+
+                                if (log_count >= log_max)
+                                {
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                Error = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Error = ex.Message;
+            }
+
+            LatestGetEventLog = logs.ToArray();
+            return LatestGetEventLog;
         }
 
         public EventLog[] GetLogOnOffEventLogList(string machineName, int log_max = 100)
