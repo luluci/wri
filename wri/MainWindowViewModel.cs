@@ -54,11 +54,28 @@ namespace wri
             WebView2 = window.WebView2;
             // 初期化完了ハンドラ登録
             WebView2.CoreWebView2InitializationCompleted += webView2CoreWebView2InitializationCompleted;
+            WebView2.NavigationCompleted += webView_NavigationCompleted;
+            // JavaScript側からの呼び出し
+            WebView2.WebMessageReceived += webView_WebMessageReceived;
+
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
-            WebView2.CoreWebView2.Navigate(ScriptPath.Value.AbsoluteUri);
 
+        }
+
+        private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
+        {
+            // WebView2起動時の初期化完了後に1回だけコールされる
+        }
+
+        private async void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+        {
+            //webView.CoreWebView2.PostWebMessageAsString("C#からのデータ送信");
+
+            // 表示完了時にコールされる。F5による更新時にもコールされる。
+            // このときObjectの登録等も初期化されるため、毎回登録する。
             // API登録
+            // 登録するインスタンスのclassはアクセスレベルをpublicにしないとエラー
             // wriアプリのAPIなのでwriとしておく
             WebView2.CoreWebView2.AddHostObjectToScript("wri", EntryPoint);
 
@@ -66,13 +83,6 @@ namespace wri
             await RunScriptLoaded("const wri = chrome.webview.hostObjects.sync.wri; true");
             await RunScriptLoaded("const wri_async = chrome.webview.hostObjects.wri; true");
             await RunScriptLoaded("csLoaded()");
-
-            // JavaScript側からの呼び出し
-            WebView2.WebMessageReceived += webView_WebMessageReceived;
-        }
-
-        private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
-        {
         }
 
         private void webView_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
