@@ -62,15 +62,27 @@
 			let base = document.getElementById("log_body");
 			base.innerHTML = "";
 
+			// EventLog取得数取得
 			let input_elem = document.getElementById("get_event_log_size");
 			let size = input_elem.value;
+			// EventLogフィルター取得
+			let log_def_table = document.getElementById("get_event_log_def_table");
+			let tbody_tag = log_def_table.getElementsByTagName("tbody")[0];
+			let id_filter = [];
+			let event_dict = {};
+			for (let i = 0; i < tbody_tag.children.length; i++) {
+				let tag = tbody_tag.children[i];
+				let event_id = Number(tag.children[0].children[0].value);
+				let message = tag.children[1].children[0].value
+				id_filter.push(event_id);
+				event_dict[event_id] = message;
+			}
 
+			// 
 			let wm = wri.win.WM_SYSCOMMAND;
-
 			let machine_name = wri.win.MachineName;
 			//let logs = wri.win.GetLogOnOffEventLogList(machine_name, size);
-			let filter = [6005,6006,6008,6009,7001,7002,1,12,13,42];
-			let logs = wri.win.GetEventLogList("System", machine_name, filter, size);
+			let logs = wri.win.GetEventLogList("System", machine_name, id_filter, size);
 			
 			// 
 			for (let i = 0; i < logs.length; i++) {
@@ -81,7 +93,11 @@
 				tag_id.textContent = log.EventId;
 				// Message作成
 				let tag_content = document.createElement("td");
-				tag_content.textContent = log.Message;
+				if (log.EventId in event_dict) {
+					tag_content.textContent = event_dict[log.EventId];
+				} else {
+					tag_content.textContent = log.Message;
+				}
 				// DateTime作成
 				let tag_dt = document.createElement("td");
 				let dt = new Date(log.TimeGenerated.Year, log.TimeGenerated.Month-1, log.TimeGenerated.Day, log.TimeGenerated.Hour, log.TimeGenerated.Minute, log.TimeGenerated.Second, log.TimeGenerated.Millisecond);
@@ -131,6 +147,38 @@
 			padding: 5px 10px;
 			background-color: rgba(11, 51, 97, 0.918);
 		}
+
+		#get_event_log_def_table {
+			margin: 10px 10px;
+			border-collapse: collapse;
+		}
+		#get_event_log_def_table thead {
+			padding: 2px 10px;
+			font-size: 15px;
+		}
+		#get_event_log_def_table thead th {
+			border-radius: 15px;
+			border: 1px solid #ffffffb2;
+			padding: 2px 10px;
+			font-size: 15px;
+		}
+		#get_event_log_def_table thead th.event_id,
+		#get_event_log_def_table tbody td.event_id {
+			width: 100px;
+			padding: 2px 5px;
+			border: 1px solid #ffffffb2;
+		}
+		#get_event_log_def_table thead th.message,
+		#get_event_log_def_table tbody td.message {
+			width: 200px;
+			padding: 2px 5px;
+			border: 1px solid #ffffffb2;
+		}
+		#get_event_log_def_table tbody td input {
+			width: inherit;
+			font-size: 12px;
+		}
+
 		#event_log {
 			margin: 10px 10px;
 			border-collapse: collapse;
@@ -174,9 +222,63 @@
 				Windows EventLog 取得
 			</div>
 			<div class="form">
-				<span>取得ログ数</span>
-				<input id="get_event_log_size" type="number" value="20"/>
-				<button onclick="get_event_log()">Get EventLog</button>
+				<div>
+					<span>取得ログ数</span>
+					<input id="get_event_log_size" type="number" value="20"/>
+					<button onclick="get_event_log()">Get EventLog</button>
+				</div>
+				<div>
+					<table id="get_event_log_def_table">
+						<thead>
+							<tr>
+								<th class="event_id">EventID</th>
+								<th class="message">Message</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="event_id"><input type="number" value="6005" /></td>
+								<td class="message"><input type="text" value="ログオン:起動" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="6006" /></td>
+								<td class="message"><input type="text" value="ログオフ:正常シャットダウン" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="6008" /></td>
+								<td class="message"><input type="text" value="ログオフ:正常ではないシャットダウン" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="6009" /></td>
+								<td class="message"><input type="text" value="ログオン:起動時にブート情報を記録" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="1" /></td>
+								<td class="message"><input type="text" value="ログオフ:スリープ" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="42" /></td>
+								<td class="message"><input type="text" value="ログオン:スリープから復帰" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="12" /></td>
+								<td class="message"><input type="text" value="ログオン:OS起動" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="13" /></td>
+								<td class="message"><input type="text" value="ログオン:起動" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="7001" /></td>
+								<td class="message"><input type="text" value="ログオン:起動" /></td>
+							</tr>
+							<tr>
+								<td class="event_id"><input type="number" value="7002" /></td>
+								<td class="message"><input type="text" value="ログオフ:シャットダウン" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div style="margin-top: 10px; border-bottom: 2px solid #fff;">EventLog Output</div>
 			<table id="event_log">
