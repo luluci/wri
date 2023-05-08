@@ -123,13 +123,52 @@
 		}
     </script>
 	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		.body_pane {
+			display: flex;
+			flex-direction: row;
+			margin: 0;
+			padding: 0;
+		}
+		.body_pane .main_pane {
+			width: 100%;
+			background-color:rgb(239, 255, 213);
+			margin: 0;
+			padding: 0;
+		}
+		.body_pane .side_pane {
+			width: 30%;
+			background-color:rgb(239, 255, 213);
+			margin: 0;
+			padding: 0;
+		}
+
+		.body_pane .side_pane .side_item_list {
+			border: 0.5px solid burlywood;
+		}
+
 		.container {
 			display: flex;
 			flex-direction: column;
 		}
+
+		.container .c_header {
+			margin: 0px 10px 10px 10px;
+			background-color: rgba(0, 65, 139, 0.918);
+			border-bottom-left-radius: 10px;
+			border-bottom-right-radius: 5px;
+		}
+		.container .c_header .item {
+			margin: 5px 10px;
+			color: aliceblue;
+		}
+
 		.container .c_item {
-			width: 80%;
-			margin: 10px auto;
+			width: auto;
+			margin: 10px 10px;
 			padding: 20px;
 			background-color: rgba(0, 65, 139, 0.918);
 			border-radius: 20px;
@@ -208,103 +247,123 @@
 	</style>
 </head>
 <body>
-	<div class="container">
-		<div class="c_item">
-			<div class="header">
-				PCロック→モニタOFF
-			</div>
-			<div class="form">
-				<button onclick="afk()">AFK</button>
-			</div>
-		</div>
-		<div class="c_item">
-			<div class="header">
-				Windows EventLog 取得
-			</div>
-			<div class="form">
-				<div>
-					<span>取得ログ数</span>
-					<input id="get_event_log_size" type="number" value="20"/>
-					<button onclick="get_event_log()">Get EventLog</button>
+<div class="body_pane">
+	<div class="main_pane">
+		<div class="container">
+			<div class="c_header">
+				<div class="item">
+					header1
 				</div>
-				<div>
-					<table id="get_event_log_def_table">
-						<thead>
-							<tr>
-								<th class="event_id">EventID</th>
-								<th class="message">Message</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td class="event_id"><input type="number" value="6005" /></td>
-								<td class="message"><input type="text" value="ログオン:起動" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="6006" /></td>
-								<td class="message"><input type="text" value="ログオフ:正常シャットダウン" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="6008" /></td>
-								<td class="message"><input type="text" value="ログオフ:正常ではないシャットダウン" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="6009" /></td>
-								<td class="message"><input type="text" value="ログオン:起動時にブート情報を記録" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="1" /></td>
-								<td class="message"><input type="text" value="ログオフ:スリープ" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="42" /></td>
-								<td class="message"><input type="text" value="ログオン:スリープから復帰" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="12" /></td>
-								<td class="message"><input type="text" value="ログオン:OS起動" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="13" /></td>
-								<td class="message"><input type="text" value="ログオン:起動" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="7001" /></td>
-								<td class="message"><input type="text" value="ログオン:起動" /></td>
-							</tr>
-							<tr>
-								<td class="event_id"><input type="number" value="7002" /></td>
-								<td class="message"><input type="text" value="ログオフ:シャットダウン" /></td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="item">
+					header2
 				</div>
 			</div>
-			<div style="margin-top: 10px; border-bottom: 2px solid #fff;">EventLog Output</div>
-			<table id="event_log">
-				<thead>
-					<tr>
-						<th class="id">ID</th>
-						<th class="message">Message</th>
-						<th class="datetime">DateTime</th>
-					</tr>
-				</thead>
-				<tbody id="log_body">
-					<tr>
-						<td>-</td><td>-</td><td>-</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="c_item">
-			<div class="header">
-				Do nanika
+			<div class="c_item">
+				<div class="header">
+					PCロック→モニタOFF
+				</div>
+				<div class="form">
+					<button onclick="afk()">AFK</button>
+				</div>
 			</div>
-			<div class="form">
-				<button onclick="get_event_log()">nanika</button>
+			<div class="c_item">
+				<div class="header">
+					Windows EventLog 取得
+				</div>
+				<div class="form">
+					<div>
+						<span>取得ログ数</span>
+						<input id="get_event_log_size" type="number" value="20"/>
+						<button onclick="get_event_log()">Get EventLog</button>
+					</div>
+					<div>
+						<table id="get_event_log_def_table">
+							<thead>
+								<tr>
+									<th class="event_id">EventID</th>
+									<th class="message">Message</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="event_id"><input type="number" value="6005" /></td>
+									<td class="message"><input type="text" value="ログオン:起動" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="6006" /></td>
+									<td class="message"><input type="text" value="ログオフ:正常シャットダウン" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="6008" /></td>
+									<td class="message"><input type="text" value="ログオフ:正常ではないシャットダウン" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="6009" /></td>
+									<td class="message"><input type="text" value="ログオン:起動時にブート情報を記録" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="1" /></td>
+									<td class="message"><input type="text" value="ログオフ:スリープ" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="42" /></td>
+									<td class="message"><input type="text" value="ログオン:スリープから復帰" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="12" /></td>
+									<td class="message"><input type="text" value="ログオン:OS起動" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="13" /></td>
+									<td class="message"><input type="text" value="ログオン:起動" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="7001" /></td>
+									<td class="message"><input type="text" value="ログオン:起動" /></td>
+								</tr>
+								<tr>
+									<td class="event_id"><input type="number" value="7002" /></td>
+									<td class="message"><input type="text" value="ログオフ:シャットダウン" /></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div style="margin-top: 10px; border-bottom: 2px solid #fff;">EventLog Output</div>
+				<table id="event_log">
+					<thead>
+						<tr>
+							<th class="id">ID</th>
+							<th class="message">Message</th>
+							<th class="datetime">DateTime</th>
+						</tr>
+					</thead>
+					<tbody id="log_body">
+						<tr>
+							<td>-</td><td>-</td><td>-</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="c_item">
+				<div class="header">
+					Do nanika
+				</div>
+				<div class="form">
+					<button onclick="get_event_log()">nanika</button>
+				</div>
 			</div>
 		</div>
 	</div>
+	<div class="side_pane">
+		<div class="side_item_list" >
+			<ul>
+				<li>item1</li>
+				<li>item2</li>
+			</ul>
+		</div>
+	</div>
+</div>
 
 	<div id="init-message">初期化メッセージ表示</div>
 
