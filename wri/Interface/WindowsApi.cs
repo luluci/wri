@@ -103,7 +103,7 @@ namespace wri.Interface
                             {
                                 logs.Add(new EventLog
                                 {
-                                    EventId = entry.InstanceId,
+                                    InstanceId = entry.InstanceId,
                                     Message = entry.Message,
                                     TimeGenerated = new DateTime(entry.TimeGenerated),
                                 });
@@ -213,7 +213,7 @@ namespace wri.Interface
                             {
                                 logs.Add(new EventLog
                                 {
-                                    EventId = entry.InstanceId,
+                                    InstanceId = entry.InstanceId,
                                     Message = message,
                                     TimeGenerated = new DateTime(entry.TimeGenerated),
                                 });
@@ -246,7 +246,7 @@ namespace wri.Interface
     [ComVisible(true)]
     public class EventLog
     {
-        public long EventId { get; set; }
+        public long InstanceId { get; set; }
         public string Message { get; set; }
         public DateTime TimeGenerated { get; set; }
     }

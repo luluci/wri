@@ -90,11 +90,13 @@
 				let row = document.createElement("tr");
 				// ID作成
 				let tag_id = document.createElement("td");
-				tag_id.textContent = log.EventId;
+				let instance_id = log.InstanceId;
+				let event_id = instance_id & 0xFFFF;
+				tag_id.textContent = event_id;
 				// Message作成
 				let tag_content = document.createElement("td");
-				if (log.EventId in event_dict) {
-					tag_content.textContent = event_dict[log.EventId];
+				if (event_id in event_dict) {
+					tag_content.textContent = event_dict[event_id];
 				} else {
 					tag_content.textContent = log.Message;
 				}
