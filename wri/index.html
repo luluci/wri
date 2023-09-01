@@ -3,6 +3,7 @@
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
 
+	<script type="text/javascript" charset="utf-8" src="./script/WindowList.js"></script>
     <script language="javascript" type="text/javascript">
 		// C#側からAPI登録を実行される。
 		// const wri = chrome.webview.hostObjects.sync.wri;
@@ -361,6 +362,15 @@
 							</tr>
 						</tbody>
 					</table>
+				</div>
+				<div class="c_item">
+					<div class="header">
+						Window操作
+					</div>
+					<div class="form">
+						<button onclick="get_window_list()">Window一覧作成</button>
+						<button onclick="move_window_into_screen()">ウインドウを画面内に移動</button>
+					</div>
 				</div>
 				<div class="c_item">
 					<div class="header">
