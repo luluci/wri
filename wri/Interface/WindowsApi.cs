@@ -69,6 +69,11 @@ namespace wri.Interface
             return list.ToArray();
         }
 
+        public int GetMonitorCount()
+        {
+            return UtilWinApi.GetSystemMetrics(UtilWinApi.SystemMetric.SM_CMONITORS);
+        }
+
         public void GetDisplayInfo()
         {
             foreach (var s in System.Windows.Forms.Screen.AllScreens)
