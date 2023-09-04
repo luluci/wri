@@ -13,5 +13,34 @@ namespace wri
     /// </summary>
     public partial class App : Application
     {
+        [STAThread]
+        public static void Main()
+        {
+            App app = new App();
+            app.InitializeComponent();
+            app.Run();
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            if (e.Args.Count() > 0)
+            {
+                // コマンドライン引数が存在するとき
+                // コンソールアプリモードで処理
+                foreach (string arg in e.Args)
+                {
+                    MessageBox.Show(arg);
+                }
+
+            }
+            else
+            {
+                // コマンドライン引数が存在しないとき
+                // GUI起動
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.Show();
+            }
+        }
     }
+
 }
