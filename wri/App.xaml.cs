@@ -27,11 +27,12 @@ namespace wri
             {
                 // コマンドライン引数が存在するとき
                 // コンソールアプリモードで処理
-                foreach (string arg in e.Args)
-                {
-                    MessageBox.Show(arg);
-                }
-
+                // コンソールにアタッチ
+                Utility.WindowsApi.AttachConsole(-1);
+                Console.WriteLine("<wri.exe コンソールモード>");
+                var cmd = new CommandLine();
+                cmd.Parse(e.Args);
+                Application.Current.Shutdown();
             }
             else
             {

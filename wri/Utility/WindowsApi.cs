@@ -130,6 +130,9 @@ namespace wri.Utility
             SM_REMOTECONTROL = 0x2001,
         }
 
+        [DllImport("Kernel32.dll")]
+        public static extern bool AttachConsole(int processId);
+
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(SystemMetric smIndex);
 

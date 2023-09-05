@@ -56,6 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="CommandLine.cs" />
     <Compile Include="Interface\EntryPoint.cs" />
     <Compile Include="Interface\WindowsApi.cs" />
     <Compile Include="MainWindowViewModel.cs" />
