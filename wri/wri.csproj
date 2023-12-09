@@ -58,6 +58,8 @@
     </Page>
     <Compile Include="CommandLine.cs" />
     <Compile Include="Interface\EntryPoint.cs" />
+    <Compile Include="Interface\IO.cs" />
+    <Compile Include="Interface\System.cs" />
     <Compile Include="Interface\WindowsApi.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Utility\BindableBase.cs" />

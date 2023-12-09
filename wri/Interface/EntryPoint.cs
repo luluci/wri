@@ -21,11 +21,15 @@ namespace wri.Interface
         public int TestVar2 { get; set; } = 22;
 
         // Interfaceクラスインスタンス
+        public System system { get; set; }
         public WindowsApi win { get; set; }
+        public IO io { get; set; }
 
         public EntryPoint()
         {
+            system = new System();
             win = new WindowsApi();
+            io = new IO();
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
@@ -33,7 +37,7 @@ namespace wri.Interface
 
         public void MessageBox(string msg)
         {
-            System.Windows.MessageBox.Show(msg);
+            global::System.Windows.MessageBox.Show(msg);
         }
     }
 }

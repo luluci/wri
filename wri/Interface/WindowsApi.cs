@@ -76,7 +76,7 @@ namespace wri.Interface
 
         public void GetDisplayInfo()
         {
-            foreach (var s in System.Windows.Forms.Screen.AllScreens)
+            foreach (var s in global::System.Windows.Forms.Screen.AllScreens)
             {
                 Console.WriteLine("{0} {1}", s.DeviceName, s.Bounds);
             }
@@ -174,7 +174,7 @@ namespace wri.Interface
             
             return true;
         }
-        public void UpdateScreenInfo(WindowInfo info, int id, System.Windows.Forms.Screen screen, System.Drawing.Point pt)
+        public void UpdateScreenInfo(WindowInfo info, int id, global::System.Windows.Forms.Screen screen, global::System.Drawing.Point pt)
         {
             info.ScreenId = id;
             info.DisplayDeviceName = screen.DeviceName;
@@ -182,13 +182,13 @@ namespace wri.Interface
             info.ScreenX = pt.X - screen.Bounds.X;
             info.ScreenY = pt.Y - screen.Bounds.Y;
         }
-        public void CheckScreenInfo(WindowInfo info, System.Drawing.Rectangle rect)
+        public void CheckScreenInfo(WindowInfo info, global::System.Drawing.Rectangle rect)
         {
             int screen_id = 0;
             int near_screen_diff = int.MaxValue;
             int near_screen_id = -1;
 
-            foreach (var s in System.Windows.Forms.Screen.AllScreens)
+            foreach (var s in global::System.Windows.Forms.Screen.AllScreens)
             {
                 // Rectangle
                 if (s.Bounds.Contains(rect.Location))
@@ -215,8 +215,8 @@ namespace wri.Interface
             info.ScreenId = -1;
             // 近傍スクリーン記憶
             info.NearScreenId = near_screen_id;
-            info.NearScreenX = System.Windows.Forms.Screen.AllScreens[near_screen_id].Bounds.X;
-            info.NearScreenY = System.Windows.Forms.Screen.AllScreens[near_screen_id].Bounds.Y;
+            info.NearScreenX = global::System.Windows.Forms.Screen.AllScreens[near_screen_id].Bounds.X;
+            info.NearScreenY = global::System.Windows.Forms.Screen.AllScreens[near_screen_id].Bounds.Y;
         }
 
         public void EnumWindow2()
@@ -224,7 +224,7 @@ namespace wri.Interface
             var placement = new UtilWinApi.WINDOWPLACEMENT();
             placement.length = Marshal.SizeOf(placement);
 
-            foreach (var process in System.Diagnostics.Process.GetProcesses())
+            foreach (var process in global::System.Diagnostics.Process.GetProcesses())
             {
                 IntPtr hWnd = process.MainWindowHandle;
                 if (hWnd != IntPtr.Zero)
@@ -351,9 +351,9 @@ namespace wri.Interface
 
             try
             {
-                if (System.Diagnostics.EventLog.Exists(logName, machineName))
+                if (global::System.Diagnostics.EventLog.Exists(logName, machineName))
                 {
-                    using (var log = new System.Diagnostics.EventLog(logName, machineName))
+                    using (var log = new global::System.Diagnostics.EventLog(logName, machineName))
                     {
                         int max = log.Entries.Count;
                         for (int idx = max - 1; idx >= 0; idx--)
@@ -412,9 +412,9 @@ namespace wri.Interface
 
             try
             {
-                if (System.Diagnostics.EventLog.Exists(logName, machineName))
+                if (global::System.Diagnostics.EventLog.Exists(logName, machineName))
                 {
-                    using (var log = new System.Diagnostics.EventLog(logName, machineName))
+                    using (var log = new global::System.Diagnostics.EventLog(logName, machineName))
                     {
                         int max = log.Entries.Count;
                         for (int idx = max-1; idx>=0; idx--)                        
@@ -559,7 +559,7 @@ namespace wri.Interface
         public int Second { get; set; }
         public int Millisecond { get; set; }
 
-        public DateTime(System.DateTime dt)
+        public DateTime(global::System.DateTime dt)
         {
             Year = dt.Year;
             Month = dt.Month;
