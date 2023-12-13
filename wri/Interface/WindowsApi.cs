@@ -360,12 +360,13 @@ namespace wri.Interface
                         //foreach (System.Diagnostics.EventLogEntry entry in log.Entries)
                         {
                             var entry = log.Entries[idx];
+                            var event_id = entry.InstanceId & 0xFFFF;
 
                             // filter
                             log_flag = true;
                             if (enable_filter)
                             {
-                                if (!filter_dict.ContainsKey((int)entry.InstanceId))
+                                if (!filter_dict.ContainsKey((int)event_id))
                                 {
                                     log_flag = false;
                                 }
@@ -376,6 +377,7 @@ namespace wri.Interface
                                 logs.Add(new EventLog
                                 {
                                     InstanceId = entry.InstanceId,
+                                    EventId = event_id,
                                     Message = entry.Message,
                                     TimeGenerated = new DateTime(entry.TimeGenerated),
                                 });
@@ -543,6 +545,7 @@ namespace wri.Interface
     public class EventLog
     {
         public long InstanceId { get; set; }
+        public long EventId { get; set; }
         public string Message { get; set; }
         public DateTime TimeGenerated { get; set; }
     }

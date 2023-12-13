@@ -107,7 +107,8 @@
 				// ID作成
 				let tag_id = document.createElement("td");
 				let instance_id = log.InstanceId;
-				let event_id = instance_id & 0xFFFF;
+				//let event_id = instance_id & 0xFFFF;
+				let event_id = log.EventId;
 				tag_id.textContent = event_id;
 				// Message作成
 				let tag_content = document.createElement("td");
