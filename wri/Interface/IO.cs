@@ -4,10 +4,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace wri.Interface
 {
-    using UtilWinApi = Utility.WindowsApi;
+    using UtilWinApi = global::Utility.WindowsApi;
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
@@ -22,6 +23,10 @@ namespace wri.Interface
             directory = new DirectoryIf();
         }
 
+        public void Save()
+        {
+
+        }
     }
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
@@ -65,6 +70,21 @@ namespace wri.Interface
                 return fd;
             }
             return null;
+        }
+
+        public void SaveTo(string path, string text)
+        {
+            try
+            {
+                using (var sw = new global::System.IO.StreamWriter(path, false))//, Encoding.UTF8
+                {
+                    sw.Write(text);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void Dispose()

@@ -1,0 +1,133 @@
+
+
+.body_pane {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+}
+
+.body_pane .main_pane {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.body_pane .side_pane {
+    width: 30%;
+    margin: 0;
+    padding: 0;
+}
+
+.body_pane .side_pane .side_item_list {
+    border: 0.5px solid burlywood;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.container .c_header {
+    margin: 0px 10px 10px 10px;
+    background-color: rgba(0, 65, 139, 0.918);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 5px;
+}
+
+.container .c_header .item {
+    margin: 5px 10px;
+    color: aliceblue;
+}
+
+.container .c_item {
+    width: auto;
+    margin: 10px 10px;
+    padding: 20px;
+    background-color: rgba(0, 65, 139, 0.918);
+    border-radius: 20px;
+    color: aliceblue;
+}
+
+.container .c_item .header {
+    border-bottom: 1px solid #fff;
+    margin-bottom: 10px;
+    padding: 1px 10px;
+}
+
+.container .c_item .form {
+    border: 1px dashed rgba(163, 169, 177, 0.918);
+    border-radius: 10px;
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: rgba(11, 51, 97, 0.918);
+}
+
+#get_event_log_def_table {
+    margin: 10px 10px;
+    border-collapse: collapse;
+}
+
+#get_event_log_def_table thead {
+    padding: 2px 10px;
+    font-size: 15px;
+}
+
+#get_event_log_def_table thead th {
+    border-radius: 15px;
+    border: 1px solid #ffffffb2;
+    padding: 2px 10px;
+    font-size: 15px;
+}
+
+#get_event_log_def_table thead th.event_id,
+#get_event_log_def_table tbody td.event_id {
+    width: 100px;
+    padding: 2px 5px;
+    border: 1px solid #ffffffb2;
+}
+
+#get_event_log_def_table thead th.message,
+#get_event_log_def_table tbody td.message {
+    width: 200px;
+    padding: 2px 5px;
+    border: 1px solid #ffffffb2;
+}
+
+#get_event_log_def_table tbody td input {
+    width: inherit;
+    font-size: 12px;
+}
+
+#event_log {
+    margin: 10px 10px;
+    border-collapse: collapse;
+}
+
+#event_log thead th {
+    border-bottom: 2px solid #fff;
+    padding: 2px 10px;
+    font-size: 15px;
+}
+
+#event_log thead th.id {
+    width: 50px;
+}
+
+#event_log thead th.message {
+    width: auto;
+}
+
+#event_log thead th.datetime {
+    width: 130px;
+}
+
+#event_log tbody tr {
+    border-bottom: 1px dashed #fff;
+    padding: 2px 10px;
+    font-size: 12px;
+}
+
+#event_log tbody tr td {
+    padding: 2px 10px;
+}

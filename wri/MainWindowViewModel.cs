@@ -19,6 +19,7 @@ namespace wri
         // 
         MainWindow window;
         //
+        public ReactivePropertySlim<string> WindowTitle { get; set; }
         public ReactivePropertySlim<Uri> ScriptPath { get; set; }
         // WebView2
         public WebView2 WebView2;
@@ -35,16 +36,16 @@ namespace wri
             string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             CoreWebView2Environment.SetLoaderDllFolderPath(rootPath);
 
+            WindowTitle = new ReactivePropertySlim<string>("wri");
+            WindowTitle.AddTo(Disposables);
+
             // index.htmlへのパスを作成
             //string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             //string SettingPath = rootPath + @"\Script";
-            var uri = new Uri($@"{rootPath}\index.html");
+            var uri = new Uri($@"{rootPath}\apps\index.html");
 
             ScriptPath = new ReactivePropertySlim<Uri>(uri);
             ScriptPath.AddTo(Disposables);
-
-            // 適切なタイミングで初期化する
-            EntryPoint = new Interface.EntryPoint();
         }
 
         public async Task InitAsync(MainWindow window)
@@ -58,9 +59,11 @@ namespace wri
             // JavaScript側からの呼び出し
             WebView2.WebMessageReceived += webView_WebMessageReceived;
 
+            // 適切なタイミングで初期化する
+            EntryPoint = new Interface.EntryPoint();
+
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
-
         }
 
         private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
@@ -70,19 +73,30 @@ namespace wri
 
         private async void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
         {
-            //webView.CoreWebView2.PostWebMessageAsString("C#からのデータ送信");
+            try
+            {
+                //webView.CoreWebView2.PostWebMessageAsString("C#からのデータ送信");
+                WindowTitle.Value = "wri - " + WebView2.Source.ToString();
+                EntryPoint.Source = WebView2.Source;
+                EntryPoint.SourcePath = WebView2.Source.LocalPath;
 
-            // 表示完了時にコールされる。F5による更新時にもコールされる。
-            // このときObjectの登録等も初期化されるため、毎回登録する。
-            // API登録
-            // 登録するインスタンスのclassはアクセスレベルをpublicにしないとエラー
-            // wriアプリのAPIなのでwriとしておく
-            WebView2.CoreWebView2.AddHostObjectToScript("wri", EntryPoint);
+                // 表示完了時にコールされる。F5による更新時にもコールされる。
+                // このときObjectの登録等も初期化されるため、毎回登録する。
+                // API登録
+                // 登録するインスタンスのclassはアクセスレベルをpublicにしないとエラー
+                // wriアプリのAPIなのでwriとしておく
+                WebView2.CoreWebView2.AddHostObjectToScript("wri", EntryPoint);
 
-            // WebView2/index.htmlのJavaScript初期化
-            await RunScriptLoaded("const wri = chrome.webview.hostObjects.sync.wri; true");
-            await RunScriptLoaded("const wri_async = chrome.webview.hostObjects.wri; true");
-            await RunScriptLoaded("csLoaded()");
+                // WebView2/index.htmlのJavaScript初期化
+                await RunScriptLoaded("const wri = chrome.webview.hostObjects.sync.wri; true");
+                await RunScriptLoaded("const wri_async = chrome.webview.hostObjects.wri; true");
+                await RunScriptLoaded("csLoaded()");
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "初期化エラー");
+                //System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
         }
 
         private void webView_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)

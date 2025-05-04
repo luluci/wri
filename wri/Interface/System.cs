@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace wri.Interface
 {
-    using UtilWinApi = Utility.WindowsApi;
+    using UtilWinApi = global::Utility.WindowsApi;
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]

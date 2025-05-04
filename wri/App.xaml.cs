@@ -28,7 +28,7 @@ namespace wri
                 // コマンドライン引数が存在するとき
                 // コンソールアプリモードで処理
                 // コンソールにアタッチ
-                Utility.WindowsApi.AttachConsole(-1);
+                global::Utility.WindowsApi.AttachConsole(-1);
                 Console.WriteLine("<wri.exe コンソールモード>");
                 var cmd = new CommandLine();
                 cmd.Parse(e.Args);

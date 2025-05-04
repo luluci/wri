@@ -20,6 +20,10 @@ namespace wri.Interface
         public int TestVar1 = 11;
         public int TestVar2 { get; set; } = 22;
 
+        // WebView2側に公開しない変数:プロパティにしなければ見えないはず
+        public Uri Source;
+        public string SourcePath { get; set; } = string.Empty;  
+
         // Interfaceクラスインスタンス
         public System system { get; set; }
         public WindowsApi win { get; set; }
@@ -34,6 +38,7 @@ namespace wri.Interface
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
         }
+
 
         public void MessageBox(string msg)
         {

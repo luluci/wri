@@ -6,7 +6,8 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:wri"
         mc:Ignorable="d"
-        Title="wri" Height="450" Width="800" Loaded="Window_Loaded">
+        d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
+        Title="{Binding WindowTitle.Value}" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <wv2:WebView2 Name="WebView2" Source="{Binding ScriptPath.Value}"/>
     </Grid>
