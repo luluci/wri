@@ -12,6 +12,7 @@ using Microsoft.Web.WebView2.Wpf;
 
 namespace wri
 {
+    using System.Windows.Controls;
     using Utility;
 
     class MainWindowViewModel : BindableBase, IDisposable
@@ -21,8 +22,8 @@ namespace wri
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
         public ReactivePropertySlim<Uri> ScriptPath { get; set; }
-        // WebView2
-        public WebView2 WebView2;
+        // WebView2 WebView2CompositionControl
+        public WebView2CompositionControl WebView2;
         public Interface.EntryPoint EntryPoint { get; set; }
 
         public MainWindowViewModel(MainWindow window)
@@ -51,6 +52,9 @@ namespace wri
         public async Task InitAsync(MainWindow window)
         {
             window.Show();
+
+            window.toolbar.Height = 0;
+
             // WebView2初期化処理
             WebView2 = window.WebView2;
             // 初期化完了ハンドラ登録
@@ -59,11 +63,51 @@ namespace wri
             // JavaScript側からの呼び出し
             WebView2.WebMessageReceived += webView_WebMessageReceived;
 
+            //var opt = WebView2.CreationProperties;
+
             // 適切なタイミングで初期化する
             EntryPoint = new Interface.EntryPoint();
 
+            //WebView2.AllowExternalDrop = true;
+            //WebView2.AllowDrop = true;
+            //window.Base.DragEnter += (object sender, System.Windows.DragEventArgs e) =>
+            //{
+            //    if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            //    {
+            //        e.Effects = System.Windows.DragDropEffects.Copy;
+            //    }
+            //    else
+            //    {
+            //        e.Effects = System.Windows.DragDropEffects.None;
+            //    }
+            //};
+            window.Base.DragOver += (object sender, System.Windows.DragEventArgs e) =>
+            {
+                if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+                {
+                    e.Effects = System.Windows.DragDropEffects.Copy;
+                }
+                else
+                {
+                    e.Effects = System.Windows.DragDropEffects.None;
+                }
+            };
+            //window.Base.Drop += (object sender, System.Windows.DragEventArgs e) =>
+            //{
+            //    if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            //    {
+            //        e.Effects = System.Windows.DragDropEffects.Copy;
+            //    }
+            //    else
+            //    {
+            //        e.Effects = System.Windows.DragDropEffects.None;
+            //    }
+            //};
+
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
+
+            //WebView2.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
         }
 
         private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
@@ -117,6 +161,33 @@ namespace wri
                 }
                 await Task.Delay(100);
             }
+        }
+
+        //private void CoreWebView2_PermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
+        //{
+        //    // Example: Automatically grant geolocation permission
+        //    if (e.PermissionKind == CoreWebView2PermissionKind.FileReadWrite)
+        //    {
+        //        e.State = CoreWebView2PermissionState.Allow;
+        //    }
+        //    else
+        //    {
+        //        // Deny other permissions by default
+        //        e.State = CoreWebView2PermissionState.Deny;
+        //    }
+        //}
+
+        public bool OnClosing()
+        {
+            // WebView2の終了を防止する
+            // true:アプリ終了を防ぐ
+            // false:アプリ終了を許可する
+            if (EntryPoint.preventClose)
+            {
+                System.Windows.MessageBox.Show(EntryPoint.preventCloseMsg, "wri");
+                return true;
+            }
+            return false;
         }
 
         #region IDisposable Support

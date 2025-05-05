@@ -19,6 +19,40 @@
 				//tag.textContent = "初期化完了";
 				const elem = document.getElementsByClassName("c_header")[0].getElementsByClassName("item")[0];
 				elem.textContent += " update!";
+
+                //const dd_elems = Array.from(document.getElementsByClassName("dandd_area"));
+      //          const dd_elems = Array.from(document.getElementsByTagName("body"));
+      //          dd_elems.forEach(element => {
+      //              element.addEventListener("dragover", (event) => {
+      //                  event.preventDefault();
+      //              }, false);
+      //              element.addEventListener("drop", (event) => {
+						//event.preventDefault();
+						//const items = event.dataTransfer.items;
+						//if (items.length > 0) {
+						//	const item = items[0];
+      //                      const file = item.getAsFile();
+      //                      const handle = item.getAsFileSystemHandle().then((handle) => {
+      //                          handle.getFile().then((file) => {
+      //                              console.log(file);
+      //                          });
+      //                          console.log(handle);
+      //                      });
+      //                      item.getAsString((str) => {
+      //                          console.log(str);
+						//	});
+						//}
+      //                  const files = event.dataTransfer.files;
+      //                  if (files.length > 0) {
+      //                      const file = files[0];
+      //                      // ファイルのパスを取得
+      //                      const filePath = file.path;
+      //                      // C#側にファイルパスを渡す
+      //                      // wri.openFile(filePath);
+      //                      console.log(filePath);
+      //                  }
+      //              }, false);
+      //          });
 			} catch (msg) {
 				return false;
 			}
@@ -28,7 +62,17 @@
 		// ↑ロジックを理解した上で変更すること↑
 
 		// 
+        // F5キーによるreloadを禁止
+        document.addEventListener("keydown", function (e) {
+			if ((e.which || e.keyCode) == 116) {
+				var result = window.confirm('よろしいですか？');
+                if (result === true) {
+                    e.preventDefault();
+				} else {
 
+				}
+            }
+        });
 
 		const test_func = () => {
 			let hoge = "str";
@@ -84,7 +128,7 @@
 						<div class="header">
 							HTMLを開く
 						</div>
-						<div class="form">
+						<div class="form dandd_area">
 							<span>Drag & Drop</span>
 						</div>
 					</div>

@@ -22,7 +22,11 @@ namespace wri.Interface
 
         // WebView2側に公開しない変数:プロパティにしなければ見えないはず
         public Uri Source;
-        public string SourcePath { get; set; } = string.Empty;  
+        public string SourcePath { get; set; } = string.Empty;
+
+        // アプリ制御フラグ
+        public bool preventClose { get; set; } = false; // true:アプリ終了を防ぐ
+        public string preventCloseMsg { get; set; } = string.Empty; // 終了防止メッセージ
 
         // Interfaceクラスインスタンス
         public System system { get; set; }

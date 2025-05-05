@@ -108,7 +108,7 @@
       <Version>3.3.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Web.WebView2">
-      <Version>1.0.1661.34</Version>
+      <Version>1.0.3179.45</Version>
     </PackageReference>
     <PackageReference Include="ReactiveProperty.WPF">
       <Version>9.1.2</Version>
@@ -121,6 +121,7 @@
     <Content Include="apps\TestWinAPI.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="apps\WBS.html" />
     <Content Include="script\Utility.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

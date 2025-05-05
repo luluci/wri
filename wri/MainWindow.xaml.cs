@@ -44,5 +44,9 @@ namespace wri
             }
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = vm.OnClosing();
+        }
     }
 }

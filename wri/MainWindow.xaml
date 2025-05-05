@@ -7,8 +7,15 @@
         xmlns:local="clr-namespace:wri"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
-        Title="{Binding WindowTitle.Value}" Height="450" Width="800" Loaded="Window_Loaded">
-    <Grid>
-        <wv2:WebView2 Name="WebView2" Source="{Binding ScriptPath.Value}"/>
+        Title="{Binding WindowTitle.Value}" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid x:Name="Base" AllowDrop="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="toolbar" Grid.Row="0">
+            <Label Content="test"/>
+        </Grid>
+        <wv2:WebView2CompositionControl Grid.Row="1" Name="WebView2" Source="{Binding ScriptPath.Value}" AllowExternalDrop="False" />
     </Grid>
 </Window>
