@@ -72,8 +72,76 @@ const addFunctionEditable = (parent) => {
         const row = rows[id];
         // functionの変更対象
         const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name);
+        applyEditable(name, null);
 
+        // phaseに適用
+        addPhaseEditable(row);
+    }
+}
+const addPhaseEditable = (parent) => {
+    const rows = parent.getElementsByClassName("phase");
+    // phaseの前にインジケーターを追加
+    for (let id = 0; id < rows.length; id++) {
+        const row = rows[id];
+        // phaseの変更対象
+        const name = row.querySelector(".caption .work_name .text");
+        applyEditable(name, null);
+
+        // work_packageに適用
+        addWorkEditable(row);
+    }
+}
+const addWorkEditable = (parent) => {
+    const rows = parent.getElementsByClassName("work_package");
+    for (let id = 0; id < rows.length; id++) {
+        const row = rows[id];
+        // work_packageの変更対象
+        const name = row.querySelector(".caption .work_name .text");
+        applyEditable(name, null);
+        const owner = row.querySelector(".caption .work_owner .text");
+        applyEditable(owner, null);
+        const plan_date_begin = row.querySelector(".caption .work_plan_date_begin .text");
+        applyEditable(plan_date_begin, null);
+        const plan_date_end = row.querySelector(".caption .work_plan_date_end .text");
+        applyEditable(plan_date_end, null);
+        const actual_date_begin = row.querySelector(".caption .work_actual_date_begin .text");
+        applyEditable(actual_date_begin, null);
+        const actual_date_end = row.querySelector(".caption .work_actual_date_end .text");
+        applyEditable(actual_date_end, null);
+        const plan_man_hour = row.querySelector(".caption .work_plan_man_hour .text");
+        applyEditable(plan_man_hour, null);
+        const actual_man_hour = row.querySelector(".caption .work_actual_man_hour .text");
+        applyEditable(actual_man_hour, null);
+        const progress = row.querySelector(".caption .work_progress .value");
+        applyEditable(progress, null);
+
+        // taskに適用
+        addTaskEditable(row);
+    }
+}
+const addTaskEditable = (parent) => {
+    const rows = parent.getElementsByClassName("task");
+    for (let id = 0; id < rows.length; id++) {
+        const row = rows[id];
+        // taskの変更対象
+        const name = row.querySelector(".work_name .text");
+        applyEditable(name, null);
+        const owner = row.querySelector(".work_owner .text");
+        applyEditable(owner, null);
+        const plan_date_begin = row.querySelector(".work_plan_date_begin .text");
+        applyEditable(plan_date_begin, null);
+        const plan_date_end = row.querySelector(".work_plan_date_end .text");
+        applyEditable(plan_date_end, null);
+        const actual_date_begin = row.querySelector(".work_actual_date_begin .text");
+        applyEditable(actual_date_begin, null);
+        const actual_date_end = row.querySelector(".work_actual_date_end .text");
+        applyEditable(actual_date_end, null);
+        const plan_man_hour = row.querySelector(".work_plan_man_hour .text");
+        applyEditable(plan_man_hour, null);
+        const actual_man_hour = row.querySelector(".work_actual_man_hour .text");
+        applyEditable(actual_man_hour, null);
+        const progress = row.querySelector(".work_progress .value");
+        applyEditable(progress, null);
     }
 }
 
