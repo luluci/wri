@@ -125,6 +125,7 @@
     <Content Include="script\Utility.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="script\WBS.js" />
     <Content Include="script\WindowList.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
