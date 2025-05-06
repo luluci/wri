@@ -119,36 +119,76 @@
 			grid-column: 4;
 			text-align: right;
 			font-size: 0.9em;
+			min-height: 1em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_plan_date_end {
 			padding: 1px 8px;
 			grid-column: 5;
 			text-align: right;
 			font-size: 0.9em;
+			min-height: 1em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_actual_date_begin {
 			padding: 1px 8px;
 			grid-column: 4;
 			text-align: right;
 			font-size: 0.9em;
+			min-height: 1em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_actual_date_end {
 			padding: 1px 8px;
 			grid-column: 5;
 			text-align: right;
 			font-size: 0.9em;
+			min-height: 1em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_plan_man_hour {
 			padding: 1px 8px;
 			grid-column: 6;
 			text-align: right;
 			font-size: 0.9em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_actual_man_hour {
 			padding: 1px 8px;
 			grid-column: 6;
 			text-align: right;
 			font-size: 0.9em;
+
+			display:table;
+			& .text {
+				display:table-cell;
+				vertical-align:middle;
+			}
 		}
 		.work_progress {
 			padding: 1px 8px;
@@ -227,8 +267,8 @@
 									color: #000;
 									border-top: 1px solid rgb(0, 65, 139);
 								}
-								& .work_name {
-									padding-left: 1em;
+								& .work_name .text {
+									text-indent: 1em;
 								}
 								& .work_actual_date_begin,
 								& .work_actual_date_end,
@@ -250,8 +290,8 @@
 											background-color:rgb(243, 255, 223);
 											color: #000;
 										}
-										& .work_name {
-											padding-left: 2em;
+										& .work_name .text {
+											text-indent: 2em;
 										}
 									}
 
@@ -269,7 +309,7 @@
 												background-color:rgb(243, 255, 223);
 											}
 											& .work_name {
-												padding-left: 3em;
+												text-indent: 3em;
 												border-right: 1px solid rgb(0, 65, 139);
 												background-color:rgb(243, 255, 223);
 											}
@@ -301,12 +341,12 @@
 			<div class="work_id"><span class="text">ID</span></div>
 			<div class="work_name"><span class="text">タスク名</span></div>
 			<div class="work_owner"><span class="text">担当者</span></div>
-			<div class="work_plan_date_begin">見積 開始日</div>
-			<div class="work_plan_date_end">終了日</div>
-			<div class="work_actual_date_begin">実績 開始日</div>
-			<div class="work_actual_date_end">終了日</div>
-			<div class="work_plan_man_hour">工数</div>
-			<div class="work_actual_man_hour">(hr)</div>
+			<div class="work_plan_date_begin"><span class="text">見積 開始日</span></div>
+			<div class="work_plan_date_end"><span class="text">終了日</span></div>
+			<div class="work_actual_date_begin"><span class="text">実績 開始日</span></div>
+			<div class="work_actual_date_end"><span class="text">終了日</span></div>
+			<div class="work_plan_man_hour"><span class="text">工数</span></div>
+			<div class="work_actual_man_hour"><span class="text">(hr)</span></div>
 			<div class="work_progress"><span class="text">進捗<br>(%)</span></div>
 		</div>
 		<div class="items">
@@ -315,12 +355,12 @@
 					<div class="work_id"><span class="text">ID</span></div>
 					<div class="work_name"><span class="text">Function_1</span></div>
 					<div class="work_owner"><span class="text"></span></div>
-					<div class="work_plan_date_begin"></div>
-					<div class="work_plan_date_end"></div>
-					<div class="work_actual_date_begin"></div>
-					<div class="work_actual_date_end"></div>
-					<div class="work_plan_man_hour"></div>
-					<div class="work_actual_man_hour"></div>
+					<div class="work_plan_date_begin"><span class="text"></span></div>
+					<div class="work_plan_date_end"><span class="text"></span></div>
+					<div class="work_actual_date_begin"><span class="text"></span></div>
+					<div class="work_actual_date_end"><span class="text"></span></div>
+					<div class="work_plan_man_hour"><span class="text"></span></div>
+					<div class="work_actual_man_hour"><span class="text"></span></div>
 					<div class="work_progress"><span class="value"></span></div>
 				</div>
 				<div class="items">
@@ -329,12 +369,12 @@
 							<div class="work_id"><span class="text">ID</span></div>
 							<div class="work_name"><span class="text">Phase_1</span></div>
 							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"></div>
-							<div class="work_plan_date_end"></div>
-							<div class="work_actual_date_begin"></div>
-							<div class="work_actual_date_end"></div>
-							<div class="work_plan_man_hour"></div>
-							<div class="work_actual_man_hour"></div>
+							<div class="work_plan_date_begin"><span class="text"></span></div>
+							<div class="work_plan_date_end"><span class="text"></span></div>
+							<div class="work_actual_date_begin"><span class="text"></span></div>
+							<div class="work_actual_date_end"><span class="text"></span></div>
+							<div class="work_plan_man_hour"><span class="text"></span></div>
+							<div class="work_actual_man_hour"><span class="text"></span></div>
 							<div class="work_progress"><span class="value"></span></div>
 						</div>
 						<div class="items">
@@ -343,10 +383,10 @@
 									<div class="work_id"><span class="text">ID</span></div>
 									<div class="work_name"><span class="text">WorkPackage_1_1</span></div>
 									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin">xx/xx</div>
-									<div class="work_plan_date_end">xx/xx</div>
-									<div class="work_actual_date_begin">xx/xx</div>
-									<div class="work_actual_date_end">xx/xx</div>
+									<div class="work_plan_date_begin"><span class="text">xx/xx</span></div>
+									<div class="work_plan_date_end"><span class="text">xx/xx</span></div>
+									<div class="work_actual_date_begin"><span class="text">xx/xx</span></div>
+									<div class="work_actual_date_end"><span class="text">xx/xx</span></div>
 									<div class="work_plan_man_hour">0hr</div>
 									<div class="work_actual_man_hour">0hr</div>
 									<div class="work_progress"><span class="value">0%</span></div>
@@ -356,10 +396,10 @@
 										<div class="work_id"><span class="text">ID</span></div>
 										<div class="work_name"><span class="text">WBS_Task_1_1_1</span></div>
 										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin">xx/xx</div>
-										<div class="work_plan_date_end">xx/xx</div>
-										<div class="work_actual_date_begin">xx/xx</div>
-										<div class="work_actual_date_end">xx/xx</div>
+										<div class="work_plan_date_begin"><span class="text"></span></div>
+										<div class="work_plan_date_end"><span class="text"></span></div>
+										<div class="work_actual_date_begin"><span class="text"></span></div>
+										<div class="work_actual_date_end"><span class="text"></span></div>
 										<div class="work_plan_man_hour">0hr</div>
 										<div class="work_actual_man_hour">0hr</div>
 										<div class="work_progress"><span class="value">0%</span></div>
@@ -368,12 +408,12 @@
 										<div class="work_id"><span class="text">ID</span></div>
 										<div class="work_name"><span class="text">WBS_Task_1_1_2</span></div>
 										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin">xx/xx</div>
-										<div class="work_plan_date_end">xx/xx</div>
-										<div class="work_actual_date_begin">xx/xx</div>
-										<div class="work_actual_date_end">xx/xx</div>
-										<div class="work_plan_man_hour">0hr</div>
-										<div class="work_actual_man_hour">0hr</div>
+										<div class="work_plan_date_begin"><span class="text"></span></div>
+										<div class="work_plan_date_end"><span class="text"></span></div>
+										<div class="work_actual_date_begin"><span class="text"></span></div>
+										<div class="work_actual_date_end"><span class="text"></span></div>
+										<div class="work_plan_man_hour"><span class="text"></span></div>
+										<div class="work_actual_man_hour"><span class="text">0</span></div>
 										<div class="work_progress"><span class="value">0%</span></div>
 									</div>
 								</div>
@@ -385,12 +425,12 @@
 							<div class="work_id"><span class="text">ID</span></div>
 							<div class="work_name"><span class="text">Phase_2</span></div>
 							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"></div>
-							<div class="work_plan_date_end"></div>
-							<div class="work_actual_date_begin"></div>
-							<div class="work_actual_date_end"></div>
-							<div class="work_plan_man_hour"></div>
-							<div class="work_actual_man_hour"></div>
+							<div class="work_plan_date_begin"><span class="text"></span></div>
+							<div class="work_plan_date_end"><span class="text"></span></div>
+							<div class="work_actual_date_begin"><span class="text"></span></div>
+							<div class="work_actual_date_end"><span class="text"></span></div>
+							<div class="work_plan_man_hour"><span class="text"></span></div>
+							<div class="work_actual_man_hour"><span class="text"></span></div>
 							<div class="work_progress"><span class="value"></span></div>
 						</div>
 						<div class="items">
@@ -399,12 +439,12 @@
 									<div class="work_id"><span class="text">ID</span></div>
 									<div class="work_name"><span class="text">WorkPackage_2_1</span></div>
 									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin">xx/xx</div>
-									<div class="work_plan_date_end">xx/xx</div>
-									<div class="work_actual_date_begin">xx/xx</div>
-									<div class="work_actual_date_end">xx/xx</div>
-									<div class="work_plan_man_hour">0hr</div>
-									<div class="work_actual_man_hour">0hr</div>
+									<div class="work_plan_date_begin"><span class="text"></span></div>
+									<div class="work_plan_date_end"><span class="text"></span></div>
+									<div class="work_actual_date_begin"><span class="text"></span></div>
+									<div class="work_actual_date_end"><span class="text"></span></div>
+									<div class="work_plan_man_hour"><span class="text"></span></div>
+									<div class="work_actual_man_hour"><span class="text">0</span></div>
 									<div class="work_progress"><span class="value">0%</span></div>
 								</div>
 								<div class="items">
@@ -412,24 +452,24 @@
 										<div class="work_id"><span class="text">ID</span></div>
 										<div class="work_name"><span class="text">WBS_Task_2_1_1</span></div>
 										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin">xx/xx</div>
-										<div class="work_plan_date_end">xx/xx</div>
-										<div class="work_actual_date_begin">xx/xx</div>
-										<div class="work_actual_date_end">xx/xx</div>
-										<div class="work_plan_man_hour">0hr</div>
-										<div class="work_actual_man_hour">0hr</div>
+										<div class="work_plan_date_begin"><span class="text"></span></div>
+										<div class="work_plan_date_end"><span class="text"></span></div>
+										<div class="work_actual_date_begin"><span class="text"></span></div>
+										<div class="work_actual_date_end"><span class="text"></span></div>
+										<div class="work_plan_man_hour"><span class="text"></span></div>
+										<div class="work_actual_man_hour"><span class="text">0</span></div>
 										<div class="work_progress"><span class="value">0%</span></div>
 									</div>
 									<div class="task" data-func_id="1" data-phase_id="2" data-work_id="1" data-task_id="2">
 										<div class="work_id"><span class="text">ID</span></div>
 										<div class="work_name"><span class="text">WBS_Task_2_1_2</span></div>
 										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin">xx/xx</div>
-										<div class="work_plan_date_end">xx/xx</div>
-										<div class="work_actual_date_begin">xx/xx</div>
-										<div class="work_actual_date_end">xx/xx</div>
-										<div class="work_plan_man_hour">0hr</div>
-										<div class="work_actual_man_hour">0hr</div>
+										<div class="work_plan_date_begin"><span class="text"></span></div>
+										<div class="work_plan_date_end"><span class="text"></span></div>
+										<div class="work_actual_date_begin"><span class="text"></span></div>
+										<div class="work_actual_date_end"><span class="text"></span></div>
+										<div class="work_plan_man_hour"><span class="text"></span></div>
+										<div class="work_actual_man_hour"><span class="text">0</span></div>
 										<div class="work_progress"><span class="value">0%</span></div>
 									</div>
 								</div>
@@ -464,13 +504,13 @@
 					<div class="work_id"><span class="text">ID</span></div>
 					<div class="work_name"><span class="text">Function</span></div>
 					<div class="work_owner"><span class="text"></span></div>
-					<div class="work_plan_date_begin"></div>
-					<div class="work_plan_date_end"></div>
-					<div class="work_actual_date_begin"></div>
-					<div class="work_actual_date_end"></div>
-					<div class="work_plan_man_hour"></div>
-					<div class="work_actual_man_hour"></div>
-					<div class="work_progress"></div>
+					<div class="work_plan_date_begin"><span class="text"></span></div>
+					<div class="work_plan_date_end"><span class="text"></span></div>
+					<div class="work_actual_date_begin"><span class="text"></span></div>
+					<div class="work_actual_date_end"><span class="text"></span></div>
+					<div class="work_plan_man_hour"><span class="text"></span></div>
+					<div class="work_actual_man_hour"><span class="text"></span></div>
+					<div class="work_progress"><span class="text"></span></div>
 				</div>
 				<div class="items">
 					<div class="phase" data-func_id="0" data-phase_id="0">
@@ -478,13 +518,13 @@
 							<div class="work_id"><span class="text">ID</span></div>
 							<div class="work_name"><span class="text">Phase</span></div>
 							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"></div>
-							<div class="work_plan_date_end"></div>
-							<div class="work_actual_date_begin"></div>
-							<div class="work_actual_date_end"></div>
-							<div class="work_plan_man_hour"></div>
-							<div class="work_actual_man_hour"></div>
-							<div class="work_progress"></div>
+							<div class="work_plan_date_begin"><span class="text"></span></div>
+							<div class="work_plan_date_end"><span class="text"></span></div>
+							<div class="work_actual_date_begin"><span class="text"></span></div>
+							<div class="work_actual_date_end"><span class="text"></span></div>
+							<div class="work_plan_man_hour"><span class="text"></span></div>
+							<div class="work_actual_man_hour"><span class="text"></span></div>
+							<div class="work_progress"><span class="text"></span></div>
 						</div>
 						<div class="items">
 							<div class="work_package" data-func_id="0" data-phase_id="0" data-work_id="0">
@@ -492,26 +532,26 @@
 									<div class="work_id"><span class="text">ID</span></div>
 									<div class="work_name"><span class="text">WorkPackage</span></div>
 									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin">xx/xx</div>
-									<div class="work_plan_date_end">xx/xx</div>
-									<div class="work_actual_date_begin">xx/xx</div>
-									<div class="work_actual_date_end">xx/xx</div>
-									<div class="work_plan_man_hour">0hr</div>
-									<div class="work_actual_man_hour">0hr</div>
-									<div class="work_progress">0%</div>
+									<div class="work_plan_date_begin"><span class="text"></span></div>
+									<div class="work_plan_date_end"><span class="text"></span></div>
+									<div class="work_actual_date_begin"><span class="text"></span></div>
+									<div class="work_actual_date_end"><span class="text"></span></div>
+									<div class="work_plan_man_hour"><span class="text"></span></div>
+									<div class="work_actual_man_hour"><span class="text">0</span></div>
+									<div class="work_progress"><span class="text">0</span></div>
 								</div>
 								<div class="items">
 									<div class="task" data-func_id="0" data-phase_id="0" data-work_id="0" data-task_id="0">
 										<div class="work_id"><span class="text">ID</span></div>
 										<div class="work_name"><span class="text">WBS_Task</span></div>
 										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin">xx/xx</div>
-										<div class="work_plan_date_end">xx/xx</div>
-										<div class="work_actual_date_begin">xx/xx</div>
-										<div class="work_actual_date_end">xx/xx</div>
-										<div class="work_plan_man_hour">0hr</div>
-										<div class="work_actual_man_hour">0hr</div>
-										<div class="work_progress">0%</div>
+										<div class="work_plan_date_begin"><span class="text"></span></div>
+										<div class="work_plan_date_end"><span class="text"></span></div>
+										<div class="work_actual_date_begin"><span class="text"></span></div>
+										<div class="work_actual_date_end"><span class="text"></span></div>
+										<div class="work_plan_man_hour"><span class="text"></span></div>
+										<div class="work_actual_man_hour"><span class="text">0</span></div>
+										<div class="work_progress"><span class="text">0</span>%</div>
 									</div>
 								</div>
 							</div>

@@ -1,4 +1,5 @@
-
+// WBS要素
+var wbs = null;
 // toolbar要素
 var toolbar = null;
 var toolbox = null;
@@ -20,6 +21,8 @@ var insert_indicator = null;
 var insert_indicator_list = []; // 表示用に追加したインジケーターのリスト, 後で削除するために使用
 
 document.addEventListener("DOMContentLoaded", function() {
+    wbs = document.getElementById("WBS");
+
     // toolbar初期化
     initToolbar();
 
@@ -32,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
     wbs_template_work = wbs_template.querySelector(".work_package");
     wbs_template_task = wbs_template.querySelector(".task");
 
+    addEditable();
 });
 
 const initToolbar = () => {
@@ -55,6 +59,59 @@ const resetToolbar = () => {
     toolbox.innerHTML = "";
 
     setWbsChanged(false);
+}
+
+const addEditable = () => {
+    // 
+    addFunctionEditable(wbs);
+}
+const addFunctionEditable = (parent) => {
+    const rows = parent.getElementsByClassName("function");
+    // functionの前にインジケーターを追加
+    for (let id = 0; id < rows.length; id++) {
+        const row = rows[id];
+        // functionの変更対象
+        const name = row.querySelector(".caption .work_name .text");
+        applyEditable(name);
+
+    }
+}
+
+const applyEditable = (elem, validator) => {
+    elem.addEventListener("click", (e) => {
+       // クリックしたらinputで編集可能にする
+        if (elem.dataset.value === undefined || elem.dataset.value === "") {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = elem.innerText;
+            elem.dataset.value = elem.innerText;
+            elem.innerText = "";
+            elem.appendChild(input);
+            input.focus();
+            input.addEventListener("blur", () => {
+                if (validator) {
+                    // バリデーションチェック
+                    if (validator(input.value) === false) {
+                        alert("無効な値です。");
+                        input.value = elem.dataset.value;
+                    }
+                }
+                if (elem.dataset.value !== input.value) {
+                    setWbsChanged(true);
+                }
+                elem.dataset.value = "";
+                elem.innerText = input.value;
+            });
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    input.blur();
+                } else if (e.key === "Escape") {
+                    input.value = elem.dataset.value;
+                    input.blur();
+                }
+            });
+        }
+    });
 }
 
 // F5キーによるreloadを禁止
