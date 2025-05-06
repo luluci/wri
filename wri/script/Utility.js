@@ -25,9 +25,14 @@ const writeToClipboard = (text) => {
     });
 }
 
-const save = () => {
+const save = (force = false) => {
     try {
-        var result = window.confirm('変更を保存します。ファイルを上書きしますがよろしいですか？');
+        let result = false;
+        if (force) {
+            result = true;
+        } else {
+            result = window.confirm('変更を保存します。ファイルを上書きしますがよろしいですか？');
+        }
         if (result == true) {
             const path = wri.SourcePath;
             const dom = getDOM();

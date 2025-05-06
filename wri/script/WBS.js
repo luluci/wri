@@ -20,11 +20,8 @@ var insert_indicator = null;
 var insert_indicator_list = []; // 表示用に追加したインジケーターのリスト, 後で削除するために使用
 
 document.addEventListener("DOMContentLoaded", function() {
-    // toolbar表示
-    toolbar = document.getElementById("WBS_toolbar");
-    toolbar.style.setProperty("display", "grid");
-    toolbox = document.getElementById("WBS_toolbar_toolbox");
-    toolbar_status = document.getElementById("WBS_toolbar_status").querySelector(".text");
+    // toolbar初期化
+    initToolbar();
 
     // 挿入位置インジケーター参照取得
     insert_indicator = document.getElementById("work_insert_indicator");
@@ -35,15 +32,30 @@ document.addEventListener("DOMContentLoaded", function() {
     wbs_template_work = wbs_template.querySelector(".work_package");
     wbs_template_task = wbs_template.querySelector(".task");
 
-    // 操作ボタン追加
+});
+
+const initToolbar = () => {
+    // toolbar表示
+    toolbar = document.getElementById("WBS_toolbar");
+    toolbar.style.setProperty("display", "grid");
+    toolbox = document.getElementById("WBS_toolbar_toolbox");
+    toolbar_status = document.getElementById("WBS_toolbar_status").querySelector(".text");
+
     // 保存ボタン
     const saveButton = makeSaveButton();
     toolbox.appendChild(saveButton);
     // タスク追加ボタン
     const addTaskButton = makeAddButton();
     toolbox.appendChild(addTaskButton);
+}
+const resetToolbar = () => {
+    // toolbar非表示
+    toolbar.style.setProperty("display", null);
+    // 追加したボタンを削除
+    toolbox.innerHTML = "";
 
-});
+    setWbsChanged(false);
+}
 
 // F5キーによるreloadを禁止
 document.addEventListener("keydown", function (e) {
@@ -70,16 +82,33 @@ document.addEventListener("keydown", function (e) {
 const saveChange = () => {
     // 保存処理を実行
     if (wbs_changed === true) {
-        var result = save();
+        let result = window.confirm('変更を保存します。ファイルを上書きしますがよろしいですか？');
         if (result === true) {
-            // 
-            wri.preventClose = false;
+            // 編集モードを終了する
+            if (insert_mode === true) {
+                changeInsertMode();
+            }
+            // toolbarを非表示にする
+            resetToolbar();
+
+            // 保存処理を実行
+            result = save(true);
+            if (result === true) {
+                setWbsChanged(false);
+            } else {
+                // 保存失敗
+                alert("保存に失敗しました。");
+                setWbsChanged(true);
+            }
+
+            // toolbarを初期化する
+            initToolbar();
         }
     }
 }
 
 const makeSaveButton = () => {
-    var button = document.createElement("button");
+    let button = document.createElement("button");
     button.innerText = "保存";
     button.addEventListener("click", function () {
         // 保存処理を実行
@@ -89,28 +118,35 @@ const makeSaveButton = () => {
 }
 
 const makeAddButton = () => {
-    var button = document.createElement("button");
+    let button = document.createElement("button");
     button.innerText = "要素追加";
-    button.addEventListener("click", function () {
+    button.addEventListener("click", () => {
+        changeInsertMode();
+        //
         if (insert_mode === true) {
-            // 挿入モードのとき、
-            // インジケーターを削除して終了
-            removeInsertIndicator();
-            insert_mode = false;
             // ボタンの表示を元に戻す
             button.innerText = "要素追加";
         } else {
-            // 挿入モード以外のとき
-            // 挿入モードを設定する
-            addInsertIndicator();
-
-            insert_mode = true;
             // ボタンの表示を変更する
             button.innerText = "要素追加終了";
         }
     });
 
     return button;
+}
+
+const changeInsertMode = () => {
+    if (insert_mode === true) {
+        // 挿入モードのとき、
+        // インジケーターを削除して終了
+        removeInsertIndicator();
+        insert_mode = false;
+    } else {
+        // 挿入モード以外のとき
+        // 挿入モードを設定する
+        addInsertIndicator();
+        insert_mode = true;
+    }
 }
 
 const removeInsertIndicator = () => {
@@ -316,7 +352,7 @@ const setWbsChanged = (changed) => {
     } else {
         // 変更なし
         toolbar_status.innerText = "編集ツール";
-        toolbar_status.style.setProperty("color", "#ffffff");
+        toolbar_status.style.setProperty("color", null);
         //
         wri.preventCloseMsg = "";
     }
