@@ -179,7 +179,7 @@ const makeInsertIndicator = (parent, label, color, template, procInsertIndicator
         // インジケーターの後ろに新しい要素を追加する
         indicator.after(elem);
         //
-        const new_indicator = makeInsertIndicator(parent, label, color, template, procInsertIndicator);
+        const new_indicator = makeInsertIndicator(parent, label, color, template, procInsertIndicator, procUpdateId);
         elem.after(new_indicator);
         // 機能IDを更新する
         procUpdateId(parent);

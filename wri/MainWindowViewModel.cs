@@ -21,7 +21,7 @@ namespace wri
         MainWindow window;
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
-        public ReactivePropertySlim<Uri> ScriptPath { get; set; }
+        public ReactivePropertySlim<Uri> SourcePath { get; set; }
         // WebView2 WebView2CompositionControl
         public WebView2CompositionControl WebView2;
         public Interface.EntryPoint EntryPoint { get; set; }
@@ -45,8 +45,8 @@ namespace wri
             //string SettingPath = rootPath + @"\Script";
             var uri = new Uri($@"{rootPath}\apps\index.html");
 
-            ScriptPath = new ReactivePropertySlim<Uri>(uri);
-            ScriptPath.AddTo(Disposables);
+            SourcePath = new ReactivePropertySlim<Uri>(uri);
+            SourcePath.AddTo(Disposables);
         }
 
         public async Task InitAsync(MainWindow window)
@@ -92,17 +92,30 @@ namespace wri
                     e.Effects = System.Windows.DragDropEffects.None;
                 }
             };
-            //window.Base.Drop += (object sender, System.Windows.DragEventArgs e) =>
-            //{
-            //    if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
-            //    {
-            //        e.Effects = System.Windows.DragDropEffects.Copy;
-            //    }
-            //    else
-            //    {
-            //        e.Effects = System.Windows.DragDropEffects.None;
-            //    }
-            //};
+            window.Base.Drop += (object sender, System.Windows.DragEventArgs e) =>
+            {
+                if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+                {
+                    if (e.Data.GetData(System.Windows.DataFormats.FileDrop) is string[] files)
+                    {
+                        var file = files[0];
+                        var ext = System.IO.Path.GetExtension(file).ToLower();
+                        if (ext == ".html")
+                        {
+                            var check = CheckPreventClose();
+                            if (!check)
+                            {
+                                var uri = new Uri(file);
+                                SourcePath.Value = uri;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    e.Effects = System.Windows.DragDropEffects.None;
+                }
+            };
 
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
@@ -177,17 +190,27 @@ namespace wri
         //    }
         //}
 
+        private bool CheckPreventClose()
+        {
+            // WebView2終了防止チェック
+            if (EntryPoint.preventClose)
+            {
+                var result = System.Windows.MessageBox.Show(EntryPoint.preventCloseMsg + "\r\n終了してよろしいですか？", "wri", System.Windows.MessageBoxButton.YesNo);
+                if (result == System.Windows.MessageBoxResult.No)
+                {
+                    // 終了を防止する
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public bool OnClosing()
         {
             // WebView2の終了を防止する
             // true:アプリ終了を防ぐ
             // false:アプリ終了を許可する
-            if (EntryPoint.preventClose)
-            {
-                System.Windows.MessageBox.Show(EntryPoint.preventCloseMsg, "wri");
-                return true;
-            }
-            return false;
+            return CheckPreventClose();
         }
 
         #region IDisposable Support
