@@ -36,8 +36,11 @@ document.addEventListener("DOMContentLoaded", function() {
     wbs_template_task = wbs_template.querySelector(".task");
 
     // 操作ボタン追加
+    // 保存ボタン
+    const saveButton = makeSaveButton();
+    toolbox.appendChild(saveButton);
     // タスク追加ボタン
-    const addTaskButton = makeTaskAddButton();
+    const addTaskButton = makeAddButton();
     toolbox.appendChild(addTaskButton);
 
 });
@@ -56,10 +59,36 @@ document.addEventListener("keydown", function (e) {
             }
         }
     }
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        // ブラウザの保存ダイアログを無効化
+        e.preventDefault();
+        // 保存処理を実行
+        saveChange();
+    }
 });
 
+const saveChange = () => {
+    // 保存処理を実行
+    if (wbs_changed === true) {
+        var result = save();
+        if (result === true) {
+            // 
+            wri.preventClose = false;
+        }
+    }
+}
 
-const makeTaskAddButton = () => {
+const makeSaveButton = () => {
+    var button = document.createElement("button");
+    button.innerText = "保存";
+    button.addEventListener("click", function () {
+        // 保存処理を実行
+        saveChange();
+    });
+    return button;
+}
+
+const makeAddButton = () => {
     var button = document.createElement("button");
     button.innerText = "要素追加";
     button.addEventListener("click", function () {

@@ -32,8 +32,11 @@ const save = () => {
             const path = wri.SourcePath;
             const dom = getDOM();
             wri.io.file.SaveTo(path, dom);
+            return true;
         }
     } catch (e) {
         console.error('Error saving file:', e);
     }
+
+    return false;
 }
