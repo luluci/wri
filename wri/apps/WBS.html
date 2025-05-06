@@ -39,11 +39,39 @@
 		#WBS_toolbar {
 			width: auto;
 			margin: 10px 10px;
-			padding: 10px;
-			border: 3px solid rgb(0, 65, 139);
-			border-radius: 20px;
-			background-color:rgb(243, 255, 223);
+
 			display: none;
+			grid-template-columns: 100px auto;
+
+			& #WBS_toolbar_status {
+				grid-column: 1;
+				grid-row: 1;
+				margin: 0;
+				padding: 2px 10px;
+				background-color: rgb(0, 65, 139);
+				border: 3px solid rgb(0, 65, 139);
+				border-top-left-radius: 20px;
+				border-bottom-left-radius: 20px;
+				color: #fff;
+				font-size: 0.8em;
+				text-align: center;
+
+				display:table;
+				& .text {
+					display:table-cell;
+					vertical-align:middle;
+				}
+			}
+			& #WBS_toolbar_toolbox {
+				grid-column: 2;
+				grid-row: 1;
+				margin: 0;
+				padding: 2px 10px;
+				background-color:rgb(243, 255, 223);
+				border: 3px solid rgb(0, 65, 139);
+				border-top-right-radius: 20px;
+				border-bottom-right-radius: 20px;
+			}
 		}
 
 		.work_id {
@@ -125,7 +153,7 @@
 			padding: 1px 8px;
 			grid-row: auto / span 2;
 			grid-column: 1 / 8;
-			background-color: orange;
+			background-color: rgb(243, 130, 96);
 			text-align: center;
 			cursor : pointer;
 		}
@@ -145,13 +173,13 @@
 				display:contents;
 			}
 
-			& .header {
+			& .caption {
 				font-weight: bold;
 				display:contents;
 				background-color:rgb(243, 255, 223) !important;
 			}
 
-			& .body {
+			& .items {
 				display:contents;
 
 				& .function {
@@ -236,28 +264,20 @@
 			}
 		}
 
-		.WBS_template {
+		#WBS_template {
 			display: none;
 		}
-
-		
-    .insert-indicator {
-      position: absolute;
-      height: 2px;
-      background-color: blue;
-      width: 100%;
-      pointer-events: none;
-      transition: top 0.05s ease;
-    }
 
 	</style>
 </head>
 <body>
 	<div id="WBS_toolbar">
+		<div id="WBS_toolbar_status"><span class="text">編集ツール</span></div>
+		<div id="WBS_toolbar_toolbox"></div>
 	</div>
 
 	<div class="WBS" id="WBS">
-		<div class="header">
+		<div class="caption">
 			<div class="work_id"><span class="text">ID</span></div>
 			<div class="work_name"><span class="text">タスク名</span></div>
 			<div class="work_owner"><span class="text">担当者</span></div>
@@ -269,7 +289,7 @@
 			<div class="work_actual_man_hour">工数</div>
 			<div class="work_progress">進捗</div>
 		</div>
-		<div class="body">
+		<div class="items">
 			<div class="function" data-func_id="1">
 				<div class="caption">
 					<div class="work_id"><span class="text">ID</span></div>
