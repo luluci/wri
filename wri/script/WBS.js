@@ -15,6 +15,13 @@ var wbs_template_task = null; // タスクテンプレート
 // WBS編集ツール
 var wbs_changed = false; // WBSが変更されたかどうかのフラグ
 
+// 編集設定
+const input_size_name = 20;
+const input_size_owner = 2;
+const input_size_date = 6;
+const input_size_hour = 3;
+const input_size_progress = 3;
+
 // 挿入処理変数
 var insert_mode = false;
 var insert_indicator = null;
@@ -72,7 +79,7 @@ const addFunctionEditable = (parent) => {
         const row = rows[id];
         // functionの変更対象
         const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null);
+        applyEditable(name, null, input_size_name);
 
         // phaseに適用
         addPhaseEditable(row);
@@ -85,7 +92,7 @@ const addPhaseEditable = (parent) => {
         const row = rows[id];
         // phaseの変更対象
         const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null);
+        applyEditable(name, null, input_size_name);
 
         // work_packageに適用
         addWorkEditable(row);
@@ -97,23 +104,23 @@ const addWorkEditable = (parent) => {
         const row = rows[id];
         // work_packageの変更対象
         const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null);
+        applyEditable(name, null, input_size_name);
         const owner = row.querySelector(".caption .work_owner .text");
-        applyEditable(owner, null);
-        const plan_date_begin = row.querySelector(".caption .work_plan_date_begin .text");
-        applyEditable(plan_date_begin, null);
-        const plan_date_end = row.querySelector(".caption .work_plan_date_end .text");
-        applyEditable(plan_date_end, null);
-        const actual_date_begin = row.querySelector(".caption .work_actual_date_begin .text");
-        applyEditable(actual_date_begin, null);
-        const actual_date_end = row.querySelector(".caption .work_actual_date_end .text");
-        applyEditable(actual_date_end, null);
+        applyEditable(owner, null, input_size_owner);
+        const plan_date_begin = row.querySelector(".caption .work_plan_date_begin span");
+        applyEditable(plan_date_begin, null, input_size_date);
+        const plan_date_end = row.querySelector(".caption .work_plan_date_end span");
+        applyEditable(plan_date_end, null, input_size_date);
+        const actual_date_begin = row.querySelector(".caption .work_actual_date_begin span");
+        applyEditable(actual_date_begin, null, input_size_date);
+        const actual_date_end = row.querySelector(".caption .work_actual_date_end span");
+        applyEditable(actual_date_end, null, input_size_date);
         const plan_man_hour = row.querySelector(".caption .work_plan_man_hour .text");
-        applyEditable(plan_man_hour, null);
+        applyEditable(plan_man_hour, null, input_size_hour);
         const actual_man_hour = row.querySelector(".caption .work_actual_man_hour .text");
-        applyEditable(actual_man_hour, null);
+        applyEditable(actual_man_hour, null, input_size_hour);
         const progress = row.querySelector(".caption .work_progress .value");
-        applyEditable(progress, null);
+        applyEditable(progress, null, input_size_progress);
 
         // taskに適用
         addTaskEditable(row);
@@ -125,56 +132,95 @@ const addTaskEditable = (parent) => {
         const row = rows[id];
         // taskの変更対象
         const name = row.querySelector(".work_name .text");
-        applyEditable(name, null);
+        applyEditable(name, null, input_size_name);
         const owner = row.querySelector(".work_owner .text");
-        applyEditable(owner, null);
-        const plan_date_begin = row.querySelector(".work_plan_date_begin .text");
-        applyEditable(plan_date_begin, null);
-        const plan_date_end = row.querySelector(".work_plan_date_end .text");
-        applyEditable(plan_date_end, null);
-        const actual_date_begin = row.querySelector(".work_actual_date_begin .text");
-        applyEditable(actual_date_begin, null);
-        const actual_date_end = row.querySelector(".work_actual_date_end .text");
-        applyEditable(actual_date_end, null);
+        applyEditable(owner, null, input_size_owner);
+        const plan_date_begin = row.querySelector(".work_plan_date_begin span");
+        applyEditable(plan_date_begin, null, input_size_date);
+        const plan_date_end = row.querySelector(".work_plan_date_end span");
+        applyEditable(plan_date_end, null, input_size_date);
+        const actual_date_begin = row.querySelector(".work_actual_date_begin span");
+        applyEditable(actual_date_begin, null, input_size_date);
+        const actual_date_end = row.querySelector(".work_actual_date_end span");
+        applyEditable(actual_date_end, null, input_size_date);
         const plan_man_hour = row.querySelector(".work_plan_man_hour .text");
-        applyEditable(plan_man_hour, null);
+        applyEditable(plan_man_hour, null, input_size_hour);
         const actual_man_hour = row.querySelector(".work_actual_man_hour .text");
-        applyEditable(actual_man_hour, null);
+        applyEditable(actual_man_hour, null, input_size_hour);
         const progress = row.querySelector(".work_progress .value");
-        applyEditable(progress, null);
+        applyEditable(progress, null, input_size_progress);
     }
 }
 
-const applyEditable = (elem, validator) => {
+const applyEditable = (elem, validator, size=5) => {
     elem.addEventListener("click", (e) => {
        // クリックしたらinputで編集可能にする
-        if (elem.dataset.value === undefined || elem.dataset.value === "") {
+        if (elem.dataset.temp === undefined || elem.dataset.temp === "") {
             const input = document.createElement("input");
-            input.type = "text";
-            input.value = elem.innerText;
-            elem.dataset.value = elem.innerText;
-            elem.innerText = "";
-            elem.appendChild(input);
-            input.focus();
-            input.addEventListener("blur", () => {
-                if (validator) {
-                    // バリデーションチェック
-                    if (validator(input.value) === false) {
-                        alert("無効な値です。");
-                        input.value = elem.dataset.value;
+
+            const elem_class = elem.getAttribute("class");
+            if (elem_class === "date") {
+                // 初期値チェック
+                if (elem.dataset.value === undefined || elem.dataset.value === "") {
+                    elem.dataset.value = new Date().toISOString().slice(0, 10);
+                }
+                //
+                input.type = "date";
+                input.value = elem.dataset.value;
+                input.size = size;
+                elem.dataset.temp = elem.dataset.value;
+                elem.innerText = "";
+                elem.appendChild(input);
+                input.focus();
+                input.addEventListener("blur", () => {
+                    if (validator) {
+                        // バリデーションチェック
+                        if (validator(input.value) === false) {
+                            alert("無効な値です。");
+                            input.value = elem.dataset.temp;
+                        }
                     }
-                }
-                if (elem.dataset.value !== input.value) {
-                    setWbsChanged(true);
-                }
-                elem.dataset.value = "";
-                elem.innerText = input.value;
-            });
+                    if (elem.dataset.temp !== input.value) {
+                        setWbsChanged(true);
+                    }
+                    elem.dataset.temp = "";
+                    elem.dataset.value = input.value;
+                    // 表示用テキスト作成
+                    const date = new Date(input.value);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    elem.innerText = month + "/" + day;
+                });
+            } else {
+                input.type = "text";
+                input.value = elem.innerText;
+                input.size = size;
+                elem.dataset.temp = elem.innerText;
+                elem.innerText = "";
+                elem.appendChild(input);
+                input.focus();
+                input.addEventListener("blur", () => {
+                    if (validator) {
+                        // バリデーションチェック
+                        if (validator(input.value) === false) {
+                            alert("無効な値です。");
+                            input.value = elem.dataset.temp;
+                        }
+                    }
+                    if (elem.dataset.temp !== input.value) {
+                        setWbsChanged(true);
+                    }
+                    elem.dataset.temp = "";
+                    elem.innerText = input.value;
+                });
+            }
+
             input.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     input.blur();
                 } else if (e.key === "Escape") {
-                    input.value = elem.dataset.value;
+                    input.value = elem.dataset.temp;
                     input.blur();
                 }
             });
