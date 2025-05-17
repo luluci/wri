@@ -3,7 +3,8 @@
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
 
-	<script type="text/javascript" charset="utf-8" src="./script/WindowList.js"></script>
+	<!-- <script type="text/javascript" charset="utf-8" src="./script/WindowList.js"></script> -->
+	<script type="text/javascript" charset="utf-8" src="./script/Utility.js"></script>
     <script language="javascript" type="text/javascript">
 		// C#側からAPI登録を実行される。
 		// const wri = chrome.webview.hostObjects.sync.wri;
@@ -14,8 +15,44 @@
 		const csLoaded = () => {
 			try {
 				//
-				let tag = document.getElementById("init-message");
-				tag.textContent = "初期化完了";
+				//let tag = document.getElementById("init-message");
+				//tag.textContent = "初期化完了";
+				const elem = document.getElementsByClassName("c_header")[0].getElementsByClassName("item")[0];
+				elem.textContent += " update!";
+
+                //const dd_elems = Array.from(document.getElementsByClassName("dandd_area"));
+      //          const dd_elems = Array.from(document.getElementsByTagName("body"));
+      //          dd_elems.forEach(element => {
+      //              element.addEventListener("dragover", (event) => {
+      //                  event.preventDefault();
+      //              }, false);
+      //              element.addEventListener("drop", (event) => {
+						//event.preventDefault();
+						//const items = event.dataTransfer.items;
+						//if (items.length > 0) {
+						//	const item = items[0];
+      //                      const file = item.getAsFile();
+      //                      const handle = item.getAsFileSystemHandle().then((handle) => {
+      //                          handle.getFile().then((file) => {
+      //                              console.log(file);
+      //                          });
+      //                          console.log(handle);
+      //                      });
+      //                      item.getAsString((str) => {
+      //                          console.log(str);
+						//	});
+						//}
+      //                  const files = event.dataTransfer.files;
+      //                  if (files.length > 0) {
+      //                      const file = files[0];
+      //                      // ファイルのパスを取得
+      //                      const filePath = file.path;
+      //                      // C#側にファイルパスを渡す
+      //                      // wri.openFile(filePath);
+      //                      console.log(filePath);
+      //                  }
+      //              }, false);
+      //          });
 			} catch (msg) {
 				return false;
 			}
@@ -24,19 +61,18 @@
 		}
 		// ↑ロジックを理解した上で変更すること↑
 
-		const zeroPadding = (value, len) => {
-			return value.padStart(len, '0');
-		}
-		const toHex = (value, len) => {
-			return zeroPadding(value.toString(16), len);
-		}
-		const sleepThread = (msec) => {
-			var e = new Date().getTime() + (msec);
-			while (new Date().getTime() <= e) {}
-		}
-
 		// 
+        // F5キーによるreloadを禁止
+        document.addEventListener("keydown", function (e) {
+			if ((e.which || e.keyCode) == 116) {
+				var result = window.confirm('よろしいですか？');
+                if (result === true) {
+                    e.preventDefault();
+				} else {
 
+				}
+            }
+        });
 
 		const test_func = () => {
 			let hoge = "str";
@@ -44,103 +80,9 @@
 			return 0;
 		}
 
-		const debug = () => {
-			//const val = test_func_async();
-			//return "debug"
-			let var1 = wri.TestVar1;
-			let var2 = wri.TestVar2;
-
-			let tag = document.getElementById("debug-message");
-			tag.textContent = var1 + " / " + var2;
-		}
-		var dbg_obj1;
-		const debug1 = () => {
-			dbg_obj1 = wri.io.file.Open("./test.txt");
-
-			var elem = document.getElementById("debug-message-1");
-			elem.textContent = "" + dbg_obj1.IsOpen;
-		}
-		const debug2 = () => {
-		
-			var elem = document.getElementById("debug-message-2");
-			elem.textContent = "" + dbg_obj1.IsOpen;
-			dbg_obj1 = null;
-			wri.system.GC();
-		}
-
-
-		const afk = () => {
-			wri.win.LockPC();
-			wri.win.MonitorOff();
-		}
-
-		const get_event_log = () => {
-			let base = document.getElementById("log_body");
-			base.innerHTML = "";
-
-			// EventLog取得数取得
-			let input_elem = document.getElementById("get_event_log_size");
-			let size = input_elem.value;
-			// EventLogフィルター取得
-			let log_def_table = document.getElementById("get_event_log_def_table");
-			let tbody_tag = log_def_table.getElementsByTagName("tbody")[0];
-			let id_filter = [];
-			let event_dict = {};
-			for (let i = 0; i < tbody_tag.children.length; i++) {
-				let tag = tbody_tag.children[i];
-				let event_id = Number(tag.children[0].children[0].value);
-				let message = tag.children[1].children[0].value
-				id_filter.push(event_id);
-				event_dict[event_id] = message;
-			}
-
-			// 
-			let wm = wri.win.WM_SYSCOMMAND;
-			let machine_name = wri.win.MachineName;
-			//let logs = wri.win.GetLogOnOffEventLogList(machine_name, size);
-			let logs = wri.win.GetEventLogList("System", machine_name, id_filter, size);
-			
-			// 
-			for (let i = 0; i < logs.length; i++) {
-				let log = logs[i];
-				let row = document.createElement("tr");
-				// ID作成
-				let tag_id = document.createElement("td");
-				let instance_id = log.InstanceId;
-				//let event_id = instance_id & 0xFFFF;
-				let event_id = log.EventId;
-				tag_id.textContent = event_id;
-				// Message作成
-				let tag_content = document.createElement("td");
-				if (event_id in event_dict) {
-					tag_content.textContent = event_dict[event_id];
-				} else {
-					tag_content.textContent = log.Message;
-				}
-				// DateTime作成
-				let tag_dt = document.createElement("td");
-				let dt = new Date(log.TimeGenerated.Year, log.TimeGenerated.Month-1, log.TimeGenerated.Day, log.TimeGenerated.Hour, log.TimeGenerated.Minute, log.TimeGenerated.Second, log.TimeGenerated.Millisecond);
-				tag_dt.textContent = dt.toLocaleString();
-				//
-				row.appendChild(tag_id);
-				row.appendChild(tag_content);
-				row.appendChild(tag_dt);
-				base.appendChild(row);
-			}
-			//
-			if (logs.length === 0) {
-				let row = document.createElement("tr");
-				let tag_1 = document.createElement("td");
-				tag_1.textContent = "Log Result 0."
-				let tag_2 = document.createElement("td");
-				let tag_3 = document.createElement("td");
-				row.appendChild(tag_1);
-				row.appendChild(tag_2);
-				row.appendChild(tag_3);
-				base.appendChild(row);
-			}
-		}
     </script>
+
+	<link rel="stylesheet" type="text/css" href="./styles/default.css" />
 	<style type="text/css">
 		body {
 			margin: 0;
@@ -160,265 +102,50 @@
 			width: 100%;
 		}
 
-		.body_pane {
-			display: flex;
-			flex-direction: row;
-			margin: 0;
-			padding: 0;
-		}
-		.body_pane .main_pane {
-			width: 100%;
-			margin: 0;
-			padding: 0;
-		}
-		.body_pane .side_pane {
-			width: 30%;
-			margin: 0;
-			padding: 0;
-		}
-
-		.body_pane .side_pane .side_item_list {
-			border: 0.5px solid burlywood;
-		}
-
-		.container {
-			display: flex;
-			flex-direction: column;
-		}
-
-		.container .c_header {
-			margin: 0px 10px 10px 10px;
-			background-color: rgba(0, 65, 139, 0.918);
-			border-bottom-left-radius: 10px;
-			border-bottom-right-radius: 5px;
-		}
-		.container .c_header .item {
-			margin: 5px 10px;
-			color: aliceblue;
-		}
-
-		.container .c_item {
-			width: auto;
-			margin: 10px 10px;
-			padding: 20px;
-			background-color: rgba(0, 65, 139, 0.918);
-			border-radius: 20px;
-			color: aliceblue;
-		}
-		.container .c_item .header {
-			border-bottom: 1px solid #fff;
-			margin-bottom: 10px;
-			padding: 1px 10px;
-		}
-		.container .c_item .form {
-			border: 1px dashed rgba(163, 169, 177, 0.918);
-			border-radius: 10px;
-			margin: 0 10px;
-			padding: 5px 10px;
-			background-color: rgba(11, 51, 97, 0.918);
-		}
-
-		#get_event_log_def_table {
-			margin: 10px 10px;
-			border-collapse: collapse;
-		}
-		#get_event_log_def_table thead {
-			padding: 2px 10px;
-			font-size: 15px;
-		}
-		#get_event_log_def_table thead th {
-			border-radius: 15px;
-			border: 1px solid #ffffffb2;
-			padding: 2px 10px;
-			font-size: 15px;
-		}
-		#get_event_log_def_table thead th.event_id,
-		#get_event_log_def_table tbody td.event_id {
-			width: 100px;
-			padding: 2px 5px;
-			border: 1px solid #ffffffb2;
-		}
-		#get_event_log_def_table thead th.message,
-		#get_event_log_def_table tbody td.message {
-			width: 200px;
-			padding: 2px 5px;
-			border: 1px solid #ffffffb2;
-		}
-		#get_event_log_def_table tbody td input {
-			width: inherit;
-			font-size: 12px;
-		}
-
-		#event_log {
-			margin: 10px 10px;
-			border-collapse: collapse;
-		}
-		#event_log thead th {
-			border-bottom: 2px solid #fff;
-			padding: 2px 10px;
-			font-size: 15px;
-		}
-		#event_log thead th.id {
-			width: 50px;
-		}
-		#event_log thead th.message {
-			width: auto;
-		}
-		#event_log thead th.datetime {
-			width: 130px;
-		}
-		#event_log tbody tr {
-			border-bottom: 1px dashed #fff;
-			padding: 2px 10px;
-			font-size: 12px;
-		}
-		#event_log tbody tr td {
-			padding: 2px 10px;
-		}
 	</style>
 </head>
 <body>
-<div id="body">
-	<div class="body_pane">
-		<div class="main_pane">
-			<div class="container">
-				<div class="c_header">
-					<div class="item">
-						header1
-					</div>
-					<div class="item">
-						header2
-					</div>
-				</div>
-				<div class="c_item">
-					<div class="header">
-						PCロック→モニタOFF
-					</div>
-					<div class="form">
-						<button onclick="afk()">AFK</button>
-					</div>
-				</div>
-				<div class="c_item">
-					<div class="header">
-						Windows EventLog 取得
-					</div>
-					<div class="form">
-						<div>
-							<span>取得ログ数</span>
-							<input id="get_event_log_size" type="number" value="20"/>
-							<button onclick="get_event_log()">Get EventLog</button>
+	<div id="body">
+		<div class="body_pane">
+			<div class="main_pane">
+				<div class="container">
+					<div class="c_header">
+						<div class="item">
+							header
 						</div>
-						<div>
-							<table id="get_event_log_def_table">
-								<thead>
-									<tr>
-										<th class="event_id">EventID</th>
-										<th class="message">Message</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td class="event_id"><input type="number" value="6005" /></td>
-										<td class="message"><input type="text" value="ログオン:起動" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="6006" /></td>
-										<td class="message"><input type="text" value="ログオフ:正常シャットダウン" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="6008" /></td>
-										<td class="message"><input type="text" value="ログオフ:正常ではないシャットダウン" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="6009" /></td>
-										<td class="message"><input type="text" value="ログオン:起動時にブート情報を記録" /></td>
-									</tr>
-									<!--
-									<tr>
-										<td class="event_id"><input type="number" value="1" /></td>
-										<td class="message"><input type="text" value="ログオフ:スリープ" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="42" /></td>
-										<td class="message"><input type="text" value="ログオン:スリープから復帰" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="12" /></td>
-										<td class="message"><input type="text" value="ログオン:OS起動" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="13" /></td>
-										<td class="message"><input type="text" value="ログオン:起動" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="7001" /></td>
-										<td class="message"><input type="text" value="ログオン:起動" /></td>
-									</tr>
-									<tr>
-										<td class="event_id"><input type="number" value="7002" /></td>
-										<td class="message"><input type="text" value="ログオフ:シャットダウン" /></td>
-									</tr>
-									-->
-								</tbody>
-							</table>
+					</div><div class="c_item">
+						<div class="header">
+							App List
+						</div>
+						<div class="item">
+							<a href="./apps/WBS.html">WBS</a>
+						</div>
+						<div class="item">
+							<a href="./apps/TestWinAPI.html">TestApp WinAPI</a>
+						</div>
+						<div class="form">
+							<button onclick="save()">saveDOM</button>
 						</div>
 					</div>
-					<div style="margin-top: 10px; border-bottom: 2px solid #fff;">EventLog Output</div>
-					<table id="event_log">
-						<thead>
-							<tr>
-								<th class="id">ID</th>
-								<th class="message">Message</th>
-								<th class="datetime">DateTime</th>
-							</tr>
-						</thead>
-						<tbody id="log_body">
-							<tr>
-								<td>-</td><td>-</td><td>-</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="c_item">
-					<div class="header">
-						Window操作
-					</div>
-					<div class="form">
-						<button onclick="get_window_list()">Window一覧作成</button>
-						<button onclick="move_window_into_screen()">ウインドウを画面内に移動</button>
-					</div>
-				</div>
-				<div class="c_item">
-					<div class="header">
-						Do nanika
-					</div>
-					<div class="form">
-						<button onclick="get_event_log()">nanika</button>
+					<div class="c_item">
+						<div class="header">
+							HTMLを開く
+						</div>
+						<div class="form dandd_area">
+							<span>Drag & Drop</span>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="side_pane">
-			<div class="side_item_list" >
-				<ul>
-					<li>item1</li>
-					<li>item2</li>
-				</ul>
-			</div>
+			<!-- <div class="side_pane">
+				<div class="side_item_list" >
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+					</ul>
+				</div>
+			</div> -->
 		</div>
 	</div>
-</div>
-<div id="footer">
-
-	<div id="init-message">初期化メッセージ表示</div>
-
-	<button onclick="debug()">Debug</button>
-	<button onclick="debug1()">Debug1</button>
-	<button onclick="debug2()">Debug2</button>
-	<div id="debug-message">ここにデバッグ用メッセージ表示</div>
-	<div id="debug-message-1">ここにデバッグ用メッセージ表示</div>
-	<div id="debug-message-2">ここにデバッグ用メッセージ表示</div>
-
-</div>
 </body>
 </html>

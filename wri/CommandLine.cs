@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace wri
 {
-    class CommandLine
+    public class CommandLine
     {
-        // 
+        public bool IsGuiMode;
+
+        // GUIモード
+        public string InputFile;
+
+        // コンソールモード
         Interface.EntryPoint ep = new Interface.EntryPoint();
         Type WinApiT = typeof(Interface.WindowsApi);
         // 解析状態
@@ -21,10 +27,26 @@ namespace wri
 
         public CommandLine()
         {
+            IsGuiMode = true;
+            InputFile = string.Empty;
         }
 
         public void Parse(string[] args)
         {
+            if (args.Length > 0)
+            {
+                var ext = System.IO.Path.GetExtension(args[0]);
+                switch (ext)
+                {
+                    case ".html":
+                        InputFile = args[0];
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
             // コマンドライン引数をチェック
             foreach (string arg in args)
             {
@@ -32,10 +54,12 @@ namespace wri
                 {
                     case "-h":
                     case "--help":
+                        IsGuiMode = false;
                         Help();
                         return;
 
                     case "--winapi":
+                        IsGuiMode = false;
                         optionState = OptionState.WinApi;
                         break;
 
@@ -84,10 +108,12 @@ namespace wri
 
         public void Help()
         {
-            Console.WriteLine("Usage: wri.exe <option> <value> <value> ... <option> <value> ...");
-            Console.WriteLine("  option:");
-            Console.WriteLine("    -h, --help : value = none");
-            Console.WriteLine("    --winapi   : value = WindowsApiクラス内の実行したいメソッド名");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  [GUI Mode]    wri.exe <html file>");
+            Console.WriteLine("  [ConsoleMode] wri.exe <option> <value> <value> ... <option> <value> ...");
+            Console.WriteLine("    option:");
+            Console.WriteLine("      -h, --help : value = none");
+            Console.WriteLine("      --winapi   : value = WindowsApiクラス内の実行したいメソッド名");
         }
     }
 }

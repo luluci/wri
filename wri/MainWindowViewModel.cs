@@ -19,6 +19,7 @@ namespace wri
     {
         // 
         MainWindow window;
+        CommandLine cmd;
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
         public ReactivePropertySlim<Uri> SourcePath { get; set; }
@@ -26,10 +27,11 @@ namespace wri
         public WebView2CompositionControl WebView2;
         public Interface.EntryPoint EntryPoint { get; set; }
 
-        public MainWindowViewModel(MainWindow window)
+        public MainWindowViewModel(MainWindow window, CommandLine cmd)
         {
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
+            this.cmd = cmd;
 
             // WebView2インスタンスの初期化前に実施する
             // dllをexeファイル内に取り込むのと相性が悪い。
@@ -43,7 +45,15 @@ namespace wri
             // index.htmlへのパスを作成
             //string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             //string SettingPath = rootPath + @"\Script";
-            var uri = new Uri($@"{rootPath}\apps\index.html");
+            Uri uri;
+            if (object.ReferenceEquals(cmd.InputFile, string.Empty))
+            {
+                uri = new Uri($@"{rootPath}\index.html");
+            }
+            else
+            {
+                uri = new Uri(cmd.InputFile);
+            }
 
             SourcePath = new ReactivePropertySlim<Uri>(uri);
             SourcePath.AddTo(Disposables);

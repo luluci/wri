@@ -23,13 +23,12 @@ namespace wri
     {
         MainWindowViewModel vm;
 
-        public MainWindow()
+        public MainWindow(CommandLine cmd)
         {
-            vm = new MainWindowViewModel(this);
+            vm = new MainWindowViewModel(this, cmd);
             this.DataContext = vm;
 
             InitializeComponent();
-
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)

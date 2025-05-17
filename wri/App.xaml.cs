@@ -23,23 +23,26 @@ namespace wri
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (e.Args.Count() > 0)
+            // コマンドライン引数解析
+            // 特定のコマンドでコンソールモードで動作する
+            var cmd = new CommandLine();
+            cmd.Parse(e.Args);
+            //
+            if (cmd.IsGuiMode)
+            {
+                // コマンドライン引数が存在しないとき
+                // GUI起動
+                MainWindow mainWindow = new MainWindow(cmd);
+                mainWindow.Show();
+            }
+            else
             {
                 // コマンドライン引数が存在するとき
                 // コンソールアプリモードで処理
                 // コンソールにアタッチ
                 global::Utility.WindowsApi.AttachConsole(-1);
-                Console.WriteLine("<wri.exe コンソールモード>");
-                var cmd = new CommandLine();
-                cmd.Parse(e.Args);
+                //Console.WriteLine("<wri.exe コンソールモード>");
                 Application.Current.Shutdown();
-            }
-            else
-            {
-                // コマンドライン引数が存在しないとき
-                // GUI起動
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
             }
         }
     }
