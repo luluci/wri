@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reactive.Joins;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+
+using GlobExpressions;
 
 namespace wri.Interface
 {
@@ -26,6 +30,18 @@ namespace wri.Interface
         public void Save()
         {
 
+        }
+
+        public string[] GlobDirectories(string path, string pattern)
+        {
+            var root = new DirectoryInfo(path);
+            return root.GlobDirectories(pattern).Select(x => x.FullName).ToArray();
+        }
+
+        public string[] GlobFiles(string path, string pattern)
+        {
+            var root = new DirectoryInfo(path);
+            return root.GetFiles(pattern).Select(x => x.FullName).ToArray();
         }
     }
 

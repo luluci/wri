@@ -55,6 +55,13 @@
     padding: 1px 10px;
 }
 
+.container .c_item .body {
+    border: 2px dotted #FFFFFF;
+    border-radius: 10px;
+    padding: 1px 10px;
+    background-color: #FFFFFF;
+}
+
 .container .c_item .form {
     border: 1px dashed rgba(163, 169, 177, 0.918);
     border-radius: 10px;

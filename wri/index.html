@@ -20,6 +20,17 @@
 				const elem = document.getElementsByClassName("c_header")[0].getElementsByClassName("item")[0];
 				elem.textContent += " update!";
 
+				const apps_elem = document.getElementById("apps_list");
+				const apps = wri.io.GlobFiles("./", "apps/*");
+                for (let i = 0; i < apps.length; i++) {
+                    const elem_div = document.createElement("div");
+					const elem_a = document.createElement("a");
+					elem_a.href = apps[i];
+                    elem_a.textContent = apps[i].split("\\").reverse()[0].split('.')[0];
+					elem_div.appendChild(elem_a);
+                    apps_elem.appendChild(elem_div);
+				}
+
                 //const dd_elems = Array.from(document.getElementsByClassName("dandd_area"));
       //          const dd_elems = Array.from(document.getElementsByTagName("body"));
       //          dd_elems.forEach(element => {
@@ -116,6 +127,8 @@
 					</div><div class="c_item">
 						<div class="header">
 							App List
+						</div>
+						<div class="body" id="apps_list">
 						</div>
 						<div class="item">
 							<a href="./apps/WBS.html">WBS</a>

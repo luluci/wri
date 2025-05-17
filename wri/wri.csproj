@@ -110,11 +110,14 @@
     <PackageReference Include="Costura.Fody">
       <Version>3.3.3</Version>
     </PackageReference>
+    <PackageReference Include="Glob">
+      <Version>1.1.9</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Web.WebView2">
-      <Version>1.0.3179.45</Version>
+      <Version>1.0.3240.44</Version>
     </PackageReference>
     <PackageReference Include="ReactiveProperty.WPF">
-      <Version>9.1.2</Version>
+      <Version>9.7.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
