@@ -19,8 +19,8 @@ var wbs_changed = false; // WBSが変更されたかどうかのフラグ
 const input_size_name = 20;
 const input_size_owner = 2;
 const input_size_date = 6;
-const input_size_hour = 3;
-const input_size_progress = 3;
+const input_size_hour = 1;
+const input_size_progress = 1;
 
 // 挿入処理変数
 var insert_mode = false;
@@ -33,14 +33,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // toolbar初期化
     initToolbar();
 
-    // 挿入位置インジケーター参照取得
-    insert_indicator = document.getElementById("work_insert_indicator");
     // テンプレート参照取得
     wbs_template = document.getElementById("WBS_template");
-    wbs_template_func = wbs_template.querySelector(".function");
-    wbs_template_phase = wbs_template.querySelector(".phase");
-    wbs_template_work = wbs_template.querySelector(".work_package");
-    wbs_template_task = wbs_template.querySelector(".task");
+    wbs_template_func = document.getElementById("WBS_function_template");
+    wbs_template_phase = document.getElementById("WBS_phase_template");
+    wbs_template_work = document.getElementById("WBS_work_template");
+    wbs_template_task = document.getElementById("WBS_task_template");
+    // 挿入位置インジケーター参照取得
+    insert_indicator = wbs_template.querySelector(".insert_indicator");
 
     addEditable();
 });
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
 const initToolbar = () => {
     // toolbar表示
     toolbar = document.getElementById("WBS_toolbar");
-    toolbar.style.setProperty("display", "grid");
+    toolbar.style.setProperty("display", "table-row");
     toolbox = document.getElementById("WBS_toolbar_toolbox");
     toolbar_status = document.getElementById("WBS_toolbar_status").querySelector(".text");
 
@@ -61,7 +61,7 @@ const initToolbar = () => {
 }
 const resetToolbar = () => {
     // toolbar非表示
-    toolbar.style.setProperty("display", null);
+    toolbar.style.setProperty("display", "none");
     // 追加したボタンを削除
     toolbox.innerHTML = "";
 
@@ -69,90 +69,85 @@ const resetToolbar = () => {
 }
 
 const addEditable = () => {
-    // 
-    addFunctionEditable(wbs);
-}
-const addFunctionEditable = (parent) => {
-    const rows = parent.getElementsByClassName("function");
-    // functionの前にインジケーターを追加
-    for (let id = 0; id < rows.length; id++) {
-        const row = rows[id];
-        // functionの変更対象
-        const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null, input_size_name);
+    //
+    const wbs = document.getElementById("WBS");
+    const root = wbs.querySelector("tbody");
+    const rows = root.querySelectorAll("tr");
+    for (let i=0; i<rows.length; i++){
+        const row = rows[i];
+        switch (row.className) {
+            case "function":
+                addFunctionEditable(row);
+                break;
+            case "phase":
+                addPhaseEditable(row);
+                break;
+            case "work_package":
+                addWorkEditable(row);
+                break;
+            case "task":
+                addTaskEditable(row);
+                break;
 
-        // phaseに適用
-        addPhaseEditable(row);
+            default:
+                break;
+        }
     }
 }
-const addPhaseEditable = (parent) => {
-    const rows = parent.getElementsByClassName("phase");
-    // phaseの前にインジケーターを追加
-    for (let id = 0; id < rows.length; id++) {
-        const row = rows[id];
-        // phaseの変更対象
-        const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null, input_size_name);
-
-        // work_packageに適用
-        addWorkEditable(row);
-    }
+const addFunctionEditable = (row) => {
+    // functionの変更対象
+    const name = row.querySelector(".work_name span");
+    applyEditable(name, null, input_size_name);
 }
-const addWorkEditable = (parent) => {
-    const rows = parent.getElementsByClassName("work_package");
-    for (let id = 0; id < rows.length; id++) {
-        const row = rows[id];
-        // work_packageの変更対象
-        const name = row.querySelector(".caption .work_name .text");
-        applyEditable(name, null, input_size_name);
-        const owner = row.querySelector(".caption .work_owner .text");
-        applyEditable(owner, null, input_size_owner);
-        const plan_date_begin = row.querySelector(".caption .work_plan_date_begin span");
-        applyEditable(plan_date_begin, null, input_size_date);
-        const plan_date_end = row.querySelector(".caption .work_plan_date_end span");
-        applyEditable(plan_date_end, null, input_size_date);
-        const actual_date_begin = row.querySelector(".caption .work_actual_date_begin span");
-        applyEditable(actual_date_begin, null, input_size_date);
-        const actual_date_end = row.querySelector(".caption .work_actual_date_end span");
-        applyEditable(actual_date_end, null, input_size_date);
-        const plan_man_hour = row.querySelector(".caption .work_plan_man_hour .text");
-        applyEditable(plan_man_hour, null, input_size_hour);
-        const actual_man_hour = row.querySelector(".caption .work_actual_man_hour .text");
-        applyEditable(actual_man_hour, null, input_size_hour);
-        const progress = row.querySelector(".caption .work_progress .value");
-        applyEditable(progress, null, input_size_progress);
-
-        // taskに適用
-        addTaskEditable(row);
-    }
+const addPhaseEditable = (row) => {
+    // phaseの変更対象
+    const name = row.querySelector(".work_name span");
+    applyEditable(name, null, input_size_name);
 }
-const addTaskEditable = (parent) => {
-    const rows = parent.getElementsByClassName("task");
-    for (let id = 0; id < rows.length; id++) {
-        const row = rows[id];
-        // taskの変更対象
-        const name = row.querySelector(".work_name .text");
-        applyEditable(name, null, input_size_name);
-        const owner = row.querySelector(".work_owner .text");
-        applyEditable(owner, null, input_size_owner);
-        const plan_date_begin = row.querySelector(".work_plan_date_begin span");
-        applyEditable(plan_date_begin, null, input_size_date);
-        const plan_date_end = row.querySelector(".work_plan_date_end span");
-        applyEditable(plan_date_end, null, input_size_date);
-        const actual_date_begin = row.querySelector(".work_actual_date_begin span");
-        applyEditable(actual_date_begin, null, input_size_date);
-        const actual_date_end = row.querySelector(".work_actual_date_end span");
-        applyEditable(actual_date_end, null, input_size_date);
-        const plan_man_hour = row.querySelector(".work_plan_man_hour .text");
-        applyEditable(plan_man_hour, null, input_size_hour);
-        const actual_man_hour = row.querySelector(".work_actual_man_hour .text");
-        applyEditable(actual_man_hour, null, input_size_hour);
-        const progress = row.querySelector(".work_progress .value");
-        applyEditable(progress, null, input_size_progress);
-    }
+const addWorkEditable = (row) => {
+    // work_packageの変更対象
+    const name = row.querySelector(".work_name span");
+    applyEditable(name, null, input_size_name);
+    const owner = row.querySelector(".work_owner span");
+    applyEditable(owner, null, input_size_owner);
+    const plan_date_begin = row.querySelector(".work_date_begin .plan span");
+    applyEditable(plan_date_begin, null, input_size_date);
+    const plan_date_end = row.querySelector(".work_date_end .plan span");
+    applyEditable(plan_date_end, null, input_size_date);
+    const actual_date_begin = row.querySelector(".work_date_begin .actual span");
+    applyEditable(actual_date_begin, null, input_size_date);
+    const actual_date_end = row.querySelector(".work_date_end .actual span");
+    applyEditable(actual_date_end, null, input_size_date);
+    const plan_man_hour = row.querySelector(".work_man_hour .plan span");
+    applyEditable(plan_man_hour, null, input_size_hour);
+    const actual_man_hour = row.querySelector(".work_man_hour .actual span");
+    applyEditable(actual_man_hour, null, input_size_hour);
+    const progress = row.querySelector(".work_progress span");
+    applyEditable(progress, null, input_size_progress);
+}
+const addTaskEditable = (row) => {
+    // taskの変更対象
+    const name = row.querySelector(".work_name .text");
+    applyEditable(name, null, input_size_name);
+    const owner = row.querySelector(".work_owner .text");
+    applyEditable(owner, null, input_size_owner);
+    const plan_date_begin = row.querySelector(".work_date_begin .plan span");
+    applyEditable(plan_date_begin, null, input_size_date);
+    const plan_date_end = row.querySelector(".work_date_end .plan span");
+    applyEditable(plan_date_end, null, input_size_date);
+    const actual_date_begin = row.querySelector(".work_date_begin .actual span");
+    applyEditable(actual_date_begin, null, input_size_date);
+    const actual_date_end = row.querySelector(".work_date_end .actual span");
+    applyEditable(actual_date_end, null, input_size_date);
+    const plan_man_hour = row.querySelector(".work_man_hour .plan span");
+    applyEditable(plan_man_hour, null, input_size_hour);
+    const actual_man_hour = row.querySelector(".work_man_hour .actual span");
+    applyEditable(actual_man_hour, null, input_size_hour);
+    const progress = row.querySelector(".work_progress span");
+    applyEditable(progress, null, input_size_progress);
 }
 
-const applyEditable = (elem, validator, size=5) => {
+const applyEditable = (elem, validator, size) => {
     elem.addEventListener("click", (e) => {
        // クリックしたらinputで編集可能にする
         if (elem.dataset.temp === undefined || elem.dataset.temp === "") {
@@ -329,8 +324,13 @@ const removeInsertIndicator = () => {
 }
 
 const addInsertIndicator = () => {
+
     //
     const wbs = document.getElementById("WBS");
+    const root = wbs.querySelector("tbody");
+    const rows = root.querySelectorAll("tr");
+    //addInsertIndicatorImpl(root);
+
     // addInsertIndicatorImpl(wbs, "function", makeFunctionInsertIndicator, (func) => {
     //     // Function要素に対して適用する処理
     //     addInsertIndicatorImpl(func, "phase", makePhaseInsertIndicator, (phase) => {
@@ -344,81 +344,237 @@ const addInsertIndicator = () => {
     //         });
     //     });
     // });
-    addFunctionInsertIndicator(wbs);
+
+    // let i = 0;
+    // while (i < rows.length) {
+    //     const row = rows[i];
+    //     if (row.className === "function") {
+    //         // function要素に対して処理適用
+    //         i = addFunctionInsertIndicator(root, rows, i);
+    //     } else {
+    //         i++;
+    //     }
+    // }
+
+    addFunctionInsertIndicator(root, rows, 0);
 }
 
-const addFunctionInsertIndicator = (parent) => {
-    // Function要素に対して適用する処理
-    addInsertIndicatorImpl(parent, "function", makeFunctionInsertIndicator, (func) => {
-        // Function要素に対して適用する処理
-        addPhaseInsertIndicator(func);
-    });
-}
-const addPhaseInsertIndicator = (parent) => {
-    // Phase要素に対して適用する処理
-    addInsertIndicatorImpl(parent, "phase", makePhaseInsertIndicator, (phase) => {
-        // Phase要素に対して適用する処理
-        addWorkInsertIndicator(phase);
-    });
-}
-const addWorkInsertIndicator = (parent) => {
-    // Work要素に対して適用する処理
-    addInsertIndicatorImpl(parent, "work_package", makeWorkInsertIndicator, (work) => {
-        // Work要素に対して適用する処理
-        addTaskInsertIndicator(work);
-    });
-}
-const addTaskInsertIndicator = (parent) => {
-    // Work要素に対して適用する処理
-    addInsertIndicatorImpl(parent, "task", makeTaskInsertIndicator, () => {
-        // Task要素に対して適用する処理
-        // ここでは何もしない
-    });
-}
 
-const addInsertIndicatorImpl = (parent, cls_name, procInsertIndicator, proc) => {
-    // 機能挿入インジケーターを追加する
-    // 親要素単位で処理する
-    // class="function"の前後に追加可能
-    const rows = parent.getElementsByClassName(cls_name);
-    // functionの前にインジケーターを追加
-    for (let id = 0; id < rows.length; id++) {
-        const row = rows[id];
-        const indicator = procInsertIndicator(parent);
-        // 前にインジケーターを追加
-        row.before(indicator);
-
-        //
-        proc(row);
+const addFunctionInsertIndicator = (root, rows, idx) => {
+    // functionを指した状態でコールする
+    // functionの前に必ずインジケーターを追加
+    let i = idx;
+    while (i < rows.length) {
+        const row = rows[i];
+        if (row.className === "function") {
+            // functionの前にインジケーターを追加
+            const indicator = makeFunctionInsertIndicator(["function", null, null, null]);
+            row.before(indicator);
+            // 次の要素をチェック
+            i++;
+            if (i < rows.length) {
+                const next_row = rows[i];
+                switch (next_row.className) {
+                    case "function":
+                        // function -> function
+                        // 間にプロセスが無い場合、挿入インジケーターを追加する
+                        const indicator = makePhaseInsertIndicator(["phase", row.dataset.func_id, null, null]);
+                        next_row.before(indicator);
+                        break;
+                    case "phase":
+                        i = addPhaseInsertIndicator(root, rows, i);
+                        break;
+                    case "work_package":
+                    case "task":
+                    default:
+                        // ありえない
+                        alert("不正なWBS構造です : addFunctionInsertIndicator() : function以外の要素が出現しました");
+                        throw new Error("不正なWBS構造です : addFunctionInsertIndicator() : function以外の要素が出現しました");
+                }
+            }
+        } else {
+            // function以外の出現はありえない
+            // alert("不正なWBS構造です : addFunctionInsertIndicator() : function以外の要素が出現しました");
+            // throw new Error("不正なWBS構造です : addFunctionInsertIndicator() : function以外の要素が出現しました");
+            // ありえないので、無視する
+            i++;
+        }
     }
-    // functionのリストを格納する要素の末尾にインジケーターを追加
-    // functionが空の場合も末尾に追加できる
-    const row = parent.querySelector(".items");
-    const indicator = procInsertIndicator(parent);
-    // 前にインジケーターを追加
-    row.appendChild(indicator);
+    // function末尾のインジケーターを追加する
+    const indicator = makeFunctionInsertIndicator(["function", null, null, null]);
+    root.appendChild(indicator);
+    return i;
+}
+const addPhaseInsertIndicator = (root, rows, idx) => {
+    let i = idx;
+    let finish = false;
+    let func_id = null;
+    let phase_id = null;
+    while (i < rows.length && finish === false) {
+        const row = rows[i];
+        if (row.className === "phase") {
+            func_id = row.dataset.func_id;
+            phase_id = row.dataset.phase_id;
+            // phaseの前にインジケーターを追加
+            const indicator = makePhaseInsertIndicator(["phase", func_id, null, null]);
+            row.before(indicator);
+            // 次の要素をチェック
+            i++;
+            if (i < rows.length) {
+                const next_row = rows[i];
+                switch (next_row.className) {
+                    case "function":
+                        finish = true;
+                        break;
+                    case "phase":
+                        // phase -> phase
+                        // 間にworkが無い場合、挿入インジケーターを追加する
+                        const indicator = makeWorkInsertIndicator(["work_package", func_id, phase_id, null]);
+                        next_row.before(indicator);
+                        break;
+                    case "work_package":
+                        i = addWorkInsertIndicator(root, rows, i);
+                        break;
+                    case "task":
+                    default:
+                        // ありえない
+                        alert("不正なWBS構造です : addPhaseInsertIndicator() : phase以外の要素が出現しました");
+                        throw new Error("不正なWBS構造です : addPhaseInsertIndicator() : phase以外の要素が出現しました");
+                }
+            }
+        } else {
+            // phase以外の出現で終了
+            finish = true;
+        }
+    }
+    // phase末尾のインジケーターを追加する
+    const indicator = makePhaseInsertIndicator(["phase", func_id, null, null]);
+    if (i < rows.length) {
+        const last_row = rows[i - 1];
+        last_row.after(indicator);
+    } else {
+        // 末尾に追加する
+        root.appendChild(indicator);
+    }
+    return i;
+}
+const addWorkInsertIndicator = (root, rows, idx) => {
+    let i = idx;
+    let finish = false;
+    let func_id = null;
+    let phase_id = null;
+    let work_id = null;
+    while (i < rows.length && finish === false) {
+        const row = rows[i];
+        if (row.className === "work_package") {
+            func_id = row.dataset.func_id;
+            phase_id = row.dataset.phase_id;
+            work_id = row.dataset.work_id;
+            // workの前にインジケーターを追加
+            const indicator = makeWorkInsertIndicator(["work_package", func_id, phase_id, null]);
+            row.before(indicator);
+            // 次の要素をチェック
+            i++;
+            if (i < rows.length) {
+                const next_row = rows[i];
+                switch (next_row.className) {
+                    case "function":
+                        finish = true;
+                        break;
+                    case "phase":
+                        finish = true;
+                        break;
+                    case "work_package":
+                        // work -> work
+                        // 間にtaskが無い場合、挿入インジケーターを追加する
+                        const indicator = makeTaskInsertIndicator(["task", func_id, phase_id, work_id]);
+                        next_row.before(indicator);
+                        break;
+                    case "task":
+                        i = addTaskInsertIndicator(root, rows, i);
+                        break;
+                    default:
+                        // ありえない
+                        alert("不正なWBS構造です : addWorkInsertIndicator() : work以外の要素が出現しました");
+                        throw new Error("不正なWBS構造です : addWorkInsertIndicator() : work以外の要素が出現しました");
+                }
+            }
+        } else {
+            // work以外の出現で終了
+            finish = true;
+        }
+    }
+    // work末尾のインジケーターを追加する
+    const indicator = makeWorkInsertIndicator(["work_package", func_id, phase_id, null]);
+    if (i < rows.length) {
+        const last_row = rows[i - 1];
+        last_row.after(indicator);
+    } else {
+        // 末尾に追加する
+        root.appendChild(indicator);
+    }
+    return i;
+}
+const addTaskInsertIndicator = (root, rows, idx) => {
+    let i = idx;
+    let finish = false;
+    let func_id = null;
+    let phase_id = null;
+    let work_id = null;
+    while (i < rows.length && finish === false) {
+        const row = rows[i];
+        if (row.className === "task") {
+            func_id = row.dataset.func_id;
+            phase_id = row.dataset.phase_id;
+            work_id = row.dataset.work_id;
+            // taskの前にインジケーターを追加
+            const indicator = makeTaskInsertIndicator(["task", func_id, phase_id, work_id]);
+            row.before(indicator);
+            i++;
+        } else {
+            // task以外の出現で終了
+            finish = true;
+        }
+    }
+    // task末尾のインジケーターを追加する
+    const indicator = makeTaskInsertIndicator(["task", func_id, phase_id, work_id]);
+    if (i < rows.length) {
+        const last_row = rows[i - 1];
+        last_row.after(indicator);
+    } else {
+        // 末尾に追加する
+        root.appendChild(indicator);
+    }
+    return i;
 }
 
 
-
-const makeInsertIndicator = (parent, label, color, template, procInsertIndicator, procUpdateId) => {
+const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndicator, procUpdateId) => {
     const indicator = insert_indicator.cloneNode(true);
     indicator.id = null;
-    indicator.style.setProperty("background-color", color);
-    indicator.innerText = label;
-    indicator.addEventListener("click", () => {
+    const button = indicator.querySelector("div");
+    button.style.setProperty("background-color", color);
+    button.innerText = label;
+    button.addEventListener("click", () => {
         // インジケータークリック:挿入処理
         // 挿入要素をコピーして作成
-        const elem = template.cloneNode(true);
+        const root = template.cloneNode(true);
+        // root.style.setProperty("display", "contents");
+        // indicator.after(root);
         // インジケーターを適用
-        procInsertIndicator(elem);
-        // インジケーターの後ろに新しい要素を追加する
-        indicator.after(elem);
+        //const root = wbs.querySelector("tbody");
+        const rows = root.querySelectorAll("tr");
+        procInsertIndicator(root, rows, 0);
+        // インジケーターの前に新しい要素を追加する
+        const ary = Array.from(root.children);
+        ary.pop();
+        while (ary.length > 0) {
+            const e = ary.shift();
+            indicator.before(e);
+        }
         //
-        const new_indicator = makeInsertIndicator(parent, label, color, template, procInsertIndicator, procUpdateId);
-        elem.after(new_indicator);
         // 機能IDを更新する
-        procUpdateId(parent);
+        procUpdateId(updateInfo);
         // WBSが変更されたフラグを立てる
         setWbsChanged(true);
     });
@@ -426,87 +582,147 @@ const makeInsertIndicator = (parent, label, color, template, procInsertIndicator
     insert_indicator_list.push(indicator);
     return indicator;
 }
+const makeFunctionInsertIndicator = (updateInfo) => {
+    return makeInsertIndicator(updateInfo, "<<Function挿入>>", "rgb(0, 65, 139)", wbs_template_func, addFunctionInsertIndicator, updateFuncId);
+}
+const makePhaseInsertIndicator = (updateInfo) => {
+    return makeInsertIndicator(updateInfo, "<<Phase挿入>>", "rgb(223, 243, 255)", wbs_template_phase, addPhaseInsertIndicator, updatePhaseId);
+}
+const makeWorkInsertIndicator = (updateInfo) => {
+    return makeInsertIndicator(updateInfo, "<<Work挿入>>", "rgb(243, 255, 223)", wbs_template_work, addWorkInsertIndicator, updateWorkId);
+}
+const makeTaskInsertIndicator = (updateInfo) => {
+    return makeInsertIndicator(updateInfo, "<<Task挿入>>", "rgb(255, 160, 35)", wbs_template_task, addTaskInsertIndicator, updateTaskId);
+}
 
-const makeFunctionInsertIndicator = (parent) => {
-    return makeInsertIndicator(parent, "<<Function挿入>>", "rgb(84, 215, 255)", wbs_template_func, addPhaseInsertIndicator, updateFuncId);
-}
-const makePhaseInsertIndicator = (parent) => {
-    return makeInsertIndicator(parent, "<<Phase挿入>>", "rgb(210, 255, 87)", wbs_template_phase, addWorkInsertIndicator, updatePhaseId);
-}
-const makeWorkInsertIndicator = (parent) => {
-    return makeInsertIndicator(parent, "<<Work挿入>>", "rgb(255, 220, 63)", wbs_template_work, addTaskInsertIndicator, updateWorkId);
-}
-const makeTaskInsertIndicator = (parent) => {
-    return makeInsertIndicator(parent, "<<Task挿入>>", "rgb(255, 160, 35)", wbs_template_task, () => { }, updateTaskId);
-}
 
-
-const updateFuncId = (parent) => {
+const updateFuncId = (updateInfo) => {
     // 機能IDを更新する処理
-    const rows = parent.getElementsByClassName("function");
-    for (let i=0; i < rows.length; i++) {
-        const row = rows[i];
-        const id = i + 1;
-        // data更新
-        row.dataset.func_id = id;
-        //
-        const func_id = row.querySelector(".work_id .text");
-        func_id.innerText = row.dataset.func_id;
-
-        // フェーズIDを更新する
-        updatePhaseId(row);
-    }
+    const rows = wbs.querySelectorAll("tbody tr");
+    let i = 0;
+    updateFuncIdImpl(rows, i);
 }
-const updatePhaseId = (parent) => {
+const updatePhaseId = (updateInfo) => {
     // フェーズIDを更新する処理
-    const rows = parent.getElementsByClassName("phase");
-    for (let i=0; i < rows.length; i++) {
+    const rows = wbs.querySelectorAll("tbody tr");
+    const func_id = updateInfo[1];
+    let i = 0;
+    while (i < rows.length) {
         const row = rows[i];
-        const id = i + 1;
-        // data更新
-        row.dataset.func_id = parent.dataset.func_id;
-        row.dataset.phase_id = id;
-        //
-        const phase_id = row.querySelector(".work_id .text");
-        phase_id.innerText = row.dataset.func_id + "-" + id;
-
-        // ワークパッケージIDを更新する
-        updateWorkId(row);
+        if (row.className == "phase") {
+            if (row.dataset.func_id === func_id) {
+                updatePhaseIdImpl(rows, i, func_id);
+                break;
+            }
+        }
+        i++;
     }
 }
-const updateWorkId = (parent) => {
+const updateWorkId = (updateInfo) => {
     // ワークパッケージIDを更新する処理
-    const rows = parent.getElementsByClassName("work_package");
-    for (let i=0; i < rows.length; i++) {
-        const row = rows[i];
-        const id = i + 1;
-        // data更新
-        row.dataset.func_id = parent.dataset.func_id;
-        row.dataset.phase_id = parent.dataset.phase_id;
-        row.dataset.work_id = id;
-        //
-        const work_id = row.querySelector(".work_id .text");
-        work_id.innerText = row.dataset.func_id + "-" + row.dataset.phase_id + "-" + id;
+    const rows = wbs.querySelectorAll("tbody tr");
+    let i = 0;
+    updateWorkIdImpl(rows, i, updateInfo[1], updateInfo[2]);
+}
+const updateTaskId = (updateInfo) => {
+    // タスクIDを更新する処理
+    const rows = wbs.querySelectorAll("tbody tr");
+    let i = 0;
+    updateTaskIdImpl(rows, i, updateInfo[1], updateInfo[2], updateInfo[3]);
+}
 
-        // タスクIDを更新する
-        updateTaskId(row);
+
+const updateFuncIdImpl = (rows, i) => {
+    // 機能IDを更新する処理
+    let func_id = 1;
+    while (i < rows.length) {
+        const row = rows[i];
+        if (row.className == "function") {
+            // id更新
+            row.dataset.func_id = func_id;
+            const id_elem = row.querySelector(".work_id .text");
+            id_elem.innerText = func_id;
+            i++;
+            // phase更新
+            i = updatePhaseIdImpl(rows, i, func_id);
+            func_id++;
+        } else {
+            i++;
+        }
     }
 }
-const updateTaskId = (parent) => {
-    // タスクIDを更新する処理
-    const rows = parent.getElementsByClassName("task");
-    for (let i=0; i < rows.length; i++) {
+const updatePhaseIdImpl = (rows, i, func_id) => {
+    let phase_id = 1;
+    while (i < rows.length) {
         const row = rows[i];
-        const id = i + 1;
-        // data更新
-        row.dataset.func_id = parent.dataset.func_id;
-        row.dataset.phase_id = parent.dataset.phase_id;
-        row.dataset.work_id = parent.dataset.work_id;
-        row.dataset.task_id = id;
-        //
-        const task_id = row.querySelector(".work_id .text");
-        task_id.innerText = row.dataset.func_id + "-" + row.dataset.phase_id + "-" + row.dataset.work_id + "-" + id;
+        if (row.className == "function") {
+            break;
+        } else if (row.className == "phase") {
+            // id更新
+            row.dataset.func_id = func_id;
+            row.dataset.phase_id = phase_id;
+            const id_elem = row.querySelector(".work_id .text");
+            id_elem.innerText = func_id + "-" + phase_id;
+            i++;
+            // work更新
+            i = updateWorkIdImpl(rows, i, func_id, phase_id);
+            phase_id++;
+        } else {
+            i++;
+        }
     }
+    return i;
+}
+const updateWorkIdImpl = (rows, i, func_id, phase_id) => {
+    let work_id = 1;
+    while (i < rows.length) {
+        const row = rows[i];
+        if (row.className == "function") {
+            break;
+        } else if (row.className == "phase") {
+            break;
+        } else if (row.className == "work_package") {
+            // id更新
+            row.dataset.func_id = func_id;
+            row.dataset.phase_id = phase_id;
+            row.dataset.work_id = work_id;
+            const id_elem = row.querySelector(".work_id .text");
+            id_elem.innerText = func_id + "-" + phase_id + "-" + work_id;
+            i++;
+            // Task更新
+            i = updateTaskIdImpl(rows, i, func_id, phase_id, work_id);
+            work_id++;
+        } else {
+            i++;
+        }
+    }
+    return i;
+}
+const updateTaskIdImpl = (rows, i, func_id, phase_id, work_id) => {
+    let task_id = 1;
+    while (i < rows.length) {
+        const row = rows[i];
+        if (row.className == "function") {
+            break;
+        } else if (row.className == "phase") {
+            break;
+        } else if (row.className == "work_package") {
+            break;
+        } else if (row.className == "task") {
+            // id更新
+            row.dataset.func_id = func_id;
+            row.dataset.phase_id = phase_id;
+            row.dataset.work_id = work_id;
+            row.dataset.task_id = task_id;
+            const id_elem = row.querySelector(".work_id .text");
+            id_elem.innerText = func_id + "-" + phase_id + "-" + work_id + "-" + task_id;
+            i++;
+            task_id++;
+        } else {
+            i++;
+        }
+    }
+    return i;
 }
 
 

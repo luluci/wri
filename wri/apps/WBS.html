@@ -30,178 +30,7 @@
 		body {
 			margin: 0;
 			padding: 0;
-			display: flex;
-			flex-direction: column;
-			height: 100vh;
-			width: 100vw;
-		}
-
-		#WBS_toolbar {
-			width: auto;
-			margin: 10px 10px;
-
-			display: none;
-			grid-template-columns: 100px auto;
-
-			& #WBS_toolbar_status {
-				grid-column: 1;
-				grid-row: 1;
-				margin: 0;
-				padding: 2px 10px;
-				background-color: rgb(0, 65, 139);
-				border: 3px solid rgb(0, 65, 139);
-				border-top-left-radius: 20px;
-				border-bottom-left-radius: 20px;
-				color: #fff;
-				font-size: 0.8em;
-				text-align: center;
-
-				display:table;
-				& .text {
-					display:table-cell;
-					vertical-align:middle;
-				}
-			}
-			& #WBS_toolbar_toolbox {
-				grid-column: 2;
-				grid-row: 1;
-				margin: 0;
-				padding: 0 10px 0 0;
-				background-color:rgb(243, 255, 223);
-				border: 3px solid rgb(0, 65, 139);
-				border-top-right-radius: 20px;
-				border-bottom-right-radius: 20px;
-
-				& button {
-					margin: 3px 0 3px 10px;
-				}
-			}
-		}
-
-		.work_id {
-			padding: 1px 8px;
-			grid-row: auto / span 2;
-			grid-column: 1;
-			background-color:rgb(243, 255, 223);
-
-			display:table;
-			& .text {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_name {
-			padding: 2px;
-			padding-right: 2em;
-			grid-row: auto / span 2;
-			grid-column: 2;
-			background-color:rgb(243, 255, 223);
-
-			display:table;
-			& .text {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_owner {
-			padding: 1px 8px;
-			grid-row: auto / span 2;
-			grid-column: 3;
-
-			display:table;
-			& .text {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_plan_date_begin {
-			padding: 1px 8px;
-			grid-column: 4;
-			text-align: right;
-			font-size: 0.9em;
-			height: 1.5em;
-
-			display:table;
-			& .date {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_plan_date_end {
-			padding: 1px 8px;
-			grid-column: 5;
-			text-align: right;
-			font-size: 0.9em;
-			height: 1.5em;
-
-			display:table;
-			& .date {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_actual_date_begin {
-			padding: 1px 8px;
-			grid-column: 4;
-			text-align: right;
-			font-size: 0.9em;
-			height: 1.5em;
-
-			display:table;
-			& .date {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_actual_date_end {
-			padding: 1px 8px;
-			grid-column: 5;
-			text-align: right;
-			font-size: 0.9em;
-			height: 1.5em;
-
-			display:table;
-			& .date {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_plan_man_hour {
-			padding: 1px 8px;
-			grid-column: 6;
-			text-align: right;
-			font-size: 0.9em;
-
-			display:table;
-			& .text {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_actual_man_hour {
-			padding: 1px 8px;
-			grid-column: 6;
-			text-align: right;
-			font-size: 0.9em;
-
-			display:table;
-			& .text {
-				display:table-cell;
-				vertical-align:middle;
-			}
-		}
-		.work_progress {
-			padding: 1px 8px;
-			grid-row: auto / span 2;
-			grid-column: 7;
-			font-size: 0.9em;
-
-			display:table;
-			& .text,
-			& .value {
-				display:table-cell;
-				vertical-align:middle;
-			}
+			background-color: #404040;
 		}
 
 		.work_insert_indicator {
@@ -214,354 +43,609 @@
 		}
 
 		.WBS {
-			width: auto;
-			margin: 10px 10px;
-			border: 3px solid rgb(0, 65, 139);
 			font-size: 14px;
+			background-color:rgb(243, 255, 223);
 
-			overflow-y: auto;
-			
-			display: grid;
-			grid-auto-flow: column;
-			grid-template-columns: auto 20em 6em auto auto auto 1fr;
+			/* border-collapse: collapse; */
+			border-collapse:separate;
+			border-spacing:0;
 
-			& .extension {
-				display:contents;
+			height: auto;
+
+			table-layout: fixed;
+
+			/* & td:nth-child(1) {
+				position: sticky;
+				left: 0;
+			}
+			& thead tr th {
+				display: sticky;
+				top: 0;
+				z-index: 1;
+			}
+			& thead tr th:first-child {
+				z-index: 2;
+			} */
+			& thead {
+				position: sticky;
+				top: 0;
+				z-index: 2;
 			}
 
-			& .caption {
-				font-weight: bold;
-				display:contents;
+			& .work_id {
+				position: sticky;
+				left: 0;
+				z-index: 1;
 
-				& div {
-					background-color:rgb(243, 255, 223);
+				padding: 1px 8px;
+				background-color:rgb(243, 255, 223);
+				min-width: 50px;
+				width: 50px;
+			}
+			& .work_name {
+				position: sticky;
+				left: 66px;	/* width + padding */
+				z-index: 1;
+
+				padding: 2px;
+				padding-right: 2em;
+				background-color:rgb(243, 255, 223);
+				min-width: 14em;
+			}
+			& .work_owner {
+				padding: 1px 8px;
+				min-width: 4em;
+				text-align: center;
+			}
+			& .work_caption {
+				min-width: 2em;
+			}
+			& .work_date_begin {
+				margin: 0;
+				padding: 0;
+				text-align: center;
+				font-size: 0.9em;
+				height: 1.5em;
+				min-width: 4em;
+			}
+			& .work_date_end {
+				margin: 0;
+				padding: 0;
+				text-align: center;
+				font-size: 0.9em;
+				height: 1.5em;
+				min-width: 4em;
+			}
+			& .work_man_hour {
+				margin: 0;
+				padding: 0;
+				text-align: right;
+				font-size: 0.9em;
+				min-width: 2em;
+			}
+			& .work_progress {
+				padding: 1px 8px;
+				font-size: 0.9em;
+				min-width: 2em;
+			}
+			& .work_log {
+				padding: 1px 8px;
+				font-size: 0.9em;
+				min-width: 4em;
+			}
+
+			& .toolbar {
+				text-align: left;
+				background-color: rgb(252, 180, 122);
+
+				& th:first-child {
+					position: sticky;
+					left: 0;
+					z-index: 1;
+				}
+
+				& #WBS_toolbar_status {
+					display: inline;
+				}
+				& #WBS_toolbar_toolbox {
+					display: inline;
+				}
+
+				& #WBS_toolbar {
+					& button {
+						margin: 3px 0 3px 10px;
+					}
+				}
+			}
+			& .insert_indicator {
+				background-color: rgb(252, 180, 122);
+
+				& td:first-child {
+					position: sticky;
+					left: 0;
+					z-index: 1;
+
+					& div {
+						margin: 2px;
+						border: 1px solid #404040;
+						cursor : pointer;
+					}
 				}
 			}
 
-			& .items {
-				display:contents;
+			& .header {
+				background-color:rgb(243, 255, 223);
+				
+				& th {
+					border-bottom: 2px solid rgb(0, 65, 139);
+				}
+			}
 
-				& .function {
-					display:contents;
+			& .function {
+				background-color: rgb(0, 65, 139);
+				color: #fff;
 
-					& .caption {
-						display:contents;
+				& td {
+					background-color: rgb(0, 65, 139);
+				}
+			}
+			& .phase {
+				background-color: rgb(223, 243, 255);
+				color: #000;
 
-						& div {
-							background-color: rgb(0, 65, 139);
-							color: #fff;
-						}
+				& td {
+					background-color: rgb(223, 243, 255);
+				}
+				& .work_name {
+					text-indent: 1em;
+				}
+			}
+			& .work_package {
+				background-color: rgb(243, 255, 223);
+				color: #000;
+
+				& .work_name {
+					text-indent: 2em;
+				}
+			}
+			& .task {
+				background-color: #fff;
+				color: #000;
+
+				& .work_id {
+					background-color: rgb(243, 255, 223);
+				}
+				& .work_name {
+					text-indent: 3em;
+					border-right: 1px solid rgb(0, 65, 139);
+					background-color: rgb(243, 255, 223);
+				}
+				& .work_date_begin,
+				& .work_date_end,
+				& .work_man_hour {
+					& div span {
+						display: block;
+						min-height: 1em;
+						text-align: center;
 					}
-
-					& .items {
-						display:contents;
-						
-						& .phase {
-							display:contents;
-
-							& .caption {
-								display:contents;
-
-								& div {
-									background-color:rgb(223, 243, 255);
-									color: #000;
-									border-top: 1px solid rgb(0, 65, 139);
-								}
-								& .work_name .text {
-									text-indent: 1em;
-								}
-								& .work_actual_date_begin,
-								& .work_actual_date_end,
-								& .work_actual_man_hour {
-									border-top: none;
-								}
-							}
-
-							& .items {
-								display:contents;
-
-								& .work_package {
-									display:contents;
-
-									& .caption {
-										display:contents;
-
-										& div {
-											background-color:rgb(243, 255, 223);
-											color: #000;
-											border-top: 1px solid rgb(0, 65, 139);
-										}
-										& .work_name .text {
-											text-indent: 2em;
-										}
-									}
-
-									& .items {
-										display:contents;
-
-										& .task {
-											display:contents;
-
-											& div {
-												border-top: 1px solid rgb(0, 65, 139);
-												background-color:#fff;
-											}
-											& .work_id {
-												background-color:rgb(243, 255, 223);
-											}
-											& .work_name {
-												text-indent: 3em;
-												border-right: 1px solid rgb(0, 65, 139);
-												background-color:rgb(243, 255, 223);
-											}
-										}
-									}
-								}
-							}
-						}
+					& .plan {
+						border-bottom: 1px solid rgb(0, 65, 139);
 					}
 				}
-
+				& .work_owner,
+				& .work_caption,
+				& .work_date_begin,
+				& .work_date_end,
+				& .work_man_hour,
+				& .work_progress,
+				& .work_log {
+					border-top: 1px solid rgb(0, 65, 139);
+				}
 			}
-		}
 
-		#WBS_template {
-			display: none;
 		}
 
 	</style>
 </head>
 <body>
-	<div id="WBS_toolbar">
-		<div id="WBS_toolbar_status"><span class="text">編集ツール</span></div>
-		<div id="WBS_toolbar_toolbox"></div>
-	</div>
+	<table class="WBS" id="WBS">
+		<thead>
+			<tr class="toolbar" id="WBS_toolbar" style="display: none;">
+				<th colspan="2">
+					<div id="WBS_toolbar_status"><span class="text">編集ツール</span></div>
+					<div id="WBS_toolbar_toolbox"></div>
+				</th>
+				<th colspan="7"></th>
+			</tr>
+			<tr class="header">
+				<th class="work_id"><span class="text">ID</span></th>
+				<th class="work_name">タスク名</th>
+				<th class="work_owner">担当者</th>
+				<th class="work_caption"><div>計画</div><div>実績</div></th>
+				<th class="work_date_begin"><div>開始日</div><div>開始日</div></th>
+				<th class="work_date_end"><div>終了日</div><div>終了日</div></th>
+				<th class="work_man_hour">工数<br>(hr)</th>
+				<th class="work_progress">進捗<br>(%)</th>
+				<th class="work_log">ログ</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="insert_indicator">
+				<td colspan="2">
+					<div>を挿入</div>
+				</td>
+				<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			</tr>
+			<tr class="function" data-func_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">function_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+			<tr class="phase" data-func_id="1" data-phase_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">phase_1</span></td>
+				<td class="work_owner"></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"></td>
+			</tr>
+			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">work_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task_1</span></td>
+				<td class="work_owner"><span class="text">XXX</span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+		</tbody>
+	</table>
 
-	<div class="WBS" id="WBS">
-		<div class="caption">
-			<div class="work_id"><span class="text">ID</span></div>
-			<div class="work_name"><span class="text">タスク名</span></div>
-			<div class="work_owner"><span class="text">担当者</span></div>
-			<div class="work_plan_date_begin"><span class="text">見積 開始日</span></div>
-			<div class="work_plan_date_end"><span class="text">終了日</span></div>
-			<div class="work_actual_date_begin"><span class="text">実績 開始日</span></div>
-			<div class="work_actual_date_end"><span class="text">終了日</span></div>
-			<div class="work_plan_man_hour"><span class="text">工数</span></div>
-			<div class="work_actual_man_hour"><span class="text">(hr)</span></div>
-			<div class="work_progress"><span class="text">進捗<br>(%)</span></div>
-		</div>
-		<div class="items">
-			<div class="function" data-func_id="1">
-				<div class="caption">
-					<div class="work_id"><span class="text">ID</span></div>
-					<div class="work_name"><span class="text">Function_1</span></div>
-					<div class="work_owner"><span class="text"></span></div>
-					<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-					<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-					<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-					<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-					<div class="work_plan_man_hour"><span class="text"></span></div>
-					<div class="work_actual_man_hour"><span class="text"></span></div>
-					<div class="work_progress"><span class="value"></span></div>
-				</div>
-				<div class="items">
-					<div class="phase" data-func_id="1" data-phase_id="1">
-						<div class="caption">
-							<div class="work_id"><span class="text">ID</span></div>
-							<div class="work_name"><span class="text">Phase_1</span></div>
-							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_plan_man_hour"><span class="text"></span></div>
-							<div class="work_actual_man_hour"><span class="text"></span></div>
-							<div class="work_progress"><span class="value"></span></div>
-						</div>
-						<div class="items">
-							<div class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
-								<div class="caption">
-									<div class="work_id"><span class="text">ID</span></div>
-									<div class="work_name"><span class="text">WorkPackage_1_1</span></div>
-									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_plan_man_hour"><span class="text"></span></div>
-									<div class="work_actual_man_hour"><span class="text">0</span></div>
-									<div class="work_progress"><span class="value">0%</span></div>
-								</div>
-								<div class="items">
-									<div class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
-										<div class="work_id"><span class="text">ID</span></div>
-										<div class="work_name"><span class="text">WBS_Task_1_1_1</span></div>
-										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_plan_man_hour"><span class="text"></span></div>
-										<div class="work_actual_man_hour"><span class="text">0</span></div>
-										<div class="work_progress"><span class="value">0%</span></div>
-									</div>
-									<div class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="2">
-										<div class="work_id"><span class="text">ID</span></div>
-										<div class="work_name"><span class="text">WBS_Task_1_1_2</span></div>
-										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_plan_man_hour"><span class="text"></span></div>
-										<div class="work_actual_man_hour"><span class="text">0</span></div>
-										<div class="work_progress"><span class="value">0%</span></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="phase" data-func_id="1" data-phase_id="2">
-						<div class="caption">
-							<div class="work_id"><span class="text">ID</span></div>
-							<div class="work_name"><span class="text">Phase_2</span></div>
-							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_plan_man_hour"><span class="text"></span></div>
-							<div class="work_actual_man_hour"><span class="text"></span></div>
-							<div class="work_progress"><span class="value"></span></div>
-						</div>
-						<div class="items">
-							<div class="work_package" data-func_id="1" data-phase_id="2" data-work_id="1">
-								<div class="caption">
-									<div class="work_id"><span class="text">ID</span></div>
-									<div class="work_name"><span class="text">WorkPackage_2_1</span></div>
-									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_plan_man_hour"><span class="text"></span></div>
-									<div class="work_actual_man_hour"><span class="text">0</span></div>
-									<div class="work_progress"><span class="value">0%</span></div>
-								</div>
-								<div class="items">
-									<div class="task" data-func_id="1" data-phase_id="2" data-work_id="1" data-task_id="1">
-										<div class="work_id"><span class="text">ID</span></div>
-										<div class="work_name"><span class="text">WBS_Task_2_1_1</span></div>
-										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_plan_man_hour"><span class="text"></span></div>
-										<div class="work_actual_man_hour"><span class="text">0</span></div>
-										<div class="work_progress"><span class="value">0%</span></div>
-									</div>
-									<div class="task" data-func_id="1" data-phase_id="2" data-work_id="1" data-task_id="2">
-										<div class="work_id"><span class="text">ID</span></div>
-										<div class="work_name"><span class="text">WBS_Task_2_1_2</span></div>
-										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_plan_man_hour"><span class="text"></span></div>
-										<div class="work_actual_man_hour"><span class="text">0</span></div>
-										<div class="work_progress"><span class="value">0%</span></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
-
-	<div class="WBS" id="WBS_template">
-		<div class="extension">
-			<div class="work_insert_indicator" id="work_insert_indicator">&lt;ここに挿入&gt;</div>
-		</div>
-		<div class="header">
-			<div class="work_id"><span class="text">ID</span></div>
-			<div class="work_name"><span class="text">タスク名</span></div>
-			<div class="work_owner"><span class="text">担当者</span></div>
-			<div class="work_plan_date_begin">見積 開始日</div>
-			<div class="work_plan_date_end">終了日</div>
-			<div class="work_actual_date_begin">実績 開始日</div>
-			<div class="work_actual_date_end">終了日</div>
-			<div class="work_plan_man_hour">工数</div>
-			<div class="work_actual_man_hour">工数</div>
-			<div class="work_progress">進捗</div>
-		</div>
-		<div class="body">
-			<div class="function" data-func_id="0">
-				<div class="caption">
-					<div class="work_id"><span class="text">ID</span></div>
-					<div class="work_name"><span class="text">Function</span></div>
-					<div class="work_owner"><span class="text"></span></div>
-					<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-					<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-					<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-					<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-					<div class="work_plan_man_hour"><span class="text"></span></div>
-					<div class="work_actual_man_hour"><span class="text"></span></div>
-					<div class="work_progress"><span class="text"></span></div>
-				</div>
-				<div class="items">
-					<div class="phase" data-func_id="0" data-phase_id="0">
-						<div class="caption">
-							<div class="work_id"><span class="text">ID</span></div>
-							<div class="work_name"><span class="text">Phase</span></div>
-							<div class="work_owner"><span class="text"></span></div>
-							<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-							<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-							<div class="work_plan_man_hour"><span class="text"></span></div>
-							<div class="work_actual_man_hour"><span class="text"></span></div>
-							<div class="work_progress"><span class="text"></span></div>
-						</div>
-						<div class="items">
-							<div class="work_package" data-func_id="0" data-phase_id="0" data-work_id="0">
-								<div class="caption">
-									<div class="work_id"><span class="text">ID</span></div>
-									<div class="work_name"><span class="text">WorkPackage</span></div>
-									<div class="work_owner"><span class="text">tantou</span></div>
-									<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-									<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-									<div class="work_plan_man_hour"><span class="text"></span></div>
-									<div class="work_actual_man_hour"><span class="text">0</span></div>
-									<div class="work_progress"><span class="text">0</span></div>
-								</div>
-								<div class="items">
-									<div class="task" data-func_id="0" data-phase_id="0" data-work_id="0" data-task_id="0">
-										<div class="work_id"><span class="text">ID</span></div>
-										<div class="work_name"><span class="text">WBS_Task</span></div>
-										<div class="work_owner"><span class="text">tantou</span></div>
-										<div class="work_plan_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_plan_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_begin"><span class="date" data-value=""></span></div>
-										<div class="work_actual_date_end"><span class="date" data-value=""></span></div>
-										<div class="work_plan_man_hour"><span class="text"></span></div>
-										<div class="work_actual_man_hour"><span class="text">0</span></div>
-										<div class="work_progress"><span class="text">0</span></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+	<table class="WBS" id="WBS_template" style="display: none;">
+		<tbody>
+			<tr class="insert_indicator">
+				<td colspan="2">
+					<div>を挿入</div>
+				</td>
+				<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="WBS" style="display: none;">
+		<tbody id="WBS_function_template">
+			<tr class="function" data-func_id="1">
+				<td class="work_id"><span class="text"></span></td>
+				<td class="work_name"><span class="text">function_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+			<tr class="phase" data-func_id="1" data-phase_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name">phase_1</td>
+				<td class="work_owner"></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">work_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="WBS" style="display: none;">
+		<tbody id="WBS_phase_template">
+			<tr class="phase" data-func_id="1" data-phase_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">phase_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">work_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="WBS" style="display: none;">
+		<tbody id="WBS_work_template">
+			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">work_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="WBS" style="display: none;">
+		<tbody id="WBS_task_template">
+			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
+				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_name"><span class="text">task</span></td>
+				<td class="work_owner"><span class="text"></span></td>
+				<th class="work_caption"></th>
+				<td class="work_date_begin">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_date_end">
+					<div class="plan"><span class="date" data-value=""></span></div>
+					<div class="actual"><span class="date" data-value=""></span></div>
+				</td>
+				<td class="work_man_hour">
+					<div class="plan"><span class="value"></span></div>
+					<div class="actual"><span class="value"></span></div>
+				</td>
+				<td class="work_progress"></td>
+				<td class="work_log"></td>
+			</tr>
+		</tbody>
+	</table>
 
 </body>
 </html>
