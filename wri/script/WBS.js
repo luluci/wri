@@ -73,7 +73,10 @@ const addEditable = () => {
     const wbs = document.getElementById("WBS");
     const root = wbs.querySelector("tbody");
     const rows = root.querySelectorAll("tr");
-    for (let i=0; i<rows.length; i++){
+    addEditableImpl(rows);
+}
+const addEditableImpl = (rows) => {
+    for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         switch (row.className) {
             case "function":
@@ -287,7 +290,6 @@ const makeAddButton = () => {
     let button = document.createElement("button");
     button.innerText = "要素追加";
     button.addEventListener("click", () => {
-        changeInsertMode();
         //
         if (insert_mode === true) {
             // ボタンの表示を元に戻す
@@ -296,6 +298,8 @@ const makeAddButton = () => {
             // ボタンの表示を変更する
             button.innerText = "要素追加終了";
         }
+        //
+        changeInsertMode();
     });
 
     return button;
@@ -464,6 +468,7 @@ const addWorkInsertIndicator = (root, rows, idx) => {
     let func_id = null;
     let phase_id = null;
     let work_id = null;
+    let has_task = false;
     while (i < rows.length && finish === false) {
         const row = rows[i];
         if (row.className === "work_package") {
@@ -491,6 +496,7 @@ const addWorkInsertIndicator = (root, rows, idx) => {
                         next_row.before(indicator);
                         break;
                     case "task":
+                        has_task = true;
                         i = addTaskInsertIndicator(root, rows, i);
                         break;
                     default:
@@ -502,6 +508,17 @@ const addWorkInsertIndicator = (root, rows, idx) => {
         } else {
             // work以外の出現で終了
             finish = true;
+        }
+    }
+    // workブロック内にtaskが無い場合、挿入インジケーターを追加する
+    if (!has_task) {
+        const indicator = makeTaskInsertIndicator(["task", func_id, phase_id, work_id]);
+        if (i < rows.length) {
+            const last_row = rows[i - 1];
+            last_row.after(indicator);
+        } else {
+            // 末尾に追加する
+            root.appendChild(indicator);
         }
     }
     // work末尾のインジケーターを追加する
@@ -564,6 +581,7 @@ const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndic
         // インジケーターを適用
         //const root = wbs.querySelector("tbody");
         const rows = root.querySelectorAll("tr");
+        addEditableImpl(rows);
         procInsertIndicator(root, rows, 0);
         // インジケーターの前に新しい要素を追加する
         const ary = Array.from(root.children);
@@ -592,7 +610,7 @@ const makeWorkInsertIndicator = (updateInfo) => {
     return makeInsertIndicator(updateInfo, "<<Work挿入>>", "rgb(243, 255, 223)", wbs_template_work, addWorkInsertIndicator, updateWorkId);
 }
 const makeTaskInsertIndicator = (updateInfo) => {
-    return makeInsertIndicator(updateInfo, "<<Task挿入>>", "rgb(255, 160, 35)", wbs_template_task, addTaskInsertIndicator, updateTaskId);
+    return makeInsertIndicator(updateInfo, "<<Task挿入>>", "rgb(255, 255, 255)", wbs_template_task, addTaskInsertIndicator, updateTaskId);
 }
 
 

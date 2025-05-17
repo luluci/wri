@@ -91,11 +91,21 @@
 				padding-right: 2em;
 				background-color:rgb(243, 255, 223);
 				min-width: 14em;
+
+				& span {
+					display: block;
+					min-height: 1.2em;
+				}
 			}
 			& .work_owner {
 				padding: 1px 8px;
 				min-width: 4em;
 				text-align: center;
+
+				& span {
+					display: block;
+					min-height: 1.2em;
+				}
 			}
 			& .work_caption {
 				min-width: 2em;
@@ -127,6 +137,11 @@
 				padding: 1px 8px;
 				font-size: 0.9em;
 				min-width: 2em;
+
+				& span {
+					display: block;
+					min-height: 1.2em;
+				}
 			}
 			& .work_log {
 				padding: 1px 8px;
@@ -513,9 +528,9 @@
 				<td class="work_log"><span class="value"></span></td>
 			</tr>
 			<tr class="phase" data-func_id="1" data-phase_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
-				<td class="work_name">phase_1</td>
-				<td class="work_owner"></td>
+				<td class="work_id"><span class="text"></span></td>
+				<td class="work_name"><span class="text">phase_1</span></td>
+				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
@@ -529,11 +544,11 @@
 					<div class="plan"><span class="value"></span></div>
 					<div class="actual"><span class="value"></span></div>
 				</td>
-				<td class="work_progress"></td>
-				<td class="work_log"></td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
 			</tr>
 			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
@@ -557,7 +572,7 @@
 	<table class="WBS" style="display: none;">
 		<tbody id="WBS_phase_template">
 			<tr class="phase" data-func_id="1" data-phase_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">phase_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
@@ -573,11 +588,11 @@
 					<div class="plan"><span class="value"></span></div>
 					<div class="actual"><span class="value"></span></div>
 				</td>
-				<td class="work_progress"></td>
-				<td class="work_log"></td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
 			</tr>
 			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
@@ -593,15 +608,15 @@
 					<div class="plan"><span class="value"></span></div>
 					<div class="actual"><span class="value"></span></div>
 				</td>
-				<td class="work_progress"></td>
-				<td class="work_log"></td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
 			</tr>
 		</tbody>
 	</table>
 	<table class="WBS" style="display: none;">
 		<tbody id="WBS_work_template">
 			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
@@ -617,15 +632,15 @@
 					<div class="plan"><span class="value"></span></div>
 					<div class="actual"><span class="value"></span></div>
 				</td>
-				<td class="work_progress"></td>
-				<td class="work_log"></td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
 			</tr>
 		</tbody>
 	</table>
 	<table class="WBS" style="display: none;">
 		<tbody id="WBS_task_template">
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
-				<td class="work_id"><span class="text">ID</span></td>
+				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">task</span></td>
 				<td class="work_owner"><span class="text"></span></td>
 				<th class="work_caption"></th>
@@ -641,8 +656,8 @@
 					<div class="plan"><span class="value"></span></div>
 					<div class="actual"><span class="value"></span></div>
 				</td>
-				<td class="work_progress"></td>
-				<td class="work_log"></td>
+				<td class="work_progress"><span class="value"></span></td>
+				<td class="work_log"><span class="value"></span></td>
 			</tr>
 		</tbody>
 	</table>
