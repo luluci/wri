@@ -5,9 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Microsoft.Web.WebView2.Wpf;
 
 namespace wri.Interface
 {
+    static public class GlobalData
+    {
+        static public WebView2CompositionControl WebView2;
+    }
+
     /// <summary>
     /// C# -> WebView2 Interfaceのルートとする。
     /// このクラス内にAPIを登録する。

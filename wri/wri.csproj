@@ -66,6 +66,7 @@
     <Compile Include="Interface\WindowsApi.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Utility\BindableBase.cs" />
+    <Compile Include="Utility\Console.cs" />
     <Compile Include="Utility\WindowsApi.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

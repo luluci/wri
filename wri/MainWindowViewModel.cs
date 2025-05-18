@@ -76,6 +76,7 @@ namespace wri
             //var opt = WebView2.CreationProperties;
 
             // 適切なタイミングで初期化する
+            Interface.GlobalData.WebView2 = WebView2;
             EntryPoint = new Interface.EntryPoint();
 
             //WebView2.AllowExternalDrop = true;
@@ -168,6 +169,7 @@ namespace wri
 
         private void webView_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
         {
+            // WebView2からのメッセージ受信イベント
             var s = e.TryGetWebMessageAsString();
             //MessageBox.Show(s);
         }
