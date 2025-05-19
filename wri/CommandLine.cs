@@ -7,31 +7,37 @@ using System.Windows;
 
 namespace wri
 {
-    public class CommandLine
+    public class CommandLineOption
     {
-        public bool IsGuiMode;
+        // 起動モード
+        public bool GuiMode;
 
         // GUIモード
-        public string InputFile;
+        public string LaunchFile;
+
+        public CommandLineOption()
+        {
+            GuiMode = true;
+            LaunchFile = string.Empty;
+        }
+    }
+
+    static public class CommandLine
+    {
+        static public CommandLineOption Option { get; set; } = new CommandLineOption();
 
         // コンソールモード
-        Interface.EntryPoint ep = new Interface.EntryPoint();
-        Type WinApiT = typeof(Interface.WindowsApi);
+        static Interface.EntryPoint ep = new Interface.EntryPoint();
+        static Type WinApiT = typeof(Interface.WindowsApi);
         // 解析状態
         enum OptionState
         {
             None,
             WinApi,
         }
-        OptionState optionState = OptionState.None;
+        static OptionState optionState = OptionState.None;
 
-        public CommandLine()
-        {
-            IsGuiMode = true;
-            InputFile = string.Empty;
-        }
-
-        public void Parse(string[] args)
+        static public void Parse(string[] args)
         {
             if (args.Length > 0)
             {
@@ -39,7 +45,7 @@ namespace wri
                 switch (ext)
                 {
                     case ".html":
-                        InputFile = args[0];
+                        Option.LaunchFile = args[0];
                         break;
 
                     default:
@@ -54,12 +60,12 @@ namespace wri
                 {
                     case "-h":
                     case "--help":
-                        IsGuiMode = false;
+                        Option.GuiMode = false;
                         Help();
                         return;
 
                     case "--winapi":
-                        IsGuiMode = false;
+                        Option.GuiMode = false;
                         optionState = OptionState.WinApi;
                         break;
 
@@ -70,7 +76,7 @@ namespace wri
             }
         }
 
-        private void ParseValue(string value)
+        static private void ParseValue(string value)
         {
             switch (optionState)
             {
@@ -85,7 +91,7 @@ namespace wri
             }
         }
 
-        private void ParseValueWinApi(string value)
+        static private void ParseValueWinApi(string value)
         {
             try
             {
@@ -106,7 +112,7 @@ namespace wri
             }
         }
 
-        public void Help()
+        static public void Help()
         {
             Console.WriteLine("Usage:");
             Console.WriteLine("  [GUI Mode]    wri.exe <html file>");

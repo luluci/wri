@@ -24,9 +24,9 @@ namespace wri
     {
         MainWindowViewModel vm;
 
-        public MainWindow(CommandLine cmd)
+        public MainWindow()
         {
-            vm = new MainWindowViewModel(this, cmd);
+            vm = new MainWindowViewModel(this);
             this.DataContext = vm;
 
             InitializeComponent();

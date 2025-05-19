@@ -25,14 +25,13 @@ namespace wri
         {
             // コマンドライン引数解析
             // 特定のコマンドでコンソールモードで動作する
-            var cmd = new CommandLine();
-            cmd.Parse(e.Args);
+            CommandLine.Parse(e.Args);
             //
-            if (cmd.IsGuiMode)
+            if (CommandLine.Option.GuiMode)
             {
                 // コマンドライン引数が存在しないとき
                 // GUI起動
-                MainWindow mainWindow = new MainWindow(cmd);
+                MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();
             }
             else

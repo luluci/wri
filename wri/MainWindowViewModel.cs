@@ -12,6 +12,8 @@ using Microsoft.Web.WebView2.Wpf;
 
 namespace wri
 {
+    using Microsoft.Web.WebView2.WinForms;
+    using System.Windows;
     using System.Windows.Controls;
     using Utility;
 
@@ -19,7 +21,6 @@ namespace wri
     {
         // 
         MainWindow window;
-        CommandLine cmd;
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
         public ReactivePropertySlim<Uri> SourcePath { get; set; }
@@ -27,11 +28,13 @@ namespace wri
         public WebView2CompositionControl WebView2;
         public Interface.EntryPoint EntryPoint { get; set; }
 
-        public MainWindowViewModel(MainWindow window, CommandLine cmd)
+        //
+        Uri uriBlank = new Uri("about:blank");
+
+        public MainWindowViewModel(MainWindow window)
         {
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
-            this.cmd = cmd;
 
             // WebView2インスタンスの初期化前に実施する
             // dllをexeファイル内に取り込むのと相性が悪い。
@@ -46,14 +49,15 @@ namespace wri
             //string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             //string SettingPath = rootPath + @"\Script";
             Uri uri;
-            if (object.ReferenceEquals(cmd.InputFile, string.Empty))
+            if (object.ReferenceEquals(CommandLine.Option.LaunchFile, string.Empty))
             {
                 uri = new Uri($@"{rootPath}\index.html");
             }
             else
             {
-                uri = new Uri(cmd.InputFile);
+                uri = new Uri(CommandLine.Option.LaunchFile);
             }
+            //uri = new Uri("https://www.google.co.jp");
 
             SourcePath = new ReactivePropertySlim<Uri>(uri);
             SourcePath.AddTo(Disposables);
@@ -69,6 +73,7 @@ namespace wri
             WebView2 = window.WebView2;
             // 初期化完了ハンドラ登録
             WebView2.CoreWebView2InitializationCompleted += webView2CoreWebView2InitializationCompleted;
+            WebView2.NavigationStarting += webView_NavigationStarting;
             WebView2.NavigationCompleted += webView_NavigationCompleted;
             // JavaScript側からの呼び出し
             WebView2.WebMessageReceived += webView_WebMessageReceived;
@@ -139,6 +144,30 @@ namespace wri
             // WebView2起動時の初期化完了後に1回だけコールされる
         }
 
+        private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            var uri = new Uri(e.Uri);
+            if (uri.Scheme != "file")
+            {
+                SourcePath.Value = uriBlank;
+                e.Cancel = true;
+                //
+                // HTML文字列を表示
+                //string htmlContent = @"
+                //    <html>
+                //    <head>
+                //        <title>Warning</title>
+                //    </head>
+                //    <body>
+                //        <h1>ローカルファイルのみ開けます</h1>
+                //    </body>
+                //    </html>
+                //";
+
+                //WebView2.CoreWebView2.NavigateToString(htmlContent);
+            }
+        }
+
         private async void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
         {
             try
@@ -158,7 +187,11 @@ namespace wri
                 // WebView2/index.htmlのJavaScript初期化
                 await RunScriptLoaded("const wri = chrome.webview.hostObjects.sync.wri; true");
                 await RunScriptLoaded("const wri_async = chrome.webview.hostObjects.wri; true");
-                await RunScriptLoaded("csLoaded()");
+                //
+                if (!object.ReferenceEquals(WebView2.Source, uriBlank))
+                {
+                    await RunScriptLoaded("csLoaded()");
+                }
             }
             catch (Exception ex)
             {
