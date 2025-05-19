@@ -76,7 +76,7 @@ namespace wri.Interface
                     ss.Append($"\"{console.Results[0]}\"");
                     for (int i = 1; i < console.Results.Count; i++)
                     {
-                        ss.Append($", \"{console.Results[0]}\"");
+                        ss.Append($", \"{console.Results[i]}\"");
                     }
                 }
                 var json = $"{{ \"result\" : [ {ss} ] }}";

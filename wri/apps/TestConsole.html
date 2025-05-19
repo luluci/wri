@@ -13,12 +13,13 @@
 		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
 		const csLoaded = () => {
 			try {
-				//
-				let tag = document.getElementById("init-message");
-				tag.textContent = "初期化完了";
-
+				const console = document.getElementById("console");
+				log_elem = console.querySelector(".body pre");
+				
 				window.chrome.webview.addEventListener('message', (e) => {
-					alert('message received:' + e.data);
+					for (let i=0; i< e.data.result.length; i++) {
+						log_elem.innerText += e.data.result[i] + "\n";
+					}
 				});
 				
 				const btn_start = document.getElementById("test_console_start");
@@ -62,6 +63,8 @@
 		}
 		// ↑ロジックを理解した上で変更すること↑
 
+		let log_elem;
+
 		// document.addEventListener("DOMContentLoaded", () => {
 		// });
 
@@ -81,8 +84,45 @@
 			flex: 1;
 			overflow-y: auto;
 		}
-		#footer {
+		#console {
 			width: 100%;
+			height: 30vh;
+			background-color: #606060;
+			display: flex;
+			flex-direction: column;
+
+			& .header {
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: row;
+
+				& .tab {
+					width: 100px;
+					background-color: #202020;
+					margin: 5px 2px 0 2px;
+					border-top-left-radius: 5px;
+					border-top-right-radius: 5px;
+					color: #f0f0f0;
+					font-size: 0.9em;
+					padding: 2px;
+					text-align: center;
+				}
+
+				& button {
+					padding: 0 10px;
+					margin: 5px 0 2px 10px;
+				}
+			}
+			& .body {
+				flex-grow: 1;
+				margin: 0 2px 2px 2px;
+				padding: 5px;
+				background-color: #202020;
+				height: auto;
+				overflow-y: auto;
+				color: #f0f0f0;
+			}
 		}
 
 	</style>
@@ -114,12 +154,16 @@
 		</div>
 	</div>
 </div>
-<div id="footer">
-
-	<div id="init-message">初期化メッセージ表示</div>
-
-	<button onclick="debug()">Debug</button>
-	<div id="debug-message">ここにデバッグ用メッセージ表示</div>
+<div id="console">
+	<div class="header">
+		<div class="tab">コマンドログ</div>
+		<button>クリア</button>
+	</div>
+	<div class="body">
+<pre>
+test
+</pre>
+	</div>
 
 </div>
 </body>
