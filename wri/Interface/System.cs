@@ -55,42 +55,37 @@ namespace wri.Interface
             }
         }
 
-        public async void ExecCmdAsync(string cmd)
-        {
-            // JavaScriptから"async void func()"をコールすると
-            // 関数実行開始したら即座に返る？
-            await console.ExecCmdAsync(cmd);
-            //
-            var ss = new StringBuilder();
-            foreach (string s in console.Results) {
-                ss.Append(s);
-            }
-            var json = $"{{ \"result\" : [ {ss.ToString()} ] }}";
-            GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
-        }
-
-        public bool ExecCmd(string cmd)
-        {
-            return console.ExecCmd(cmd);
-        }
-        public bool ExecCmds(object param)
+        public async void ExecCmd(object param)
         {
             try
             {
                 if (param is object[] ps)
                 {
                     var list = ps.Select(x => x as string).ToArray();
-                    return console.ExecCmd(list);
+                    await console.ExecCmdAsync(list);
                 }
                 else
                 {
                     var str = param as string;
-                    return console.ExecCmd(str);
+                    await console.ExecCmdAsync(str);
                 }
+                //
+                var ss = new StringBuilder();
+                if (console.Results.Count > 0)
+                {
+                    ss.Append($"\"{console.Results[0]}\"");
+                    for (int i = 1; i < console.Results.Count; i++)
+                    {
+                        ss.Append($", \"{console.Results[0]}\"");
+                    }
+                }
+                var json = $"{{ \"result\" : [ {ss} ] }}";
+                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                var json = $"{{ \"result\" : [ \"{ex.Message}\" ] }}";
+                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
         }
     }

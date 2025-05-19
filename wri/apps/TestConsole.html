@@ -21,18 +21,21 @@
 					alert('message received:' + e.data);
 				});
 				
-				wri.system.Console.Start();
-				wri.system.Console.ExecCmds([
-					"set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%",
-					"set MSYSTEM=UCRT64",
-					"bash"
-				]);
-				// wri.system.Console.ExecCmd("set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%");
-				// wri.system.Console.ExecCmd("set MSYSTEM=UCRT64");
-				// wri.system.Console.ExecCmd("bash");
+				const btn_start = document.getElementById("test_console_start");
+				btn_start.addEventListener("click", async () => {
+					wri.system.Console.Start();
+					wri.system.Console.ExecCmd([
+						"set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%",
+						"set MSYSTEM=UCRT64",
+						"bash"
+					]);
+					// wri.system.Console.ExecCmd("set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%");
+					// wri.system.Console.ExecCmd("set MSYSTEM=UCRT64");
+					// wri.system.Console.ExecCmd("bash");
+				});
 
-				const btn = document.getElementById("test_console_exec");
-				btn.addEventListener("click", async () => {
+				const btn_exec = document.getElementById("test_console_exec");
+				btn_exec.addEventListener("click", async () => {
 
 					// return new Promise(resolve => {
 					// 	wri.system.Console.ExecCmdAsync("sleep 2; echo test");
@@ -45,7 +48,8 @@
 					//await wri_async.system.Console.ExecCmdAsync("sleep 5");;
 					// const ret1 = wri.system.Console.test(0);
 					// const ret2 = wri.system.Console.test(1);
-					const task = wri.system.Console.ExecCmdAsync("sleep 5");
+					// const task = wri.system.Console.ExecCmd("sleep 5");
+					wri.system.Console.ExecCmd("ls");
 					// const ret = wri.system.Console.Result;
 					// alert(ret[0]);
 					// alert("test");
@@ -94,6 +98,7 @@
 						header1
 					</div>
 					<div class="item">
+						<button id="test_console_start">接続</button>
 						<button id="test_console_exec">実行</button>
 					</div>
 				</div>

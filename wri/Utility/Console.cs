@@ -118,18 +118,28 @@ namespace Utility
             {
                 if (System.Threading.Monitor.TryEnter(lockCmd))
                 {
-                    ExecCmd(cmds);
-
-                    await Task.Run(() =>
+                    if (ExecCmd(cmds))
                     {
-                        while (IsCmdRunning) Task.Delay(500);
-                    });
+                        await Task.Run(() =>
+                        {
+                            while (IsCmdRunning) Task.Delay(500);
+                        });
 
-                    System.Threading.Monitor.Exit(lockCmd);
+                        System.Threading.Monitor.Exit(lockCmd);
+                    }
+                    else
+                    {
+                        Results.Add("failed");
+                    }
+                }
+                else
+                {
+                    Results.Add("cmd is already running");
                 }
             }
             catch (Exception ex)
             {
+                Results.Add(ex.Message);
             }
         }
 
