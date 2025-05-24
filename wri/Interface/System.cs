@@ -74,7 +74,33 @@ namespace wri.Interface
         public int ExitCode { get; set; } = 0;
         public string ErrorMessage { get; set; } = string.Empty;
 
-        public async void ExecCmd(object param)
+        public void SetExitCodeStr(string cmd)
+        {
+            // 終了コードを格納している変数文字列
+            console.SetExitCodeStr(cmd);
+        }
+        public bool ExecCmd(object param)
+        {
+            // WebView2からのコールではasyncは即座にコントロールが返るため、
+            // 前のコマンドの実行中に再度コールされる可能性がある。
+            // 意図的な連続コマンド実行は配列で渡すことで対応できるため、
+            // 前のコマンド実行中に再度本関数がコールされたら失敗として終了する。
+            // 本関数自体はGUIスレッドからのみコールされるためフラグで排他制御できる。
+
+            // コマンド実行拒否したらfalseを返す
+            if (console.IsRunning)
+            {
+                return false;
+            }
+
+            // コマンド実行したらその結果に関わらずtrueを返す。
+            // そもそも実行結果を確認する前にWebView2に処理が返る。
+            // コマンド実行結果はExitCodeやPostWebMessageAsJsonによる通知で確認する。
+            ExecCmdImpl(param);
+            return true;
+        }
+
+        public async void ExecCmdImpl(object param)
         {
             try
             {

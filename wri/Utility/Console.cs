@@ -22,6 +22,7 @@ namespace Utility
         private const string _promptMarker = "__CMD_COMPLETE__";
         private const string _exitCodeCmd = "%ERRORLEVEL%";
         private const string _exitCodeBash = "$?";
+        private string _exitCodeStr = string.Empty;
         private string _promptMarkerCmd;
         private Regex _promptMarkerRegex;
         // コマンド実行用
@@ -58,6 +59,9 @@ namespace Utility
                 if (!(process is null))
                 {
                     process.Close();
+                    _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeCmd}";
+                    ExitCode = 0;
+                    ErrorMessage = string.Empty;
                 }
 
                 process = new Process();
@@ -100,6 +104,11 @@ namespace Utility
             }
         }
 
+        public void SetExitCodeStr(string cmd)
+        {
+            _exitCodeStr = cmd;
+            _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeStr}";
+        }
         public void SetBash()
         {
             _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeBash}";
@@ -138,29 +147,27 @@ namespace Utility
             }
         }
 
-        Object lockCmd = new Object();
-        private static readonly Mutex _mutex = new Mutex();
-        public async Task ExecCmdAsync(string cmd)
+        public async Task<bool> ExecCmdAsync(string cmd)
         {
             dummyCmds[0] = cmd;
-            await ExecCmdAsync(dummyCmds);
+            return await ExecCmdAsync(dummyCmds);
         }
-        public async Task ExecCmdAsync(string[] cmds)
+        public async Task<bool> ExecCmdAsync(string[] cmds)
         {
+            bool result = false;
+            // コマンド実行をリジェクトした場合にfalseを返す。
+            // コマンド実行したら結果に関わらずtrueを返す。
             try
             {
-                //System.Threading.Monitor.Enter(lockCmd);
-                //_mutex.WaitOne();
                 if (IsCmdRunning)
                 {
-                    await Task.Run(() =>
-                    {
-                        while (IsCmdRunning) Task.Delay(500);
-                    });
+                    return false;
                 }
+                IsCmdRunning = true;
 
                 if (ExecCmd(cmds))
                 {
+                    result = true;
                     await Task.Run(() =>
                     {
                         while (IsCmdRunning) Task.Delay(500);
@@ -171,28 +178,6 @@ namespace Utility
                     ErrorMessage = "ExecCmd() failed.";
                     ExitCode = -1;
                 }
-                //if (System.Threading.Monitor.TryEnter(lockCmd))
-                //{
-                //    if (ExecCmd(cmds))
-                //    {
-                //        await Task.Run(() =>
-                //        {
-                //            while (IsCmdRunning) Task.Delay(500);
-                //        });
-
-                //        System.Threading.Monitor.Exit(lockCmd);
-                //    }
-                //    else
-                //    {
-                //        ErrorMessage = "ExecCmd() failed.";
-                //        ExitCode = -1;
-                //    }
-                //}
-                //else
-                //{
-                //    ErrorMessage = "cmd is already running";
-                //    ExitCode = -1;
-                //}
             }
             catch (Exception ex)
             {
@@ -201,9 +186,10 @@ namespace Utility
             }
             finally
             {
-                //System.Threading.Monitor.Exit(lockCmd);
-                //_mutex.ReleaseMutex();
+                IsCmdRunning = false;
             }
+
+            return result;
         }
 
         public bool ExecCmd(string cmd)
@@ -213,27 +199,25 @@ namespace Utility
         }
         public bool ExecCmd(string[] cmds)
         {
-            if (process is null)
-            {
-                return false;
-            }
-            if (IsCmdRunning)
-            {
-                return false;
-            }
-
             try
             {
-                IsCmdRunning = true;
+                if (process is null)
+                {
+                    ErrorMessage = "process is not initialized.";
+                    return false;
+                }
+                // 入力されたコマンドをすべてstdinに流す
                 foreach (var cmd in cmds)
                 {
                     process.StandardInput.WriteLine(cmd);
                 }
+                // コマンド実行完了を検知するためのダミーコマンド実行
                 process.StandardInput.WriteLine(_promptMarkerCmd);
                 return true;
             }
             catch (Exception ex)
             {
+                ErrorMessage = ex.Message;
                 return false;
             }
         }

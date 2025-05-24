@@ -13,6 +13,29 @@
 		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
 		const csLoaded = () => {
 			try {
+				console_initialize();
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		const console_state_none = 0;	// コンソール未初期化
+		const console_state_wait_init_1 = 1;	// コンソール初期化中1:環境変数設定完了待ち
+		const console_state_wait_init_2 = 2;	// コンソール初期化中2:bash起動完了待ち
+		const console_state_wait_command = 3;	// コマンド実行待ち
+		const console_state_running_command = 4;	// コマンド実行中
+		let log_disp;
+		let log_elem;
+		let console_state = console_state_none;
+
+		let btn_console_connect;
+		let btn_console_exec;
+
+		const console_initialize = () => {
+			try {
 				const console = document.getElementById("console");
 				log_disp = console.querySelector(".body");
 				log_elem = console.querySelector(".body pre");
@@ -20,39 +43,55 @@
 				console_clear_btn.addEventListener('click', (e) => {
 					log_elem.innerText = "";
 				});
-				
+
 				window.chrome.webview.addEventListener('message', (e) => {
 					if (e.data.type == "console") {
 						switch (e.data.status) {
 							case "running":
+								// コマンド実行中の標準出力通知
 								log_elem.innerText += e.data.stdout + "\n";
 								log_disp.scrollTop = log_disp.scrollHeight;
 								break;
 
 							case "exit":
-								log_elem.innerText += "<exit:" + e.data.code + ">" + "\n";
-								log_disp.scrollTop = log_disp.scrollHeight;
+								// コマンド終了通知
+								// 終了コード
+								// log_elem.innerText += "<exit:" + e.data.code + ">" + "\n";
+								// log_disp.scrollTop = log_disp.scrollHeight;
+								on_console_command_exit(e.data.code);
 								break;
 						}
 					}
 				});
-				
-				const btn_start = document.getElementById("test_console_start");
-				btn_start.addEventListener("click", async () => {
+
+				btn_console_connect = document.getElementById("test_console_start");
+				btn_console_connect.addEventListener("click", async () => {
+					btn_console_exec.disabled = true;
 					wri.system.Console.Start();
-					wri.system.Console.ExecCmd([
+					const ret = wri.system.Console.ExecCmd([
 						"set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%",
 						"set MSYSTEM=UCRT64"
 					]);
-					wri.system.Console.SetBash();
-					wri.system.Console.ExecCmd("bash");
+					if (ret) {
+						// コマンド実行に成功
+						console_state = console_state_wait_init_1;
+					} else {
+						// コマンド実行に失敗
+						alert("接続失敗しました : " + console.ErrorMessage);
+						console_state = console_state_none;
+					}
+					// wri.system.Console.SetBash();
+					// const ret2 = wri.system.Console.ExecCmd("bash");
+					// const ret3 = wri.system.Console.ExecCmd("echo test");
 					// wri.system.Console.ExecCmd("set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%");
 					// wri.system.Console.ExecCmd("set MSYSTEM=UCRT64");
 					// wri.system.Console.ExecCmd("bash");
 				});
 
-				const btn_exec = document.getElementById("test_console_exec");
-				btn_exec.addEventListener("click", async () => {
+				btn_console_exec = document.getElementById("test_console_exec");
+				btn_console_exec.disabled = true;
+				btn_console_exec.addEventListener("click", async () => {
+					btn_console_exec.disabled = true;
 
 					// return new Promise(resolve => {
 					// 	wri.system.Console.ExecCmdAsync("sleep 2; echo test");
@@ -66,24 +105,77 @@
 					// const ret1 = wri.system.Console.test(0);
 					// const ret2 = wri.system.Console.test(1);
 					// const task = wri.system.Console.ExecCmd("sleep 5");
-					wri.system.Console.ExecCmd("ls");
+					const ret = wri.system.Console.ExecCmd("ls");
 					// const ret = wri.system.Console.Result;
 					// alert(ret[0]);
 					// alert("test");
+					if (ret) {
+						// コマンド実行に成功
+						console_state = console_state_running_command;
+					} else {
+						// コマンド実行に失敗
+						alert("実行失敗しました : " + console.ErrorMessage);
+						console_state = console_state_wait_command;
+					}
 				});
 			} catch (msg) {
+				alert(msg);
 				return false;
 			}
-			//Utility.Log("<WebView2/JavaScript Loaded.>");
 			return true;
 		}
-		// ↑ロジックを理解した上で変更すること↑
 
-		let log_elem;
-		let log_disp;
+		const on_console_command_exit = (code) => {
+			try {
+				switch (console_state) {
+					case console_state_wait_init_1:
+						//
+						if (code != 0) {
+							alert("終了コードが異常？  ExitCode=" + code);
+						}
+						// 終了コードを取得するため、bashの終了コード変数をセット
+						wri.system.Console.SetExitCodeStr("$?");
+						// コンソールとしてbashを起動
+						const ret = wri.system.Console.ExecCmd("bash");
+						if (ret) {
+							// コマンド実行に成功
+							console_state = console_state_wait_init_2;
+						} else {
+							// コマンド実行に失敗
+							alert("接続失敗しました : " + console.ErrorMessage);
+							console_state = console_state_none;
+						}
+						break;
 
-		// document.addEventListener("DOMContentLoaded", () => {
-		// });
+					case console_state_wait_init_2:
+						//
+						if (code != 0) {
+							alert("終了コードが異常？  ExitCode=" + code);
+						}
+						console_state = console_state_wait_command;
+						btn_console_exec.disabled = false;
+						break;
+
+					case console_state_wait_command:
+						// ありえない？
+						alert("コマンド未実行のはずなのにコマンド完了通知を受信");
+						btn_console_exec.disabled = false;
+						break;
+
+					case console_state_running_command:
+						console_state = console_state_wait_command;
+						btn_console_exec.disabled = false;
+						break;
+
+					default:
+						console_state = console_state_none;
+						break;
+				}
+
+			} catch (msg) {
+				alert(msg);
+			}
+		}
 
     </script>
 	<style type="text/css">
