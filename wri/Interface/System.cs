@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace wri.Interface
 {
@@ -40,20 +42,37 @@ namespace wri.Interface
 
         public bool Start()
         {
-            return console.Start();
+            return console.Start(OnStdout, OnExit);
+        }
+        public void SetBash()
+        {
+            console.SetBash();
         }
         public void Close()
         {
             console.Close();
         }
 
-        public string[] Result
+        private void OnStdout(string stdout)
         {
-            get
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
             {
-                return console.Results.ToArray();
-            }
+                var json = Json.MakeJsonStringConsoleStdout(stdout);
+                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+            }));
         }
+        private void StdoutPost(string stdout)
+        {
+            var json = Json.MakeJsonStringConsoleStdout(stdout);
+            GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+        }
+        private void OnExit(int code)
+        {
+            //ExitCode = console.ExitCode;
+        }
+
+        public int ExitCode { get; set; } = 0;
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public async void ExecCmd(object param)
         {
@@ -69,22 +88,16 @@ namespace wri.Interface
                     var str = param as string;
                     await console.ExecCmdAsync(str);
                 }
-                //
-                var ss = new StringBuilder();
-                if (console.Results.Count > 0)
-                {
-                    ss.Append($"\"{console.Results[0]}\"");
-                    for (int i = 1; i < console.Results.Count; i++)
-                    {
-                        ss.Append($", \"{console.Results[i]}\"");
-                    }
-                }
-                var json = $"{{ \"result\" : [ {ss} ] }}";
+                ErrorMessage = console.ErrorMessage;
+                ExitCode = console.ExitCode;
+                var json = Json.MakeJsonStringConsoleExit(ExitCode);
                 GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
             catch (Exception ex)
             {
-                var json = $"{{ \"result\" : [ \"{ex.Message}\" ] }}";
+                ErrorMessage = ex.Message;
+                ExitCode = -1;
+                var json = Json.MakeJsonStringConsoleExit(ExitCode);
                 GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
         }

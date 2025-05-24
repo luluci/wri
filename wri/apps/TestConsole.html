@@ -14,11 +14,26 @@
 		const csLoaded = () => {
 			try {
 				const console = document.getElementById("console");
+				log_disp = console.querySelector(".body");
 				log_elem = console.querySelector(".body pre");
+				const console_clear_btn = document.getElementById("console_clear_btn");
+				console_clear_btn.addEventListener('click', (e) => {
+					log_elem.innerText = "";
+				});
 				
 				window.chrome.webview.addEventListener('message', (e) => {
-					for (let i=0; i< e.data.result.length; i++) {
-						log_elem.innerText += e.data.result[i] + "\n";
+					if (e.data.type == "console") {
+						switch (e.data.status) {
+							case "running":
+								log_elem.innerText += e.data.stdout + "\n";
+								log_disp.scrollTop = log_disp.scrollHeight;
+								break;
+
+							case "exit":
+								log_elem.innerText += "<exit:" + e.data.code + ">" + "\n";
+								log_disp.scrollTop = log_disp.scrollHeight;
+								break;
+						}
 					}
 				});
 				
@@ -27,9 +42,10 @@
 					wri.system.Console.Start();
 					wri.system.Console.ExecCmd([
 						"set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%",
-						"set MSYSTEM=UCRT64",
-						"bash"
+						"set MSYSTEM=UCRT64"
 					]);
+					wri.system.Console.SetBash();
+					wri.system.Console.ExecCmd("bash");
 					// wri.system.Console.ExecCmd("set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%");
 					// wri.system.Console.ExecCmd("set MSYSTEM=UCRT64");
 					// wri.system.Console.ExecCmd("bash");
@@ -64,6 +80,7 @@
 		// ↑ロジックを理解した上で変更すること↑
 
 		let log_elem;
+		let log_disp;
 
 		// document.addEventListener("DOMContentLoaded", () => {
 		// });
@@ -157,7 +174,7 @@
 <div id="console">
 	<div class="header">
 		<div class="tab">コマンドログ</div>
-		<button>クリア</button>
+		<button id="console_clear_btn">クリア</button>
 	</div>
 	<div class="body">
 <pre>

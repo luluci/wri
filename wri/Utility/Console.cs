@@ -3,26 +3,35 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using static Utility.Console;
 
 namespace Utility
 {
     internal class Console
     {
+        // 実行結果
+        public int ExitCode = 0;
+        public string ErrorMessage = string.Empty;
+
+        //
         private Process process;
         private bool IsCmdRunning;
-        private const string _promptMarker = "__CMD_COMPLETE__";  // コマンド完了検出用のマーカー
+        private const string _promptMarker = "__CMD_COMPLETE__";
+        private const string _exitCodeCmd = "%ERRORLEVEL%";
+        private const string _exitCodeBash = "$?";
         private string _promptMarkerCmd;
-
-        public List<string> Results;
+        private Regex _promptMarkerRegex;
         // コマンド実行用
         private string[] dummyCmds;
 
         public Console()
         {
             IsCmdRunning = false;
-            Results = new List<string>();
-            _promptMarkerCmd = $"echo {_promptMarker}";
+            _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeCmd}";
+            _promptMarkerRegex = new Regex($@"^{_promptMarker} (.+)");
             dummyCmds = new string[] {""};
         }
 
@@ -34,10 +43,18 @@ namespace Utility
             }
         }
 
-        public bool Start()
+        public delegate void CallbackStdout(string output);
+        public delegate void CallbackExit(int code);
+        private CallbackStdout callbackStdout;
+        private CallbackExit callbackExit;
+
+        public bool Start(CallbackStdout stdout, CallbackExit exit)
         {
             try
             {
+                callbackStdout = stdout;
+                callbackExit = exit;
+
                 if (!(process is null))
                 {
                     process.Close();
@@ -55,6 +72,7 @@ namespace Utility
                 process.OutputDataReceived += CmdProcess_OutputDataReceived;
                 process.ErrorDataReceived += CmdProcess_OutputDataReceived;
                 process.Start();
+                process.StandardInput.WriteLine("@echo off");
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
@@ -82,6 +100,11 @@ namespace Utility
             }
         }
 
+        public void SetBash()
+        {
+            _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeBash}";
+        }
+
         public void Close()
         {
             if (process != null)
@@ -92,21 +115,31 @@ namespace Utility
 
         private void CmdProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(e.Data))
+            //if (!string.IsNullOrWhiteSpace(e.Data))
+            //{
+            //}
+            // コマンド完了を検出
+            if (!(e.Data is null))
             {
-                // コマンド完了を検出
-                if (e.Data.Contains(_promptMarker))
+                var match = _promptMarkerRegex.Match(e.Data);
+                if (match.Success)
                 {
+                    if (!int.TryParse(match.Groups[1].Value, out ExitCode))
+                    {
+                        ExitCode = -1;
+                    }
+                    callbackExit(ExitCode);
                     IsCmdRunning = false;
                 }
                 else
                 {
-                    Results.Add(e.Data);
+                    callbackStdout(e.Data);
                 }
             }
         }
 
         Object lockCmd = new Object();
+        private static readonly Mutex _mutex = new Mutex();
         public async Task ExecCmdAsync(string cmd)
         {
             dummyCmds[0] = cmd;
@@ -116,30 +149,60 @@ namespace Utility
         {
             try
             {
-                if (System.Threading.Monitor.TryEnter(lockCmd))
+                //System.Threading.Monitor.Enter(lockCmd);
+                //_mutex.WaitOne();
+                if (IsCmdRunning)
                 {
-                    if (ExecCmd(cmds))
+                    await Task.Run(() =>
                     {
-                        await Task.Run(() =>
-                        {
-                            while (IsCmdRunning) Task.Delay(500);
-                        });
+                        while (IsCmdRunning) Task.Delay(500);
+                    });
+                }
 
-                        System.Threading.Monitor.Exit(lockCmd);
-                    }
-                    else
+                if (ExecCmd(cmds))
+                {
+                    await Task.Run(() =>
                     {
-                        Results.Add("failed");
-                    }
+                        while (IsCmdRunning) Task.Delay(500);
+                    });
                 }
                 else
                 {
-                    Results.Add("cmd is already running");
+                    ErrorMessage = "ExecCmd() failed.";
+                    ExitCode = -1;
                 }
+                //if (System.Threading.Monitor.TryEnter(lockCmd))
+                //{
+                //    if (ExecCmd(cmds))
+                //    {
+                //        await Task.Run(() =>
+                //        {
+                //            while (IsCmdRunning) Task.Delay(500);
+                //        });
+
+                //        System.Threading.Monitor.Exit(lockCmd);
+                //    }
+                //    else
+                //    {
+                //        ErrorMessage = "ExecCmd() failed.";
+                //        ExitCode = -1;
+                //    }
+                //}
+                //else
+                //{
+                //    ErrorMessage = "cmd is already running";
+                //    ExitCode = -1;
+                //}
             }
             catch (Exception ex)
             {
-                Results.Add(ex.Message);
+                ErrorMessage = ex.Message;
+                ExitCode = -1;
+            }
+            finally
+            {
+                //System.Threading.Monitor.Exit(lockCmd);
+                //_mutex.ReleaseMutex();
             }
         }
 
@@ -162,12 +225,10 @@ namespace Utility
             try
             {
                 IsCmdRunning = true;
-                Results.Clear();
                 foreach (var cmd in cmds)
                 {
                     process.StandardInput.WriteLine(cmd);
                 }
-                process.StandardInput.WriteLine("echo ");
                 process.StandardInput.WriteLine(_promptMarkerCmd);
                 return true;
             }
