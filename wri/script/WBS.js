@@ -23,7 +23,12 @@ const input_size_hour = 1;
 const input_size_progress = 1;
 
 // 挿入処理変数
+const wbs_ctrl_mode_default = 0;    // 通常モード
+const wbs_ctrl_mode_edit = 1;     // 要素挿入モード
+
+var wbs_ctrl_mode = wbs_ctrl_mode_default;
 var insert_mode = false;
+var delete_mode = false;
 var insert_indicator = null;
 var insert_indicator_list = []; // 表示用に追加したインジケーターのリスト, 後で削除するために使用
 
@@ -56,7 +61,7 @@ const initToolbar = () => {
     const saveButton = makeSaveButton();
     toolbox.appendChild(saveButton);
     // タスク追加ボタン
-    const addTaskButton = makeAddButton();
+    const addTaskButton = makeEditButton();
     toolbox.appendChild(addTaskButton);
 }
 const resetToolbar = () => {
@@ -254,8 +259,8 @@ const saveChange = () => {
         let result = window.confirm('変更を保存します。ファイルを上書きしますがよろしいですか？');
         if (result === true) {
             // 編集モードを終了する
-            if (insert_mode === true) {
-                changeInsertMode();
+            if (wbs_ctrl_mode === wbs_ctrl_mode_edit) {
+                changeEditMode();
             }
             // toolbarを非表示にする
             resetToolbar();
@@ -286,38 +291,205 @@ const makeSaveButton = () => {
     return button;
 }
 
-const makeAddButton = () => {
+const makeEditButton = () => {
     let button = document.createElement("button");
-    button.innerText = "要素追加";
+    button.innerText = "編集";
     button.addEventListener("click", () => {
         //
-        if (insert_mode === true) {
+        if (wbs_ctrl_mode === wbs_ctrl_mode_edit) {
             // ボタンの表示を元に戻す
-            button.innerText = "要素追加";
+            button.innerText = "編集";
         } else {
             // ボタンの表示を変更する
-            button.innerText = "要素追加終了";
+            button.innerText = "編集終了";
         }
         //
-        changeInsertMode();
+        changeEditMode();
     });
 
     return button;
 }
 
-const changeInsertMode = () => {
-    if (insert_mode === true) {
-        // 挿入モードのとき、
-        // インジケーターを削除して終了
-        removeInsertIndicator();
-        insert_mode = false;
+const changeEditMode = () => {
+    if (wbs_ctrl_mode === wbs_ctrl_mode_edit) {
+        // 編集モードのとき
+        onExitEditMode();
+        wbs_ctrl_mode = wbs_ctrl_mode_default;
     } else {
-        // 挿入モード以外のとき
+        // 編集モード以外のとき
+        addRemoveButton();
         // 挿入モードを設定する
         addInsertIndicator();
-        insert_mode = true;
+        wbs_ctrl_mode = wbs_ctrl_mode_edit;
     }
 }
+
+const onExitEditMode = () => {
+    // 編集モード終了時の処理
+    // インジケーターを削除
+    removeInsertIndicator();
+    // 削除ボタンを消しながらIDを修正する
+    const wbs = document.getElementById("WBS");
+    const root = wbs.querySelector("tbody");
+    const rows = root.querySelectorAll("tr");
+    let i = 0;
+    let func_id = 0;
+    let phase_id = 1;
+    let work_id = 1;
+    let task_id = 1;
+    while (i < rows.length) {
+        const row = rows[i];
+        const tgt_elem = row.querySelector(".work_id");
+        const id_elem = tgt_elem?.querySelector("span");
+        switch (row.className) {
+            case "function":
+                func_id++;
+                phase_id = 0;
+                work_id = 0;
+                task_id = 0;
+                tgt_elem.removeChild(tgt_elem.lastElementChild);
+                id_elem.innerText = func_id;
+                break;
+
+            case "phase":
+                phase_id++;
+                work_id = 0;
+                task_id = 0;
+                tgt_elem.removeChild(tgt_elem.lastElementChild);
+                id_elem.innerText = func_id + "-" + phase_id;
+                break;
+
+            case "work_package":
+                work_id++;
+                task_id = 0;
+                tgt_elem.removeChild(tgt_elem.lastElementChild);
+                id_elem.innerText = func_id + "-" + phase_id + "-" + work_id;
+                break;
+
+            case "task":
+                task_id++;
+                tgt_elem.removeChild(tgt_elem.lastElementChild);
+                id_elem.innerText = func_id + "-" + phase_id + "-" + work_id + "-" + task_id;
+                break;
+
+            default:
+                break;
+        }
+        i++;
+    }
+}
+
+const addRemoveButton = () => {
+    const wbs = document.getElementById("WBS");
+    const root = wbs.querySelector("tbody");
+    const rows = root.querySelectorAll("tr");
+    addRemoveButtonImpl(rows);
+}
+const addRemoveButtonImpl = (rows) => {
+    let i = 0;
+    while (i < rows.length) {
+        const row = rows[i];
+        let btn = null;
+        switch (row.className) {
+            case "function":
+                btn = makeFunctionRemoveButton(row);
+                break;
+
+            case "phase":
+                btn = makePhaseRemoveButton(row);
+                break;
+
+            case "work_package":
+                btn = makeWorkRemoveButton(row);
+                break;
+
+            case "task":
+                btn = makeTaskRemoveButton(row);
+                break;
+
+            default:
+                break;
+        }
+        if (btn != null) {
+            const tgt_elem = row.querySelector(".work_id");
+            tgt_elem.appendChild(btn);
+            const id_elem = tgt_elem.querySelector("span");
+            id_elem.innerText = "";
+        }
+
+        i++;
+    }
+}
+const makeRemoveButton = (proc) => {
+    const elem = document.createElement("button");
+    elem.innerText = "削除"
+    elem.addEventListener("click", proc);
+    return elem;
+}
+const makeFunctionRemoveButton = (tgt_elem) => {
+    return makeRemoveButton((e) => {
+        const name_elem = tgt_elem.querySelector(".work_name span");
+        const result = window.confirm("[Function][" + name_elem.innerText + "]を削除します。\nPhase,WorkPackage,Taskも削除されます。\nよろしいですか？");
+        if (result) {
+            let next_node = tgt_elem;
+            do {
+                tgt_elem = next_node;
+                next_node = tgt_elem.nextElementSibling;
+                tgt_elem.remove();
+            } while (next_node != null && next_node.className != "function");
+            // WBSが変更されたフラグを立てる
+            setWbsChanged(true);
+        }
+    });
+}
+const makePhaseRemoveButton = (tgt_elem) => {
+    return makeRemoveButton((e) => {
+        const name_elem = tgt_elem.querySelector(".work_name span");
+        const result = window.confirm("[Phase][" + name_elem.innerText + "]を削除します。\WorkPackage,Taskも削除されます。\nよろしいですか？");
+        if (result) {
+            let next_node = tgt_elem;
+            do {
+                tgt_elem = next_node;
+                next_node = tgt_elem.nextElementSibling;
+                tgt_elem.remove();
+            } while (next_node != null && next_node.className != "function" && next_node.className != "phase");
+            // WBSが変更されたフラグを立てる
+            setWbsChanged(true);
+        }
+    });
+}
+const makeWorkRemoveButton = (tgt_elem) => {
+    return makeRemoveButton((e) => {
+        const name_elem = tgt_elem.querySelector(".work_name span");
+        const result = window.confirm("[WorkPackage][" + name_elem.innerText + "]を削除します。\nTaskも削除されます。\nよろしいですか？");
+        if (result) {
+            let next_node = tgt_elem;
+            do {
+                tgt_elem = next_node;
+                next_node = tgt_elem.nextElementSibling;
+                tgt_elem.remove();
+            } while (next_node != null && next_node.className != "function" && next_node.className != "phase" && next_node.className != "work_package");
+            // WBSが変更されたフラグを立てる
+            setWbsChanged(true);
+        }
+    });
+}
+const makeTaskRemoveButton = (tgt_elem) => {
+    return makeRemoveButton((e) => {
+        const name_elem = tgt_elem.querySelector(".work_name span");
+        const result = window.confirm("[Task][" + name_elem.innerText + "]を削除します。\nよろしいですか？");
+        if (result) {
+            let next_node = tgt_elem.nextElementSibling;
+            tgt_elem.remove();
+            if (next_node != null) {
+                next_node.remove();
+            }
+            // WBSが変更されたフラグを立てる
+            setWbsChanged(true);
+        }
+    });
+}
+
 
 const removeInsertIndicator = () => {
     // インジケーターを削除する処理
@@ -568,9 +740,12 @@ const addTaskInsertIndicator = (root, rows, idx) => {
 
 const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndicator, procUpdateId) => {
     const indicator = insert_indicator.cloneNode(true);
+    const tool_elem = indicator.querySelector("td");
     indicator.id = null;
-    const button = indicator.querySelector("div");
-    button.style.setProperty("background-color", color);
+    //const button = indicator.querySelector("div");
+    //button.style.setProperty("background-color", color);
+    const button = document.createElement("button");
+    tool_elem.appendChild(button);
     button.innerText = label;
     button.addEventListener("click", () => {
         // インジケータークリック:挿入処理
@@ -582,6 +757,7 @@ const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndic
         //const root = wbs.querySelector("tbody");
         const rows = root.querySelectorAll("tr");
         addEditableImpl(rows);
+        addRemoveButtonImpl(rows);
         procInsertIndicator(root, rows, 0);
         // インジケーターの前に新しい要素を追加する
         const ary = Array.from(root.children);
@@ -592,7 +768,7 @@ const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndic
         }
         //
         // 機能IDを更新する
-        procUpdateId(updateInfo);
+        // procUpdateId(updateInfo);
         // WBSが変更されたフラグを立てる
         setWbsChanged(true);
     });
@@ -601,16 +777,16 @@ const makeInsertIndicator = (updateInfo, label, color, template, procInsertIndic
     return indicator;
 }
 const makeFunctionInsertIndicator = (updateInfo) => {
-    return makeInsertIndicator(updateInfo, "<<Function挿入>>", "rgb(0, 65, 139)", wbs_template_func, addFunctionInsertIndicator, updateFuncId);
+    return makeInsertIndicator(updateInfo, "Function", "rgb(0, 65, 139)", wbs_template_func, addFunctionInsertIndicator, updateFuncId);
 }
 const makePhaseInsertIndicator = (updateInfo) => {
-    return makeInsertIndicator(updateInfo, "<<Phase挿入>>", "rgb(223, 243, 255)", wbs_template_phase, addPhaseInsertIndicator, updatePhaseId);
+    return makeInsertIndicator(updateInfo, "Phase", "rgb(223, 243, 255)", wbs_template_phase, addPhaseInsertIndicator, updatePhaseId);
 }
 const makeWorkInsertIndicator = (updateInfo) => {
-    return makeInsertIndicator(updateInfo, "<<Work挿入>>", "rgb(243, 255, 223)", wbs_template_work, addWorkInsertIndicator, updateWorkId);
+    return makeInsertIndicator(updateInfo, "Work", "rgb(243, 255, 223)", wbs_template_work, addWorkInsertIndicator, updateWorkId);
 }
 const makeTaskInsertIndicator = (updateInfo) => {
-    return makeInsertIndicator(updateInfo, "<<Task挿入>>", "rgb(255, 255, 255)", wbs_template_task, addTaskInsertIndicator, updateTaskId);
+    return makeInsertIndicator(updateInfo, "Task", "rgb(255, 255, 255)", wbs_template_task, addTaskInsertIndicator, updateTaskId);
 }
 
 
