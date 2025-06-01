@@ -25,12 +25,17 @@ const input_size_progress = 1;
 // 挿入処理変数
 const wbs_ctrl_mode_default = 0;    // 通常モード
 const wbs_ctrl_mode_edit = 1;     // 要素挿入モード
+const wbs_ctrl_mode_timer = 2;      // タイマーモード
 
 var wbs_ctrl_mode = wbs_ctrl_mode_default;
 var insert_mode = false;
 var delete_mode = false;
 var insert_indicator = null;
 var insert_indicator_list = []; // 表示用に追加したインジケーターのリスト, 後で削除するために使用
+
+// ログ機能設定
+var log_col_begin = -1;
+var log_col_today = [-1, null];
 
 document.addEventListener("DOMContentLoaded", function() {
     wbs = document.getElementById("WBS");
@@ -48,6 +53,9 @@ document.addEventListener("DOMContentLoaded", function() {
     insert_indicator = wbs_template.querySelector(".insert_indicator");
 
     addEditable();
+
+    // ログ機能初期化
+    initLogger();
 });
 
 const initToolbar = () => {
@@ -60,9 +68,12 @@ const initToolbar = () => {
     // 保存ボタン
     const saveButton = makeSaveButton();
     toolbox.appendChild(saveButton);
-    // タスク追加ボタン
-    const addTaskButton = makeEditButton();
-    toolbox.appendChild(addTaskButton);
+    // 編集ボタン
+    const editButton = makeEditButton();
+    toolbox.appendChild(editButton);
+    // タイマーボタン
+    const timerButton = makeTimerButton();
+    toolbox.appendChild(timerButton);
 }
 const resetToolbar = () => {
     // toolbar非表示
@@ -71,6 +82,136 @@ const resetToolbar = () => {
     toolbox.innerHTML = "";
 
     setWbsChanged(false);
+}
+
+
+const initLogger = () => {
+    // ログ機能ツール生成
+    const log_area_elem = document.getElementById("log_tool_area");
+    const btn = makeLogBeginButton();
+    log_area_elem.appendChild(btn);
+
+    // ログ情報取得
+    // ヘッダからログ行列情報を取得
+    const header = wbs.querySelector("thead tr.header");
+    const cols = header.querySelectorAll("th");
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i];
+        if (col.classList.contains("work_log")) {
+            log_col_begin = i;
+            break;
+        }
+    }
+    if (log_col_begin < 0) {
+        // ログ列が見つからない場合はエラー
+        alert("フォーマットエラー：ログ列が見つかりません。WBSのヘッダにログ列を追加してください。");
+        return;
+    }
+    // 今日のログ列を取得
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // const today_str = today.toISOString().slice(0, 10);
+    const today_ms = today.getTime();//.toString()
+    for (let i = log_col_begin+1; i < cols.length; i++) {
+        const col = cols[i];
+        if (col.dataset.date === today_ms) {
+            log_col_today = [i, col];
+            break;
+        }
+    }
+}
+const makeLogBeginButton = () => {
+    let button = document.createElement("button");
+    button.innerText = "今日>>";
+    button.addEventListener("click", function () {
+        // 今日のログ開始設定
+        // 今日分のログ列が無ければ作成
+        if (log_col_today[0] < 0) {
+            // ログ列挿入位置を決定
+            const today = new Date();
+            //today.setDate(today.getDate() - 1);
+            //today.setDate(today.getDate() + 1);
+            today.setHours(0, 0, 0, 0);
+            const today_ms = today.getTime();//.toString()
+            let result;
+            [result, log_col_today] = findLogColInsertPosition(today_ms);
+            if (result === false) {
+                log_col_today = addLogCol(today, log_col_today);
+            }
+        }
+        log_col_today[1].scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+    return button;
+}
+const findLogColInsertPosition = (tgt_ms) => {
+    // ログ列を取得出来ていない場合はエラー
+    if (log_col_begin < 0) {
+        alert("フォーマットエラー：ログ列が見つかりません。WBSのヘッダにログ列を追加してください。");
+        return;
+    }
+    // ログ列の挿入位置を決定する
+    //const tgt_ms = date.getTime();//.toString()
+    const header = wbs.querySelector("thead tr.header");
+    const cols = header.querySelectorAll("th");
+    let i;
+    for (i = log_col_begin + 1; i < cols.length; i++) {
+        const col = cols[i];
+        if (col.dataset.date == tgt_ms) {
+            // 対象ログ列が存在した場合
+            // インデックスと対象要素を返す
+            return [true, [i, cols[i]]];
+        }
+        if (col.dataset.date > tgt_ms) {
+            break;
+        }
+    }
+    i--;
+    // 対象ログ列が存在しなかった場合
+    // 挿入位置を決定して、インデックスと要素を返す
+    return [false, [i, cols[i]]];
+}
+const addLogCol = (date, log_col) => {
+    // ログ列を作成する
+    const col = document.createElement("th");
+    col.classList.add("work_log_item");
+    col.dataset.date = date.getTime().toString();
+    const date_e = document.createElement("div");
+    date_e.classList.add("date");
+    const action_e = document.createElement("div");
+    action_e.classList.add("action");
+    const today_str = date.toISOString().slice(5, 10);
+    date_e.innerText = today_str;
+    col.appendChild(date_e);
+    col.appendChild(action_e);
+    // ヘッダに追加
+    log_col[1].after(col);
+
+    // ボディに追加
+    const body = wbs.querySelector("tbody");
+    const rows = body.querySelectorAll("tr");
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        // ログ列を追加
+        // ログ列の挿入位置を決定
+        const cols = row.querySelectorAll("td");
+        const insert_elem = cols[log_col[0]];
+        // ログ列を作成
+        const log_cell = document.createElement("td");
+        log_cell.classList.add("work_log_item");
+        const date_e = document.createElement("div");
+        date_e.classList.add("date");
+        const action_e = document.createElement("div");
+        action_e.classList.add("action");
+        log_cell.appendChild(date_e);
+        log_cell.appendChild(action_e);
+        // ログ列を挿入
+        insert_elem.after(log_cell);
+    }
+
+
+    return [log_col[0] + 1, col];
 }
 
 const addEditable = () => {
@@ -299,29 +440,81 @@ const makeEditButton = () => {
         if (wbs_ctrl_mode === wbs_ctrl_mode_edit) {
             // ボタンの表示を元に戻す
             button.innerText = "編集";
+            changeWbsMode(wbs_ctrl_mode_default);
         } else {
             // ボタンの表示を変更する
             button.innerText = "編集終了";
+            changeWbsMode(wbs_ctrl_mode_edit);
         }
-        //
-        changeEditMode();
     });
 
     return button;
 }
 
-const changeEditMode = () => {
-    if (wbs_ctrl_mode === wbs_ctrl_mode_edit) {
-        // 編集モードのとき
-        onExitEditMode();
-        wbs_ctrl_mode = wbs_ctrl_mode_default;
-    } else {
-        // 編集モード以外のとき
-        addRemoveButton();
-        // 挿入モードを設定する
-        addInsertIndicator();
-        wbs_ctrl_mode = wbs_ctrl_mode_edit;
+const makeTimerButton = () => {
+    let button = document.createElement("button");
+    button.innerText = "タイマー";
+    button.addEventListener("click", () => {
+        //
+        if (wbs_ctrl_mode === wbs_ctrl_mode_timer) {
+            // ボタンの表示を元に戻す
+            button.innerText = "タイマー";
+            changeWbsMode(wbs_ctrl_mode_default);
+        } else {
+            // ボタンの表示を変更する
+            button.innerText = "タイマー終了";
+            changeWbsMode(wbs_ctrl_mode_timer);
+        }
+    });
+
+    return button;
+}
+
+const changeWbsMode = (new_mode) => {
+    // failsafe
+    if (wbs_ctrl_mode == new_mode) {
+        return;
     }
+
+    // 
+    switch (wbs_ctrl_mode) {
+        case wbs_ctrl_mode_edit:
+            // 編集モードから別のモードへ遷移
+            // 編集モード終了
+            onExitEditMode();
+            break;
+
+        case wbs_ctrl_mode_timer:
+            // タイマーモード終了
+            break;
+
+        case wbs_ctrl_mode_default:
+        default:
+            // 何もしない
+            break;
+    }
+    // 
+    wbs_ctrl_mode = new_mode;
+    switch (wbs_ctrl_mode) {
+        case wbs_ctrl_mode_edit:
+            // 編集モードへ遷移
+            // 編集モード以外のとき
+            addRemoveButton();
+            // 挿入モードを設定する
+            addInsertIndicator();
+            break;
+
+        case wbs_ctrl_mode_timer:
+            break;
+
+        case wbs_ctrl_mode_default:
+        default:
+            break;
+    }
+}
+
+const addTimerButton = () => {
+    // ヘッダにログ日追加ボタンを追加
 }
 
 const onExitEditMode = () => {
