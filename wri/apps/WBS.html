@@ -146,7 +146,12 @@
 			& .work_log {
 				padding: 1px 8px;
 				font-size: 0.9em;
-				min-width: 4em;
+				min-width: 5em;
+			}
+			& .work_log_item {
+				padding: 1px 5px;
+				font-size: 0.8em;
+				min-width: 3em;
 			}
 
 			& .toolbar {
@@ -253,7 +258,8 @@
 				& .work_date_end,
 				& .work_man_hour,
 				& .work_progress,
-				& .work_log {
+				& .work_log,
+				& .work_log_item {
 					border-top: 1px solid rgb(0, 65, 139);
 				}
 			}
@@ -281,7 +287,9 @@
 				<th class="work_date_end"><div>終了日</div><div>終了日</div></th>
 				<th class="work_man_hour">工数<br>(hr)</th>
 				<th class="work_progress">進捗<br>(%)</th>
-				<th class="work_log">ログ</th>
+				<th class="work_log"><div>ログ</div><div id="log_tool_area"></div></th>
+				<th class="work_log_item" data-date="1748617200000"><div class="date">05-31</div><div class="action"></div></th>
+				<th class="work_log_item" data-date="1748777023422"><div class="date">06-01</div><div class="action"></div></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -289,7 +297,7 @@
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">function_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -304,12 +312,14 @@
 				</td>
 				<td class="work_progress"></td>
 				<td class="work_log"></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="phase" data-func_id="1" data-phase_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">phase_1</span></td>
 				<td class="work_owner"></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -324,12 +334,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="work_package" data-func_id="1" data-phase_id="1" data-work_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -344,12 +356,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -364,12 +378,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -384,12 +400,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -404,12 +422,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -424,12 +444,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -444,12 +466,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -464,12 +488,14 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 			<tr class="task" data-func_id="1" data-phase_id="1" data-work_id="1" data-task_id="1">
 				<td class="work_id"><span class="text">ID</span></td>
 				<td class="work_name"><span class="text">task_1</span></td>
 				<td class="work_owner"><span class="text">XXX</span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -484,6 +510,8 @@
 				</td>
 				<td class="work_progress"><span class="value"></span></td>
 				<td class="work_log"><span class="value"></span></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
+				<td class="work_log_item"><div class="time"></div><div class="action"></div></td>
 			</tr>
 		</tbody>
 	</table>
@@ -505,7 +533,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">function_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -525,7 +553,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">phase_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -545,7 +573,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -569,7 +597,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">phase_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -589,7 +617,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -613,7 +641,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">work_1</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
@@ -637,7 +665,7 @@
 				<td class="work_id"><span class="text"></span></td>
 				<td class="work_name"><span class="text">task</span></td>
 				<td class="work_owner"><span class="text"></span></td>
-				<th class="work_caption"></th>
+				<td class="work_caption"></td>
 				<td class="work_date_begin">
 					<div class="plan"><span class="date" data-value=""></span></div>
 					<div class="actual"><span class="date" data-value=""></span></div>
