@@ -32,16 +32,50 @@ namespace wri.Interface
 
         }
 
-        public string[] GlobDirectories(string path, string pattern)
+        public string[] GlobDirectories(string path, string pattern, bool fullpath = true)
         {
+            if (!Directory.Exists(path))
+            {
+                throw new DirectoryNotFoundException($"The directory '{path}' does not exist.");
+            }
             var root = new DirectoryInfo(path);
-            return root.GlobDirectories(pattern).Select(x => x.FullName).ToArray();
+            //return root.GlobDirectories(pattern).Select(x => x.FullName).ToArray();
+            var files = root.GlobDirectories(pattern);
+            if (fullpath)
+            {
+                // フルパスに変換
+                return files.Select(x => x.FullName).ToArray();
+            }
+            else
+            {
+                // 相対パスのまま返す
+                return files.Select(x => x.FullName.Replace(root.FullName, "")).ToArray();
+            }
         }
 
-        public string[] GlobFiles(string path, string pattern)
+        public string[] GlobFiles(string path, string pattern, bool fullpath = true)
         {
+            if (!Directory.Exists(path))
+            {
+                throw new DirectoryNotFoundException($"The directory '{path}' does not exist.");
+            }
             var root = new DirectoryInfo(path);
-            return root.GetFiles(pattern).Select(x => x.FullName).ToArray();
+            //return root.GetFiles(pattern).Select(x => x.FullName).ToArray();
+
+            var files = new Microsoft.Extensions.FileSystemGlobbing.Matcher()
+              .AddInclude(pattern) // 検索パターンを指定
+              .Execute(new Microsoft.Extensions.FileSystemGlobbing.Abstractions.DirectoryInfoWrapper(root)) // 検索のルートディレクトリを指定
+              .Files;
+            if (fullpath)
+            {
+                // フルパスに変換
+                return files.Select(x => Path.Combine(path, x.Path)).ToArray();
+            }
+            else
+            {
+                // 相対パスのまま返す
+                return files.Select(x => x.Path).ToArray();
+            }
         }
     }
 

@@ -17,15 +17,51 @@ namespace wri.Interface
     public class System
     {
         public ConsoleIf Console { get; set; }
+        public ProcessIf Process { get; set; }
 
         public System()
         {
             Console = new ConsoleIf();
+            Process = new ProcessIf();
         }
 
         public void GC()
         {
             global::System.GC.Collect();
+        }
+    }
+
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class ProcessIf
+    {
+        public void Start(string path, string arguments = "")
+        {
+            //var process = new global::System.Diagnostics.Process();
+            //process.StartInfo.FileName = path;
+            //process.StartInfo.Arguments = arguments;
+            //process.Start();
+
+            var startInfo = new global::System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = path,
+                UseShellExecute = true,
+                CreateNoWindow = true,
+                Arguments = arguments,
+            };
+            global::System.Diagnostics.Process.Start(startInfo);
+        }
+        public void Kill(int pid)
+        {
+            try
+            {
+                var process = global::System.Diagnostics.Process.GetProcessById(pid);
+                process.Kill();
+            }
+            catch (Exception ex)
+            {
+                // Handle exception if needed
+            }
         }
     }
 

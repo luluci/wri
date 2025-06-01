@@ -20,6 +20,8 @@
 				const elem = document.getElementsByClassName("c_header")[0].getElementsByClassName("item")[0];
 				elem.textContent += " update!";
 
+				//wri.system.Process.Start("https://google.co.jp");
+                //const dirs = wri.io.GlobDirectories("./", "**/*", false);
 				const apps_elem = document.getElementById("apps_list");
 				const apps = wri.io.GlobFiles("./", "apps/*");
                 for (let i = 0; i < apps.length; i++) {
