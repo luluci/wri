@@ -141,6 +141,37 @@ namespace wri
             Interface.GlobalData.WebView2 = WebView2;
             EntryPoint = new Interface.EntryPoint();
 
+            Interface.GlobalData.SetHeaderVisibility = (isVisible) =>
+            {
+                if (isVisible)
+                {
+                    HeaderVisibility.Value = Visibility.Visible;
+                    HeaderHeight.Value = new GridLength(100);
+                    HeaderSplitterHeight.Value = new GridLength(10);
+                }
+                else
+                {
+                    HeaderVisibility.Value = Visibility.Collapsed;
+                    HeaderHeight.Value = new GridLength(0);
+                    HeaderSplitterHeight.Value = new GridLength(0);
+                }
+            };
+            Interface.GlobalData.SetFooterVisibility = (isVisible) =>
+            {
+                if (isVisible)
+                {
+                    FooterVisibility.Value = Visibility.Visible;
+                    FooterHeight.Value = new GridLength(100);
+                    FooterSplitterHeight.Value = new GridLength(10);
+                }
+                else
+                {
+                    FooterVisibility.Value = Visibility.Collapsed;
+                    FooterHeight.Value = new GridLength(0);
+                    FooterSplitterHeight.Value = new GridLength(0);
+                }
+            };
+
             //WebView2.AllowExternalDrop = true;
             //WebView2.AllowDrop = true;
             //window.Base.DragEnter += (object sender, System.Windows.DragEventArgs e) =>

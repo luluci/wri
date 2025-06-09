@@ -83,6 +83,10 @@ namespace wri.Interface
         public bool Start(bool transStdout = false)
         {
             TransferStdoutToWebView2 = transStdout;
+            if (!transStdout)
+            {
+                Interface.GlobalData.SetFooterVisibility(true);
+            }
             return console.Start(OnStdout, OnExit);
         }
         public void SetBash()

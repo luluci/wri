@@ -12,6 +12,10 @@ namespace wri.Interface
     static public class GlobalData
     {
         static public WebView2CompositionControl WebView2;
+
+        public delegate void SetVisibility(bool isVisible);
+        static public SetVisibility SetHeaderVisibility = (isVisible) => {};
+        static public SetVisibility SetFooterVisibility = (isVisible) => { };
     }
 
     /// <summary>

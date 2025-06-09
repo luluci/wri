@@ -36,28 +36,16 @@
 
 		const console_initialize = () => {
 			try {
-				const console = document.getElementById("console");
-				log_disp = console.querySelector(".body");
-				log_elem = console.querySelector(".body pre");
-				const console_clear_btn = document.getElementById("console_clear_btn");
-				console_clear_btn.addEventListener('click', (e) => {
-					log_elem.innerText = "";
-				});
-
 				window.chrome.webview.addEventListener('message', (e) => {
 					if (e.data.type == "console") {
 						switch (e.data.status) {
 							case "running":
-								// コマンド実行中の標準出力通知
-								log_elem.innerText += e.data.stdout + "\n";
-								log_disp.scrollTop = log_disp.scrollHeight;
+								// nothing
 								break;
 
 							case "exit":
 								// コマンド終了通知
 								// 終了コード
-								// log_elem.innerText += "<exit:" + e.data.code + ">" + "\n";
-								// log_disp.scrollTop = log_disp.scrollHeight;
 								on_console_command_exit(e.data.code);
 								break;
 						}
@@ -67,7 +55,7 @@
 				btn_console_connect = document.getElementById("test_console_start");
 				btn_console_connect.addEventListener("click", async () => {
 					btn_console_exec.disabled = true;
-					wri.system.Console.Start(true);
+					wri.system.Console.Start();
 					const ret = wri.system.Console.ExecCmd([
 						"set PATH=D:\\msys64\\ucrt64\\bin;D:\\msys64\\usr\\local\\bin;D:\\msys64\\usr\\bin;D:\\msys64\\bin;%PATH%",
 						"set MSYSTEM=UCRT64"
@@ -262,18 +250,6 @@
 			</div>
 		</div>
 	</div>
-</div>
-<div id="console">
-	<div class="header">
-		<div class="tab">コマンドログ</div>
-		<button id="console_clear_btn">クリア</button>
-	</div>
-	<div class="body">
-<pre>
-test
-</pre>
-	</div>
-
 </div>
 </body>
 </html>

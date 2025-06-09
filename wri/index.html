@@ -28,7 +28,7 @@
                     const elem_div = document.createElement("div");
 					const elem_a = document.createElement("a");
 					elem_a.href = apps[i];
-                    elem_a.textContent = apps[i].split("\\").reverse()[0].split('.')[0];
+                    elem_a.textContent = apps[i].split("/").reverse()[0].split('.')[0];
 					elem_div.appendChild(elem_a);
                     apps_elem.appendChild(elem_div);
 				}
@@ -126,7 +126,8 @@
 						<div class="item">
 							header
 						</div>
-					</div><div class="c_item">
+					</div>
+					<div class="c_item">
 						<div class="header">
 							App List
 						</div>
