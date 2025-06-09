@@ -71,8 +71,33 @@
         </GridSplitter>
         <Grid Grid.Row="4" Visibility="{Binding FooterVisibility.Value}">
             <TabControl>
-                <TabItem Header="Log">
-                    
+                <TabItem Header="ConsoleLog">
+                    <ScrollViewer x:Name="console_log_scrl" HorizontalScrollBarVisibility="Auto">
+                        <ListBox x:Name="console_log" ItemsSource="{Binding ConsoleLog}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.Template>
+                                <ControlTemplate>
+                                    <ItemsPresenter />
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="コピー" Command="{Binding OnClickConsoleLogCopy}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}"/>
+                                    <Separator/>
+                                    <MenuItem Header="ログクリア" Command="{Binding OnClickConsoleLogClear}"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </ScrollViewer>
+                    <TabItem.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="ログクリア" Command="{Binding OnClickConsoleLogClear}"/>
+                        </ContextMenu>
+                    </TabItem.ContextMenu>
                 </TabItem>
             </TabControl>
         </Grid>

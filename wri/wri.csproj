@@ -65,6 +65,7 @@
     <Compile Include="Interface\Json.cs" />
     <Compile Include="Interface\System.cs" />
     <Compile Include="Interface\WindowsApi.cs" />
+    <Compile Include="Log\Logger.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Utility\BindableBase.cs" />
     <Compile Include="Utility\Console.cs" />

@@ -71,13 +71,18 @@ namespace wri.Interface
     {
         Console console;
 
+        public bool TransferStdoutToWebView2 { get; set; }
+
         public ConsoleIf()
         {
             console = new Console();
+
+            TransferStdoutToWebView2 = false;
         }
 
-        public bool Start()
+        public bool Start(bool transStdout = false)
         {
+            TransferStdoutToWebView2 = transStdout;
             return console.Start(OnStdout, OnExit);
         }
         public void SetBash()
@@ -93,14 +98,16 @@ namespace wri.Interface
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
             {
-                var json = Json.MakeJsonStringConsoleStdout(stdout);
-                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                if (TransferStdoutToWebView2)
+                {
+                    var json = Json.MakeJsonStringConsoleStdout(stdout);
+                    GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                else
+                {
+                    Log.Logger.Console.Add(stdout);
+                }
             }));
-        }
-        private void StdoutPost(string stdout)
-        {
-            var json = Json.MakeJsonStringConsoleStdout(stdout);
-            GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
         }
         private void OnExit(int code)
         {

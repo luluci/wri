@@ -39,10 +39,38 @@ namespace wri
         //
         Uri uriBlank = new Uri("about:blank");
 
+        // Log
+        public ReactiveCollection<string> ConsoleLog { get; set; }
+        public ReactiveCommand OnClickConsoleLogCopy { get; set; }
+        public ReactiveCommand OnClickConsoleLogClear { get; set; }
+
         public MainWindowViewModel(MainWindow window)
         {
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
+
+            // Log
+            Log.Logger.Console.PostProc = () =>
+            {
+                //window.console_log_scrl.ScrollToEnd();
+                window.console_log_scrl.ScrollToBottom();
+            };
+            ConsoleLog = Log.Logger.Console.Log;
+            OnClickConsoleLogCopy = new ReactiveCommand();
+            OnClickConsoleLogCopy.Subscribe(log =>
+            {
+                if (log is string logstr)
+                {
+                    Clipboard.SetText(logstr);
+                }
+            })
+            .AddTo(Disposables);
+            OnClickConsoleLogClear = new ReactiveCommand();
+            OnClickConsoleLogClear.Subscribe(x =>
+            {
+                Log.Logger.Console.Clear();
+            })
+            .AddTo(Disposables);
 
             //
             HeaderSplitterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
@@ -91,11 +119,12 @@ namespace wri
 
             // test
             //HeaderVisibility.Value = Visibility.Visible;
-            //HeaderHeight.Value = new GridLength(50);
+            //HeaderHeight.Value = new GridLength(100);
             //HeaderSplitterHeight.Value = new GridLength(10);
             //FooterVisibility.Value = Visibility.Visible;
-            //FooterHeight.Value = new GridLength(50);
+            //FooterHeight.Value = new GridLength(100);
             //FooterSplitterHeight.Value = new GridLength(10);
+            //Log.Logger.Console.Add("test log");
 
             // WebView2初期化処理
             WebView2 = window.WebView2;
