@@ -90,12 +90,12 @@ namespace wri
             window.Show();
 
             // test
-            HeaderVisibility.Value = Visibility.Visible;
-            HeaderHeight.Value = new GridLength(50);
-            HeaderSplitterHeight.Value = new GridLength(10);
-            FooterVisibility.Value = Visibility.Visible;
-            FooterHeight.Value = new GridLength(50);
-            FooterSplitterHeight.Value = new GridLength(10);
+            //HeaderVisibility.Value = Visibility.Visible;
+            //HeaderHeight.Value = new GridLength(50);
+            //HeaderSplitterHeight.Value = new GridLength(10);
+            //FooterVisibility.Value = Visibility.Visible;
+            //FooterHeight.Value = new GridLength(50);
+            //FooterSplitterHeight.Value = new GridLength(10);
 
             // WebView2初期化処理
             WebView2 = window.WebView2;
