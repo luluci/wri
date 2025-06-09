@@ -21,8 +21,16 @@ namespace wri
     {
         // 
         MainWindow window;
+
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
+        public ReactivePropertySlim<GridLength> HeaderHeight { get; set; }
+        public ReactivePropertySlim<GridLength> FooterHeight { get; set; }
+        public ReactivePropertySlim<GridLength> HeaderSplitterHeight { get; set; }
+        public ReactivePropertySlim<GridLength> FooterSplitterHeight { get; set; }
+        public ReactivePropertySlim<Visibility> HeaderVisibility { get; set; }
+        public ReactivePropertySlim<Visibility> FooterVisibility { get; set; }
+        // WebView2
         public ReactivePropertySlim<Uri> SourcePath { get; set; }
         // WebView2 WebView2CompositionControl
         public WebView2CompositionControl WebView2;
@@ -35,6 +43,20 @@ namespace wri
         {
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
+
+            //
+            HeaderSplitterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
+            HeaderSplitterHeight.AddTo(Disposables);
+            FooterSplitterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
+            FooterSplitterHeight.AddTo(Disposables);
+            HeaderHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
+            HeaderHeight.AddTo(Disposables);
+            FooterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
+            FooterHeight.AddTo(Disposables);
+            HeaderVisibility = new ReactivePropertySlim<Visibility>(Visibility.Collapsed);
+            HeaderVisibility.AddTo(Disposables);
+            FooterVisibility = new ReactivePropertySlim<Visibility>(Visibility.Collapsed);
+            FooterVisibility.AddTo(Disposables);
 
             // WebView2インスタンスの初期化前に実施する
             // dllをexeファイル内に取り込むのと相性が悪い。
@@ -67,7 +89,13 @@ namespace wri
         {
             window.Show();
 
-            window.toolbar.Height = 0;
+            // test
+            HeaderVisibility.Value = Visibility.Visible;
+            HeaderHeight.Value = new GridLength(50);
+            HeaderSplitterHeight.Value = new GridLength(10);
+            FooterVisibility.Value = Visibility.Visible;
+            FooterHeight.Value = new GridLength(50);
+            FooterSplitterHeight.Value = new GridLength(10);
 
             // WebView2初期化処理
             WebView2 = window.WebView2;

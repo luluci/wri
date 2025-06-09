@@ -8,14 +8,73 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
         Title="{Binding WindowTitle.Value}" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
-    <Grid x:Name="Base" AllowDrop="True">
+    <Window.Resources>
+        <local:SplitterLimitConverter x:Key="SplitterLimitConverter" />
+    </Window.Resources>
+    <Grid x:Name="Base" AllowDrop="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="Auto" Width="Auto">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition x:Name="HeaderRowDef" Height="{Binding HeaderHeight.Value}" MinHeight="0" >
+                <RowDefinition.MaxHeight>
+                    <MultiBinding Converter="{StaticResource SplitterLimitConverter}">
+                        <Binding Path="ActualHeight" ElementName="Base" />
+                        <Binding Path="Height.Value" ElementName="FooterRowDef" />
+                    </MultiBinding>
+                </RowDefinition.MaxHeight>
+            </RowDefinition>
+            <RowDefinition Height="{Binding HeaderSplitterHeight.Value}" />
+            <RowDefinition Height="*" MinHeight="0" />
+            <RowDefinition Height="{Binding FooterSplitterHeight.Value}" />
+            <RowDefinition x:Name="FooterRowDef" Height="{Binding FooterHeight.Value}" MinHeight="0">
+                <RowDefinition.MaxHeight>
+                    <MultiBinding Converter="{StaticResource SplitterLimitConverter}">
+                        <Binding Path="ActualHeight" ElementName="Base" />
+                        <Binding Path="Height.Value" ElementName="HeaderRowDef" />
+                    </MultiBinding>
+                </RowDefinition.MaxHeight>
+            </RowDefinition>
         </Grid.RowDefinitions>
-        <Grid x:Name="toolbar" Grid.Row="0">
+        <Grid Grid.Row="0" Visibility="{Binding HeaderVisibility.Value}">
             <Label Content="test"/>
         </Grid>
-        <wv2:WebView2CompositionControl Grid.Row="1" Name="WebView2" Source="{Binding SourcePath.Value}" AllowExternalDrop="False" />
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding HeaderVisibility.Value}">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="#404040">
+                        <Path Fill="DarkGray" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Path.Data>
+                                <GeometryGroup FillRule="EvenOdd">
+                                    <RectangleGeometry Rect="0,0 20 2" />
+                                    <RectangleGeometry Rect="0,4 20 2" />
+                                </GeometryGroup>
+                            </Path.Data>
+                        </Path>
+                    </Grid>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+        <wv2:WebView2CompositionControl Grid.Row="2" Name="WebView2" Source="{Binding SourcePath.Value}" AllowExternalDrop="False" />
+        <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding FooterVisibility.Value}">
+            <GridSplitter.Template>
+                <ControlTemplate TargetType="GridSplitter">
+                    <Grid Background="#404040">
+                        <Path Fill="DarkGray" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Path.Data>
+                                <GeometryGroup FillRule="EvenOdd">
+                                    <RectangleGeometry Rect="0,0 20 2" />
+                                    <RectangleGeometry Rect="0,4 20 2" />
+                                </GeometryGroup>
+                            </Path.Data>
+                        </Path>
+                    </Grid>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
+        <Grid Grid.Row="4" Visibility="{Binding FooterVisibility.Value}">
+            <TabControl>
+                <TabItem Header="Log">
+                    
+                </TabItem>
+            </TabControl>
+        </Grid>
     </Grid>
 </Window>
