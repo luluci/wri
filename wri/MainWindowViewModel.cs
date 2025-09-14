@@ -204,14 +204,32 @@ namespace wri
                     {
                         var file = files[0];
                         var ext = System.IO.Path.GetExtension(file).ToLower();
-                        if (ext == ".html")
+                        switch (ext)
                         {
-                            var check = CheckPreventClose();
-                            if (!check)
-                            {
-                                var uri = new Uri(file);
-                                SourcePath.Value = uri;
-                            }
+                            case ".htm":
+                            case ".html":
+                                {
+                                    var check = CheckPreventClose();
+                                    if (!check)
+                                    {
+                                        var uri = new Uri(file);
+                                        SourcePath.Value = uri;
+                                    }
+                                }
+                                break;
+                            case ".xml":
+                                {
+                                    var check = CheckPreventClose();
+                                    if (!check)
+                                    {
+                                        var xml = new XmlLoader();
+                                        xml.Load(file);
+                                        WebView2.CoreWebView2.NavigateToString(xml.GetView());
+                                    }
+                                }
+                                break;
+                            default:
+                                return;
                         }
                     }
                 }
@@ -235,25 +253,37 @@ namespace wri
         private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             var uri = new Uri(e.Uri);
-            if (uri.Scheme != "file")
+            switch (uri.Scheme)
             {
-                SourcePath.Value = uriBlank;
-                e.Cancel = true;
-                //
-                // HTML文字列を表示
-                //string htmlContent = @"
-                //    <html>
-                //    <head>
-                //        <title>Warning</title>
-                //    </head>
-                //    <body>
-                //        <h1>ローカルファイルのみ開けます</h1>
-                //    </body>
-                //    </html>
-                //";
-
-                //WebView2.CoreWebView2.NavigateToString(htmlContent);
+                case "data":
+                case "file":
+                    // これらのスキームは許可する
+                    break;
+                default:
+                    // それ以外のスキームは拒否する
+                    SourcePath.Value = uriBlank;
+                    e.Cancel = true;
+                    return;
             }
+            //if (uri.Scheme != "file")
+            //{
+            //    SourcePath.Value = uriBlank;
+            //    e.Cancel = true;
+            //    //
+            //    // HTML文字列を表示
+            //    //string htmlContent = @"
+            //    //    <html>
+            //    //    <head>
+            //    //        <title>Warning</title>
+            //    //    </head>
+            //    //    <body>
+            //    //        <h1>ローカルファイルのみ開けます</h1>
+            //    //    </body>
+            //    //    </html>
+            //    //";
+
+            //    //WebView2.CoreWebView2.NavigateToString(htmlContent);
+            //}
         }
 
         private async void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
@@ -276,7 +306,7 @@ namespace wri
                 await RunScriptLoaded("const wri = chrome.webview.hostObjects.sync.wri; true");
                 await RunScriptLoaded("const wri_async = chrome.webview.hostObjects.wri; true");
                 //
-                if (!object.ReferenceEquals(WebView2.Source, uriBlank))
+                if (WebView2.Source != uriBlank)
                 {
                     await RunScriptLoaded("csLoaded()");
                 }

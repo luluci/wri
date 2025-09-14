@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace wri.Utility
+namespace Utility
 {
     public abstract class BindableBase : INotifyPropertyChanged
     {
