@@ -32,6 +32,29 @@ namespace wri.Interface
 
         }
 
+        public string GetXmlAsString(string path)
+        {
+            try
+            {
+                var xml = new Utility.XmlLoader();
+                xml.Load(path);
+                return xml.GetView();
+            }
+            catch (Exception ex)
+            {
+                return $@"
+<html>
+<head><meta charset='UTF-8'></head>
+<body>
+<h1>XMLの取得に失敗しました。</h1>
+<p>
+${ex.Message}
+</p>
+</body>
+";
+            }
+        }
+
         public string[] GlobDirectories(string path, string pattern, bool fullpath = true)
         {
             if (!Directory.Exists(path))
