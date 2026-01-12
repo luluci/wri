@@ -38,6 +38,9 @@ namespace wri.Interface
         public bool preventClose { get; set; } = false; // true:アプリ終了を防ぐ
         public string preventCloseMsg { get; set; } = string.Empty; // 終了防止メッセージ
 
+        // WebView2向けConfig情報
+        public string ConfigJson = null;
+
         // Interfaceクラスインスタンス
         public System system { get; set; }
         public WindowsApi win { get; set; }
@@ -51,6 +54,12 @@ namespace wri.Interface
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
+        }
+
+
+        public string GetConfigAsJson()
+        {
+            return ConfigJson;
         }
 
 

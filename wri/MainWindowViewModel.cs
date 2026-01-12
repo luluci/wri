@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Reactive.Disposables;
+﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
-using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace wri
 {
     using Microsoft.Web.WebView2.WinForms;
+    using System.Data.SqlTypes;
+    using System.Text.Json;
     using System.Windows;
     using System.Windows.Controls;
     using Utility;
@@ -21,6 +22,8 @@ namespace wri
     {
         // 
         MainWindow window;
+        // exeファイルが存在するフォルダパス
+        string RootPath;
 
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
@@ -48,6 +51,7 @@ namespace wri
         {
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
+            RootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
 
             // Log
             Log.Logger.Console.PostProc = () =>
@@ -89,8 +93,7 @@ namespace wri
             // WebView2インスタンスの初期化前に実施する
             // dllをexeファイル内に取り込むのと相性が悪い。
             // WebView2Loader.dllの場所を明示する。
-            string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-            CoreWebView2Environment.SetLoaderDllFolderPath(rootPath);
+            CoreWebView2Environment.SetLoaderDllFolderPath(RootPath);
 
             WindowTitle = new ReactivePropertySlim<string>("wri");
             WindowTitle.AddTo(Disposables);
@@ -101,7 +104,7 @@ namespace wri
             Uri uri;
             if (object.ReferenceEquals(CommandLine.Option.LaunchFile, string.Empty))
             {
-                uri = new Uri($@"{rootPath}\index.html");
+                uri = new Uri($@"{RootPath}\index.html");
             }
             else
             {
@@ -224,7 +227,45 @@ namespace wri
                                     {
                                         var xml = new XmlLoader();
                                         xml.Load(file);
-                                        WebView2.CoreWebView2.NavigateToString(xml.GetView());
+                                        if (xml.HasXslt)
+                                        {
+                                            // XSLTあり
+                                            WebView2.CoreWebView2.NavigateToString(xml.GetView());
+                                        }
+                                        else
+                                        {
+                                            // XSLTなし
+                                            // apps/XMLViewer.html存在チェック
+                                            bool hasViewer = false;
+                                            string viewerPath = System.IO.Path.Combine(RootPath, "apps", "XMLViewer.html");
+                                            if (System.IO.File.Exists(viewerPath))
+                                            {
+                                                hasViewer = true;
+                                            }
+                                            //
+                                            if (hasViewer)
+                                            {
+                                                // JSONにシリアル化するためのデータ構造
+                                                var jsonData = new
+                                                {
+                                                    type = "xml",
+                                                    content = System.IO.File.ReadAllText(file, Encoding.UTF8)
+                                                };
+                                                // JsonSerializer.SerializeでオブジェクトをJSON文字列に変換
+                                                // この過程で、Serializerが自動的に必要なエスケープ処理を行います。
+                                                string json = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = false });
+                                                // xmlファイルの内容を初期値で渡す
+                                                EntryPoint.ConfigJson = json;
+                                                // XMLViewerを開く
+                                                var viewerUri = new Uri(viewerPath);
+                                                SourcePath.Value = viewerUri;
+                                            }
+                                            else
+                                            {
+                                                // viewerなし
+                                                WebView2.CoreWebView2.NavigateToString(xml.GetView());
+                                            }
+                                        }
                                     }
                                 }
                                 break;
@@ -322,6 +363,7 @@ namespace wri
         {
             // WebView2からのメッセージ受信イベント
             var s = e.TryGetWebMessageAsString();
+            
             //MessageBox.Show(s);
         }
 

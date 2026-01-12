@@ -23,6 +23,11 @@ namespace Utility
 
         }
 
+        public bool HasXslt
+        {
+            get { return !(xsltPath is null); }
+        }
+
         public void Load(string path)
         {
             try

@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+	<script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				//
+				// let tag = document.getElementById("init-message");
+				// tag.textContent = "初期化完了";
+				const config = getConfig();
+				if (config !== null && config.type !== null && config.type === "xml") {
+					if (config.content !== null) {
+						loadXml(config.content);
+					}
+				}
+				//alert(config.type + " : " + config.content);
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		const loadXml = (xml) => {
+			// XML parse
+			const parser = new DOMParser();
+			const xmlDoc = parser.parseFromString(xml, "text/xml");
+			// root要素は1つだけとみなす
+			const children = xmlDoc.children;
+			if (children.length <= 0) {
+				return;
+			}
+			const root = children[0]
+			// XML analyze
+			const info = {
+				count_content: 0,
+				count_attr: 0,
+				depth: 0,
+			};
+			analyzeXml(root, info);
+			// html化typeを決定する
+			let html_type = 0;
+			if (info.count_content >= info.count_attr) {
+				html_type = 0;
+			} else {
+				html_type = 1;
+			}
+			// html化
+			let xml_dom;
+			switch (html_type) {
+				case 0:
+					// contentベース
+					xml_dom = convertByContent(root);
+					break;
+				default:
+					// attributeベース
+					xml_dom = convertByContent(root);
+					break;
+			}
+			//
+			const base_elem = document.getElementById("viewer");
+			if (base_elem !== null) {
+				base_elem.appendChild(xml_dom);
+			}
+		}
+		const analyzeXml = (node, info) => {
+			// node: htmlCollection
+			if (node.children.length === 0) {
+				if (node.textContent !== "") {
+					info.count_content++;
+				}
+				else if (node.attributes.length > 0) {
+					info.count_attr++;
+				}
+			} else {
+				const children = node.children;
+				for (let i = 0; i<children.length; i++) {
+					const node = children[i];
+					analyzeXml(node, info);
+				}
+			}
+		}
+		const convertByContent = (root) => {
+			// root要素作成
+			const table = document.createElement("table");
+			const header = document.createElement("thead");
+			const body = document.createElement("tbody");
+			table.appendChild(header);
+			table.appendChild(body);
+			table.className = "xml";
+			const children = root.children;
+			if (children.length <= 0) {
+				return;
+			}
+			// header
+			{
+				const child = children[0];
+				const row = document.createElement("tr");
+				convertByContentImplHeader(row, child);
+				header.appendChild(row);
+			}
+			//
+			for (let i=0; i<children.length; i++) {
+				const child = children[i];
+				const row = document.createElement("tr");
+				convertByContentImplBody(row, child);
+				body.appendChild(row);
+			}
+			//
+			return table;
+		}
+		const convertByContentImplHeader = (elem, node) => {
+			// node要素を追加
+			{
+				const item = document.createElement("th");
+				item.textContent = node.tagName;
+				elem.appendChild(item);
+			}
+			// 
+			for (let i=0; i<node.children.length; i++) {
+				const child = node.children[i];
+				convertByContentImplHeader(elem, child);
+			}
+		}
+		const convertByContentImplBody = (elem, node) => {
+			// node要素を追加
+			{
+				const item = document.createElement("td");
+				item.textContent = node.textContent;
+				elem.appendChild(item);
+			}
+			// 
+			for (let i=0; i<node.children.length; i++) {
+				const child = node.children[i];
+				convertByContentImplBody(elem, child);
+			}
+		}
+
+		const debug = () => {
+			//const val = test_func_async();
+			//return "debug"
+
+			// let var1 = wri.TestVar1;
+			// let var2 = wri.TestVar2;
+
+			// let tag = document.getElementById("debug-message");
+			// tag.textContent = var1 + " / " + var2;
+
+			// const filepath = wri.IO.file.OpenDialog();
+			// const content = wri.IO.file.Read(filepath);
+			// alert(content);
+		}
+
+	</script>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			background-color:rgb(239, 255, 213);
+			display: flex;
+			flex-direction: column;
+			height: 100vh;
+			width: 100vw;
+		}
+
+		#header {
+			width: 100%;
+			border-bottom: 5px solid #404040;
+			background-color: #808080;
+		}
+		#body {
+			flex: 1;
+			overflow-y: auto;
+			background-color: #fff;
+		}
+
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+<div id="header">
+	<button onclick="debug()">Debug</button>
+</div>
+<div id="body">
+	<div id="viewer"></div>
+</div>
+</body>
+</html>
