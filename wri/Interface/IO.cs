@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-
+using System.Windows.Forms;
 using GlobExpressions;
 
 namespace wri.Interface
@@ -127,20 +127,86 @@ ${ex.Message}
             //global::System.Console.WriteLine("File construct.");
         }
 
+        public string OpenDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*")
+        {
+            try
+            {
+                var ofd = new OpenFileDialog
+                {
+                    FileName = "",
+                    InitialDirectory = "",
+                    Filter = filter,
+                    Title = title,
+                    RestoreDirectory = true,
+                };
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    return ofd.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                global::System.Windows.MessageBox.Show(ex.Message);
+            }
+            return null;
+        }
+
+        public string Read(string path, string encoding = "utf8")
+        {
+            try
+            {
+                Encoding enc = Encoding.UTF8;
+                switch (encoding.ToLower())
+                {
+                    case "utf8":
+                    case "utf-8":
+                        // BOMなしUTF-8
+                        enc = new global::System.Text.UTF8Encoding(false, false);
+                        break;
+                    case "932":
+                    case "cp932":
+                    case "shift_jis":
+                    case "sjis":
+                        enc = Encoding.GetEncoding(932);
+                        break;
+                    default:
+                        enc = Encoding.UTF8;
+                        break;
+                }
+
+                using (var sr = new global::System.IO.StreamReader(path, enc))
+                {
+                    return sr.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+                global::System.Windows.MessageBox.Show(ex.Message);
+            }
+            return null;
+        }
+
         public FileDescriptorIf Open(string path)
         {
-            // dirチェック
-            var dir = global::System.IO.Path.GetDirectoryName(path);
-            if (!global::System.IO.Directory.Exists(dir))
+            try
             {
-                global::System.IO.Directory.CreateDirectory(dir);
+                // dirチェック
+                var dir = global::System.IO.Path.GetDirectoryName(path);
+                if (!global::System.IO.Directory.Exists(dir))
+                {
+                    global::System.IO.Directory.CreateDirectory(dir);
+                }
+                // file open
+                var fd = new FileDescriptorIf(path);
+                if (fd.IsOpen)
+                {
+                    FileDescQueue.AddLast(fd);
+                    return fd;
+                }
             }
-            // file open
-            var fd = new FileDescriptorIf(path);
-            if (fd.IsOpen)
+            catch (Exception ex)
             {
-                FileDescQueue.AddLast(fd);
-                return fd;
+                global::System.Windows.MessageBox.Show(ex.Message);
             }
             return null;
         }
@@ -156,7 +222,7 @@ ${ex.Message}
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                global::System.Windows.MessageBox.Show(ex.Message);
             }
         }
 

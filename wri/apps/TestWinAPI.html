@@ -47,11 +47,16 @@
 		const debug = () => {
 			//const val = test_func_async();
 			//return "debug"
-			let var1 = wri.TestVar1;
-			let var2 = wri.TestVar2;
 
-			let tag = document.getElementById("debug-message");
-			tag.textContent = var1 + " / " + var2;
+			// let var1 = wri.TestVar1;
+			// let var2 = wri.TestVar2;
+
+			// let tag = document.getElementById("debug-message");
+			// tag.textContent = var1 + " / " + var2;
+
+			const filepath = wri.IO.file.OpenDialog();
+			const content = wri.IO.file.Read(filepath);
+			alert(content);
 		}
 
 		const afk = () => {
