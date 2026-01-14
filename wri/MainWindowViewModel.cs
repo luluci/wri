@@ -227,44 +227,42 @@ namespace wri
                                     {
                                         var xml = new XmlLoader();
                                         xml.Load(file);
-                                        if (xml.HasXslt)
+                                        // apps/XMLViewer.html存在チェック
+                                        bool hasViewer = false;
+                                        string viewerPath = System.IO.Path.Combine(RootPath, "apps", "XMLViewer.html");
+                                        if (System.IO.File.Exists(viewerPath))
                                         {
-                                            // XSLTあり
-                                            WebView2.CoreWebView2.NavigateToString(xml.GetView());
+                                            hasViewer = true;
+                                        }
+                                        //
+                                        if (hasViewer)
+                                        {
+                                            string xmlstr = null;
+                                            if (xml.HasXslt)
+                                            {
+                                                // XSLTあり
+                                                xmlstr = xml.GetView();
+                                            }
+                                            // JSONにシリアル化するためのデータ構造
+                                            var jsonData = new
+                                            {
+                                                type = "xml",
+                                                content = System.IO.File.ReadAllText(file, Encoding.UTF8),
+                                                html = xmlstr,
+                                            };
+                                            // JsonSerializer.SerializeでオブジェクトをJSON文字列に変換
+                                            // この過程で、Serializerが自動的に必要なエスケープ処理を行います。
+                                            string json = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = false });
+                                            // xmlファイルの内容を初期値で渡す
+                                            EntryPoint.ConfigJson = json;
+                                            // XMLViewerを開く
+                                            var viewerUri = new Uri(viewerPath);
+                                            SourcePath.Value = viewerUri;
                                         }
                                         else
                                         {
-                                            // XSLTなし
-                                            // apps/XMLViewer.html存在チェック
-                                            bool hasViewer = false;
-                                            string viewerPath = System.IO.Path.Combine(RootPath, "apps", "XMLViewer.html");
-                                            if (System.IO.File.Exists(viewerPath))
-                                            {
-                                                hasViewer = true;
-                                            }
-                                            //
-                                            if (hasViewer)
-                                            {
-                                                // JSONにシリアル化するためのデータ構造
-                                                var jsonData = new
-                                                {
-                                                    type = "xml",
-                                                    content = System.IO.File.ReadAllText(file, Encoding.UTF8)
-                                                };
-                                                // JsonSerializer.SerializeでオブジェクトをJSON文字列に変換
-                                                // この過程で、Serializerが自動的に必要なエスケープ処理を行います。
-                                                string json = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = false });
-                                                // xmlファイルの内容を初期値で渡す
-                                                EntryPoint.ConfigJson = json;
-                                                // XMLViewerを開く
-                                                var viewerUri = new Uri(viewerPath);
-                                                SourcePath.Value = viewerUri;
-                                            }
-                                            else
-                                            {
-                                                // viewerなし
-                                                WebView2.CoreWebView2.NavigateToString(xml.GetView());
-                                            }
+                                            // viewerなし
+                                            WebView2.CoreWebView2.NavigateToString(xml.GetView());
                                         }
                                     }
                                 }

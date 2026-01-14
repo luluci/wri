@@ -25,6 +25,15 @@ const writeToClipboard = (text) => {
     });
 }
 
+const getConfig = () => {
+    const text = wri.GetConfigAsJson();
+    if (text !== null) {
+        const json = JSON.parse(text);
+        return json;
+    }
+    return null;
+}
+
 const save = (force = false) => {
     try {
         let result = false;
