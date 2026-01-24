@@ -212,20 +212,6 @@ namespace wri
                     {
                         // ファイルパスマッチング
                         var file = files[0];
-                        var check_result = checkDragDropPattern(file, out var pattern);
-                        if (check_result)
-                        {
-                            // マッチした場合は指定されたアプリを起動する
-                            // app存在チェック
-                            var appPath = System.IO.Path.Combine(RootPath, pattern.App);
-                            if (System.IO.File.Exists(appPath))
-                            {
-                                // DragDrop情報を環境変数に格納
-                                // appを開く
-                                SourcePath.Value = new Uri(appPath);
-                                return;
-                            }
-                        }
 
                         var ext = System.IO.Path.GetExtension(file).ToLower();
                         switch (ext)
@@ -428,22 +414,6 @@ namespace wri
             // settings.jsonへの書き出しは必要になったらここからdelegateを登録する
         }
 
-        private bool checkDragDropPattern(string filePath, out Interface.Json.ConfigWriDragDrop pattern)
-        {
-            pattern = null;
-            if (EntryPoint.config.Json != null && EntryPoint.config.Json.Wri != null && EntryPoint.config.Json.Wri.DragDrop != null)
-            {
-                foreach (var check in EntryPoint.config.Json.Wri.DragDrop)
-                {
-                    if (System.Text.RegularExpressions.Regex.IsMatch(filePath, check.Pattern))
-                    {
-                        pattern = check;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
 
         public async Task RunScriptLoaded(string handler)
         {

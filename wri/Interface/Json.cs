@@ -18,17 +18,6 @@ namespace wri.Interface
         }
         public class ConfigWri
         {
-            [JsonPropertyName("dragdrop")]
-            public IList<ConfigWriDragDrop> DragDrop { get; set; }
-        }
-        public class ConfigWriDragDrop
-        {
-            // DragDropしたファイルパスとマッチングするパターン
-            [JsonPropertyName("pattern")]
-            public string Pattern { get; set; } = "";
-            // パターンマッチしたときにロードするhtmlパス
-            [JsonPropertyName("app")]
-            public string App { get; set; } = "";
         }
 
 
