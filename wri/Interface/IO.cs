@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GlobExpressions;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using GlobExpressions;
 
 namespace wri.Interface
 {
@@ -20,11 +21,13 @@ namespace wri.Interface
     {
         public FileIf file { get; set; }
         public DirectoryIf directory { get; set; }
+        public PathIf path { get; set; }
 
         public IO()
         {
             file = new FileIf();
             directory = new DirectoryIf();
+            path = new PathIf();
         }
 
         public void Save()
@@ -32,7 +35,7 @@ namespace wri.Interface
 
         }
 
-        public string GetXmlAsString(string path)
+        public string ConvertXml2Html(string path)
         {
             try
             {
@@ -99,6 +102,23 @@ ${ex.Message}
                 // 相対パスのまま返す
                 return files.Select(x => x.Path).ToArray();
             }
+        }
+    }
+
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class PathIf
+    {
+        public string ExeDirectory { get; } = global::System.IO.Path.GetDirectoryName(global::System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+
+        public string Combine(string path, string file)
+        {
+            return System.IO.Path.Combine(path, file);
+        }
+
+        public string GetExtension(string path)
+        {
+            return System.IO.Path.GetExtension(path);
         }
     }
 

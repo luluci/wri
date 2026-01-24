@@ -70,6 +70,20 @@
     background-color: rgba(11, 51, 97, 0.918);
 }
 
+.container .c_item .dropzone {
+    border: 2px dashed rgba(163, 169, 177, 1);
+    border-radius: 15px;
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: rgba(11, 51, 97, 1);
+    transition: all 0.1s;
+    height: 4em;
+}
+.container .c_item .dropzone.over {
+    border: 4px dashed rgba(163, 169, 177, 1);
+    background-color: rgba(11, 51, 140, 1);
+}
+
 #get_event_log_def_table {
     margin: 10px 10px;
     border-collapse: collapse;

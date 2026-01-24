@@ -26,7 +26,7 @@ const writeToClipboard = (text) => {
 }
 
 const getConfig = () => {
-    const text = wri.GetConfigAsJson();
+    const text = wri.config.GetConfig();
     if (text !== null) {
         const json = JSON.parse(text);
         return json;
@@ -53,4 +53,42 @@ const save = (force = false) => {
     }
 
     return false;
+}
+
+const wait = async (msec) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, msec);
+    });
+}
+
+const getDroppedFilePath = async (e) => {
+    if (e.dataTransfer === null) {
+        return null;
+    }
+    if (e.dataTransfer.types.length === 0) {
+        return null;
+    }
+    const type0 = e.dataTransfer.types[0];
+    if (type0 !== "Files") {
+        return null;
+    }
+
+    wri.isDragDropInProgress = true;
+    //return new Promise(async (resolve) => {
+    //    for (let i = 0; i < 100; i++) {
+    //        if (wri.isDragDropInProgress == false) {
+    //            resolve(wri.droppedFilePath);
+    //        }
+    //        await wait(100);
+    //    }
+    //});
+    for (let i = 0; i < 100; i++) {
+        if (wri.isDragDropInProgress == false) {
+            return wri.droppedFilePath;
+        }
+        await wait(100);
+    }
+    return null;
 }

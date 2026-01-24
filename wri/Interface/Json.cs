@@ -9,8 +9,28 @@ using static wri.Interface.Json;
 
 namespace wri.Interface
 {
-    static internal class Json
+    static public class Json
     {
+        public class Config
+        {
+            [JsonPropertyName("wri")]
+            public ConfigWri Wri { get; set; }
+        }
+        public class ConfigWri
+        {
+            [JsonPropertyName("dragdrop")]
+            public IList<ConfigWriDragDrop> DragDrop { get; set; }
+        }
+        public class ConfigWriDragDrop
+        {
+            // DragDropしたファイルパスとマッチングするパターン
+            [JsonPropertyName("pattern")]
+            public string Pattern { get; set; } = "";
+            // パターンマッチしたときにロードするhtmlパス
+            [JsonPropertyName("app")]
+            public string App { get; set; } = "";
+        }
+
 
         public class ConsoleExit
         {

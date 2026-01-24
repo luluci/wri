@@ -13,7 +13,9 @@ namespace wri
 {
     using Microsoft.Web.WebView2.WinForms;
     using System.Data.SqlTypes;
+    using System.Text.Encodings.Web;
     using System.Text.Json;
+    using System.Text.Unicode;
     using System.Windows;
     using System.Windows.Controls;
     using Utility;
@@ -36,7 +38,7 @@ namespace wri
         // WebView2
         public ReactivePropertySlim<Uri> SourcePath { get; set; }
         // WebView2 WebView2CompositionControl
-        public WebView2CompositionControl WebView2;
+        public Microsoft.Web.WebView2.Wpf.WebView2 WebView2;
         public Interface.EntryPoint EntryPoint { get; set; }
 
         //
@@ -118,6 +120,11 @@ namespace wri
 
         public async Task InitAsync(MainWindow window)
         {
+            EntryPoint = new Interface.EntryPoint();
+
+            // config初期化
+            await InitConfigAsync();
+
             window.Show();
 
             // test
@@ -142,8 +149,6 @@ namespace wri
 
             // 適切なタイミングで初期化する
             Interface.GlobalData.WebView2 = WebView2;
-            EntryPoint = new Interface.EntryPoint();
-
             Interface.GlobalData.SetHeaderVisibility = (isVisible) =>
             {
                 if (isVisible)
@@ -205,7 +210,23 @@ namespace wri
                 {
                     if (e.Data.GetData(System.Windows.DataFormats.FileDrop) is string[] files)
                     {
+                        // ファイルパスマッチング
                         var file = files[0];
+                        var check_result = checkDragDropPattern(file, out var pattern);
+                        if (check_result)
+                        {
+                            // マッチした場合は指定されたアプリを起動する
+                            // app存在チェック
+                            var appPath = System.IO.Path.Combine(RootPath, pattern.App);
+                            if (System.IO.File.Exists(appPath))
+                            {
+                                // DragDrop情報を環境変数に格納
+                                // appを開く
+                                SourcePath.Value = new Uri(appPath);
+                                return;
+                            }
+                        }
+
                         var ext = System.IO.Path.GetExtension(file).ToLower();
                         switch (ext)
                         {
@@ -254,7 +275,7 @@ namespace wri
                                             // この過程で、Serializerが自動的に必要なエスケープ処理を行います。
                                             string json = JsonSerializer.Serialize(jsonData, new JsonSerializerOptions { WriteIndented = false });
                                             // xmlファイルの内容を初期値で渡す
-                                            EntryPoint.ConfigJson = json;
+                                            //EntryPoint.ConfigJson = json;
                                             // XMLViewerを開く
                                             var viewerUri = new Uri(viewerPath);
                                             SourcePath.Value = viewerUri;
@@ -280,8 +301,20 @@ namespace wri
 
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
+            WebView2.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
 
             //WebView2.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
+        }
+
+        private void CoreWebView2_NewWindowRequested(object sender, CoreWebView2NewWindowRequestedEventArgs e)
+        {
+            // WebView2にファイルをDrag&Dropしたとき、
+            // WebView2/JavaScript側でe.preventDefault();をしないとNewWindowRequestedが発生する。
+            // イベントの順番としてはWebView2/JavaScriptのdropイベント→CoreWebView2_NewWindowRequestedの順で発生する。
+            var uri = new Uri(e.Uri);
+            EntryPoint.droppedFilePath = uri.LocalPath;
+            e.Handled = true;
+            EntryPoint.isDragDropInProgress = false;
         }
 
         private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
@@ -363,6 +396,53 @@ namespace wri
             var s = e.TryGetWebMessageAsString();
             
             //MessageBox.Show(s);
+        }
+
+        public async Task InitConfigAsync()
+        {
+            // settings.jsonを読みだしてInterface.Configに展開
+            // settings.json存在チェック
+            var settings_path = System.IO.Path.Combine(RootPath, "settings.json");
+            // settings.jsonが存在しなければ終了
+            if (!System.IO.File.Exists(settings_path))
+            {
+                return;
+            }
+            // settings.json読み出し
+            EntryPoint.config.JsonText = System.IO.File.ReadAllText(settings_path, Encoding.UTF8);
+            // JSONパース
+            // JSON読み込みオプション
+            var jsonOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                //Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                //NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            };
+            //using (var stream = new System.IO.FileStream(settings_path, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            //{
+            //    // jsonファイルパース
+            //    var json = await JsonSerializer.DeserializeAsync<Interface.Json.Config>(stream, jsonOptions);
+            //}
+            EntryPoint.config.Json = JsonSerializer.Deserialize<Interface.Json.Config>(EntryPoint.config.JsonText, jsonOptions);
+
+            // settings.jsonへの書き出しは必要になったらここからdelegateを登録する
+        }
+
+        private bool checkDragDropPattern(string filePath, out Interface.Json.ConfigWriDragDrop pattern)
+        {
+            pattern = null;
+            if (EntryPoint.config.Json != null && EntryPoint.config.Json.Wri != null && EntryPoint.config.Json.Wri.DragDrop != null)
+            {
+                foreach (var check in EntryPoint.config.Json.Wri.DragDrop)
+                {
+                    if (System.Text.RegularExpressions.Regex.IsMatch(filePath, check.Pattern))
+                    {
+                        pattern = check;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public async Task RunScriptLoaded(string handler)

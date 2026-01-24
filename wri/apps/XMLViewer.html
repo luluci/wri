@@ -13,16 +13,31 @@
 		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
 		const csLoaded = () => {
 			try {
-				//
-				// let tag = document.getElementById("init-message");
-				// tag.textContent = "初期化完了";
-				const config = getConfig();
-				if (config !== null && config.type !== null && config.type === "xml") {
-					if (config.content !== null) {
-						loadXml(config.content);
+				// パラメータチェック
+				const params = new URLSearchParams(document.location.search);
+				const file = params.get("file");
+				// 引数にfileが存在したら表示対象xmlとみなす
+				if (file !== null) {
+					// ファイル内容取得
+					const content = wri.io.file.Read(file);
+					if (content !== null) {
+						loadXml(content, file);
 					}
 				}
-				//alert(config.type + " : " + config.content);
+
+				//
+				document.addEventListener("dragover", (e) => {
+					e.preventDefault();
+				});
+				document.addEventListener("drop", async (e) => {
+					const file = await getDroppedFilePath(e);
+					if (file !== null) {
+						const content = wri.io.file.Read(file);
+						if (content !== null) {
+							loadXml(content, file);
+						}
+					}
+				});
 			} catch (msg) {
 				return false;
 			}
@@ -31,10 +46,12 @@
 		}
 		// ↑ロジックを理解した上で変更すること↑
 
-		const loadXml = (xml) => {
+		const loadXml = (xml, file) => {
 			// XML parse
 			const parser = new DOMParser();
 			const xmlDoc = parser.parseFromString(xml, "text/xml");
+			// stylesheet等を解析する
+			const nodes = xmlDoc.childNodes;
 			// root要素は1つだけとみなす
 			const children = xmlDoc.children;
 			if (children.length <= 0) {
@@ -43,17 +60,22 @@
 			const root = children[0]
 			// XML analyze
 			const info = {
+				has_stylesheet: false,
+				stylesheet_data: null,
 				count_content: 0,
 				count_attr: 0,
 				depth: 0,
 			};
-			analyzeXml(root, info);
+			analyzeXml(nodes, root, info);
 			// html化typeを決定する
 			let html_type = 0;
 			if (info.count_content >= info.count_attr) {
 				html_type = 0;
 			} else {
 				html_type = 1;
+			}
+			if (info.has_stylesheet) {
+				html_type = 2;
 			}
 			// html化
 			let xml_dom;
@@ -62,6 +84,13 @@
 					// contentベース
 					xml_dom = convertByContent(root);
 					break;
+
+				case 2:
+					xml_dom = wri.io.ConvertXml2Html(file);
+					document.body.innerHTML = xml_dom;
+					return;
+
+				case 1:
 				default:
 					// attributeベース
 					xml_dom = convertByContent(root);
@@ -70,23 +99,36 @@
 			//
 			const base_elem = document.getElementById("viewer");
 			if (base_elem !== null) {
+				base_elem.innerHTML = "";
 				base_elem.appendChild(xml_dom);
 			}
 		}
-		const analyzeXml = (node, info) => {
-			// node: htmlCollection
-			if (node.children.length === 0) {
-				if (node.textContent !== "") {
+		const analyzeXml = (nodes, elem, info) => {
+			// nodes: NodeList
+			for (let i = 0; i<nodes.length; i++) {
+				const node = nodes[i];
+				if (node.nodeName === "xml-stylesheet") {
+					info.has_stylesheet = true;
+					// type=\"text/xsl\" href=\"_.xsl\"
+					info.stylesheet_data = node.data;
+				}
+			}
+			// elem: htmlCollection
+			analyzeXmlBody(elem, info);
+		}
+		const analyzeXmlBody = (elem, info) => {
+			if (elem.children.length === 0) {
+				if (elem.textContent !== "") {
 					info.count_content++;
 				}
-				else if (node.attributes.length > 0) {
+				else if (elem.attributes.length > 0) {
 					info.count_attr++;
 				}
 			} else {
-				const children = node.children;
+				const children = elem.children;
 				for (let i = 0; i<children.length; i++) {
 					const node = children[i];
-					analyzeXml(node, info);
+					analyzeXmlBody(node, info);
 				}
 			}
 		}
@@ -147,18 +189,6 @@
 		}
 
 		const debug = () => {
-			//const val = test_func_async();
-			//return "debug"
-
-			// let var1 = wri.TestVar1;
-			// let var2 = wri.TestVar2;
-
-			// let tag = document.getElementById("debug-message");
-			// tag.textContent = var1 + " / " + var2;
-
-			// const filepath = wri.IO.file.OpenDialog();
-			// const content = wri.IO.file.Read(filepath);
-			// alert(content);
 		}
 
 	</script>

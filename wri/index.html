@@ -15,6 +15,8 @@
 		const csLoaded = () => {
 			try {
 				//
+				config = getConfig();
+
 				//let tag = document.getElementById("init-message");
 				//tag.textContent = "初期化完了";
 				const elem = document.getElementsByClassName("c_header")[0].getElementsByClassName("item")[0];
@@ -33,39 +35,34 @@
                     apps_elem.appendChild(elem_div);
 				}
 
-                //const dd_elems = Array.from(document.getElementsByClassName("dandd_area"));
-      //          const dd_elems = Array.from(document.getElementsByTagName("body"));
-      //          dd_elems.forEach(element => {
-      //              element.addEventListener("dragover", (event) => {
-      //                  event.preventDefault();
-      //              }, false);
-      //              element.addEventListener("drop", (event) => {
-						//event.preventDefault();
-						//const items = event.dataTransfer.items;
-						//if (items.length > 0) {
-						//	const item = items[0];
-      //                      const file = item.getAsFile();
-      //                      const handle = item.getAsFileSystemHandle().then((handle) => {
-      //                          handle.getFile().then((file) => {
-      //                              console.log(file);
-      //                          });
-      //                          console.log(handle);
-      //                      });
-      //                      item.getAsString((str) => {
-      //                          console.log(str);
-						//	});
-						//}
-      //                  const files = event.dataTransfer.files;
-      //                  if (files.length > 0) {
-      //                      const file = files[0];
-      //                      // ファイルのパスを取得
-      //                      const filePath = file.path;
-      //                      // C#側にファイルパスを渡す
-      //                      // wri.openFile(filePath);
-      //                      console.log(filePath);
-      //                  }
-      //              }, false);
-      //          });
+                const dad_elem = document.getElementById("launch_by_dad");
+                dad_elem.addEventListener("dragenter", (e) => {
+                    e.preventDefault();
+                    dad_elem.classList.add("over");
+                });
+                dad_elem.addEventListener("dragleave", (e) => {
+                    e.preventDefault();
+                    dad_elem.classList.remove("over");
+                });
+				dad_elem.addEventListener("dragover", (e) => {
+					e.preventDefault();
+				});
+				dad_elem.addEventListener("drop", async (e) => {
+                    //alert(e);
+                    //         if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+                    //             e.preventDefault();
+                    //}
+                    //const files = [...e.dataTransfer.items]
+                    //    .map((item) => item.getAsFile())
+                    //    .filter((file) => file);
+                    //wri.Debug(files[0]);
+                    //e.preventDefault();
+                    dad_elem.classList.remove("over");
+                    const file = await getDroppedFilePath(e);
+					//alert(file);
+					launchApp(file);
+				});
+
 			} catch (msg) {
 				return false;
 			}
@@ -73,6 +70,26 @@
 			return true;
 		}
 		// ↑ロジックを理解した上で変更すること↑
+
+		//
+		var config;
+		//
+		const launchApp = (file) => {
+            try {
+                const ddptns = config.launch;
+                for (const ptn of ddptns) {
+					const re = new RegExp(ptn.pattern);
+					if (re.test(file)) {
+                        location.href = `${ptn.app}?file=${encodeURIComponent(file)}`;
+						return;
+					}
+				}
+				//
+				alert(`対応appなし：${file}`);
+			} catch (err) {
+				alert(err);
+			}
+		}
 
 		// 
         // F5キーによるreloadを禁止
@@ -85,7 +102,7 @@
 
 				}
             }
-        });
+		});
 
 		const test_func = () => {
 			let hoge = "str";
@@ -129,26 +146,20 @@
 					</div>
 					<div class="c_item">
 						<div class="header">
-							App List
+							Drag&Dropしたファイルに応じてAppを開く
 						</div>
-						<div class="body" id="apps_list">
-						</div>
-						<div class="item">
-							<a href="./apps/WBS.html">WBS</a>
-						</div>
-						<div class="item">
-							<a href="./apps/TestWinAPI.html">TestApp WinAPI</a>
-						</div>
-						<div class="form">
-							<button onclick="save()">saveDOM</button>
+						<div id="launch_by_dad" class="dropzone">
+							<span>ここに Drag & Drop</span>
 						</div>
 					</div>
 					<div class="c_item">
 						<div class="header">
-							HTMLを開く
+							App List
 						</div>
-						<div class="form dandd_area">
-							<span>Drag & Drop</span>
+						<div class="body" id="apps_list">
+						</div>
+						<div class="form">
+							<button onclick="save()">saveDOM</button>
 						</div>
 					</div>
 				</div>

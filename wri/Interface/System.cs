@@ -14,12 +14,12 @@ namespace wri.Interface
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
-    public class System
+    public class SystemIf
     {
         public ConsoleIf Console { get; set; }
         public ProcessIf Process { get; set; }
 
-        public System()
+        public SystemIf()
         {
             Console = new ConsoleIf();
             Process = new ProcessIf();
@@ -27,7 +27,7 @@ namespace wri.Interface
 
         public void GC()
         {
-            global::System.GC.Collect();
+            System.GC.Collect();
         }
     }
 
@@ -42,14 +42,14 @@ namespace wri.Interface
             //process.StartInfo.Arguments = arguments;
             //process.Start();
 
-            var startInfo = new global::System.Diagnostics.ProcessStartInfo()
+            var startInfo = new System.Diagnostics.ProcessStartInfo()
             {
                 FileName = path,
                 UseShellExecute = true,
                 CreateNoWindow = true,
                 Arguments = arguments,
             };
-            global::System.Diagnostics.Process.Start(startInfo);
+            System.Diagnostics.Process.Start(startInfo);
         }
         public void Kill(int pid)
         {

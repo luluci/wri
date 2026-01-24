@@ -11,7 +11,7 @@
     <Window.Resources>
         <local:SplitterLimitConverter x:Key="SplitterLimitConverter" />
     </Window.Resources>
-    <Grid x:Name="Base" AllowDrop="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="Auto" Width="Auto">
+    <Grid x:Name="Base" AllowDrop="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="Auto" Width="Auto">
         <Grid.RowDefinitions>
             <RowDefinition x:Name="HeaderRowDef" Height="{Binding HeaderHeight.Value}" MinHeight="0" >
                 <RowDefinition.MaxHeight>
@@ -52,7 +52,7 @@
                 </ControlTemplate>
             </GridSplitter.Template>
         </GridSplitter>
-        <wv2:WebView2CompositionControl Grid.Row="2" Name="WebView2" Source="{Binding SourcePath.Value}" AllowExternalDrop="False" />
+        <wv2:WebView2 Grid.Row="2" Name="WebView2" Source="{Binding SourcePath.Value}" AllowExternalDrop="True" />
         <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding FooterVisibility.Value}">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="GridSplitter">

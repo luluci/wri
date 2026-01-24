@@ -11,7 +11,7 @@ namespace wri.Interface
 {
     static public class GlobalData
     {
-        static public WebView2CompositionControl WebView2;
+        static public WebView2 WebView2;
 
         public delegate void SetVisibility(bool isVisible);
         static public SetVisibility SetHeaderVisibility = (isVisible) => {};
@@ -38,30 +38,31 @@ namespace wri.Interface
         public bool preventClose { get; set; } = false; // true:アプリ終了を防ぐ
         public string preventCloseMsg { get; set; } = string.Empty; // 終了防止メッセージ
 
-        // WebView2向けConfig情報
-        public string ConfigJson = null;
+        // DragDrop操作フラグ
+        public bool isDragDropInProgress { get; set; } = false;
+        public string droppedFilePath { get; set; } = null;
 
         // Interfaceクラスインスタンス
-        public System system { get; set; }
+        public SystemIf system { get; set; }
         public WindowsApi win { get; set; }
         public IO io { get; set; }
+        public Config config { get; set; }
 
         public EntryPoint()
         {
-            system = new System();
+            system = new SystemIf();
             win = new WindowsApi();
             io = new IO();
+            config = new Config();
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
         }
 
-
-        public string GetConfigAsJson()
+        public void Debug(object obj)
         {
-            return ConfigJson;
+            return;
         }
-
 
         public void MessageBox(string msg)
         {
