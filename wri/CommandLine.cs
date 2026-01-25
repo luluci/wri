@@ -14,11 +14,13 @@ namespace wri
 
         // GUIモード
         public string LaunchFile;
+        public List<string> LaunchParameter;
 
         public CommandLineOption()
         {
             GuiMode = true;
-            LaunchFile = string.Empty;
+            LaunchFile = null;
+            LaunchParameter = new List<string>();
         }
     }
 
@@ -39,23 +41,56 @@ namespace wri
 
         static public void Parse(string[] args)
         {
-            if (args.Length > 0)
+            // GUIモード起動チェック
+            // デフォルトでGUIモード
+            Option.GuiMode = true;
+            int i = 0;
+            for (; i<args.Length; i++)
             {
-                var ext = System.IO.Path.GetExtension(args[0]);
-                switch (ext)
+                var arg = args[i];
+                // オプション指定が出現したら終了
+                if (arg.StartsWith("-"))
                 {
-                    case ".html":
-                        Option.LaunchFile = args[0];
-                        break;
+                    break;
+                }
+                // 引数解析
+                // 先頭のみ起動時htmlを指定可能
+                if (i == 0)
+                {
+                    // ファイル存在チェック
+                    if (System.IO.File.Exists(arg))
+                    {
+                        // 引数情報を取得
+                        var ext = System.IO.Path.GetExtension(arg);
+                        switch (ext)
+                        {
+                            case ".html":
+                                // 存在するhtmlのみ指定可能
+                                Option.LaunchFile = arg;
+                                break;
 
-                    default:
-                        break;
+                            default:
+                                // それ以外はパラメータとして扱う
+                                Option.LaunchParameter.Add(arg);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Option.LaunchParameter.Add(arg);
+                    }
+                }
+                else
+                {
+                    // 2つ目以降の引数はパラメータとして扱う
+                    Option.LaunchParameter.Add(arg);
                 }
             }
 
             // コマンドライン引数をチェック
-            foreach (string arg in args)
+            for (; i < args.Length; i++)
             {
+                var arg = args[i];
                 switch (arg)
                 {
                     case "-h":

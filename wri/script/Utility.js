@@ -92,3 +92,7 @@ const getDroppedFilePath = async (e) => {
     }
     return null;
 }
+
+const getGetParam = () => {
+    return new URLSearchParams(document.location.search);
+}

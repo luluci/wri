@@ -15,8 +15,8 @@
 			try {
 				// パラメータチェック
 				const params = new URLSearchParams(document.location.search);
-				const file = params.get("file");
-				// 引数にfileが存在したら表示対象xmlとみなす
+				const file = params.get("param1");
+				// 引数が存在したら表示対象xmlとみなす
 				if (file !== null) {
 					// ファイル内容取得
 					const content = wri.io.file.Read(file);

@@ -103,15 +103,22 @@ namespace wri
             // index.htmlへのパスを作成
             //string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
             //string SettingPath = rootPath + @"\Script";
-            Uri uri;
-            if (object.ReferenceEquals(CommandLine.Option.LaunchFile, string.Empty))
+            // コマンドライン引数から初期起動ファイルを決定する
+            string uristr;
+            if (CommandLine.Option.LaunchFile is null)
             {
-                uri = new Uri($@"{RootPath}\index.html");
+                uristr = $@"{RootPath}\index.html";
             }
             else
             {
-                uri = new Uri(CommandLine.Option.LaunchFile);
+                uristr = CommandLine.Option.LaunchFile;
             }
+            // ファイルパスにGETパラメータ付与
+            UriBuilder uriBuilder = new UriBuilder(uristr);
+            var query = uriBuilder.Query;
+            var param = string.Join("&", CommandLine.Option.LaunchParameter.Select((value, index) => $"param{index+1}={Uri.EscapeDataString(value)}"));
+            uriBuilder.Query = string.IsNullOrEmpty(query) ? param : query.TrimStart('?') + "&" + param;
+            var uri = uriBuilder.Uri;
             //uri = new Uri("https://www.google.co.jp");
 
             SourcePath = new ReactivePropertySlim<Uri>(uri);

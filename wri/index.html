@@ -14,8 +14,14 @@
 		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
 		const csLoaded = () => {
 			try {
-				//
-				config = getConfig();
+				// app起動設定を取得
+                config = getConfig();
+				// パラメータチェック
+				const params = getGetParam();
+				const file = params.get("param1");
+                if (file !== null) {
+                    launchApp(file, document.location.search);
+				}
 
 				//let tag = document.getElementById("init-message");
 				//tag.textContent = "初期化完了";
@@ -74,13 +80,17 @@
 		//
 		var config;
 		//
-		const launchApp = (file) => {
+		const launchApp = (file, param = null) => {
             try {
                 const ddptns = config.launch;
                 for (const ptn of ddptns) {
 					const re = new RegExp(ptn.pattern);
 					if (re.test(file)) {
-                        location.href = `${ptn.app}?file=${encodeURIComponent(file)}`;
+						if (param === null) {
+							location.href = `${ptn.app}?param1=${encodeURIComponent(file)}`;
+                        } else {
+                            location.href = `${ptn.app}${param}`;
+						}
 						return;
 					}
 				}
