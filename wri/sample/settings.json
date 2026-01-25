@@ -1,0 +1,19 @@
+{
+    "wri": {
+        "detail": "wri.exe内で使用する設定情報を定義"
+    },
+
+    "launch": [
+        {
+            "pattern": ".*\\.xml",
+            "app": "./apps/XMLViewer.html"
+        }
+    ],
+
+    "xmlviewer": {
+
+    },
+    "test1": {
+        "test1.config1": "config1"
+    }
+}
