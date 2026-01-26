@@ -20,7 +20,7 @@ namespace wri
     using System.Windows.Controls;
     using Utility;
 
-    class MainWindowViewModel : BindableBase, IDisposable
+    public class MainWindowViewModel : BindableBase, IDisposable
     {
         // 
         MainWindow window;
@@ -29,6 +29,8 @@ namespace wri
 
         //
         public ReactivePropertySlim<string> WindowTitle { get; set; }
+        public ReactivePropertySlim<double> Width { get; set; }
+        public ReactivePropertySlim<double> Height { get; set; }
         public ReactivePropertySlim<GridLength> HeaderHeight { get; set; }
         public ReactivePropertySlim<GridLength> FooterHeight { get; set; }
         public ReactivePropertySlim<GridLength> HeaderSplitterHeight { get; set; }
@@ -79,6 +81,9 @@ namespace wri
             .AddTo(Disposables);
 
             //
+            Width = new ReactivePropertySlim<double>(800);
+            Height = new ReactivePropertySlim<double>(500);
+            //
             HeaderSplitterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
             HeaderSplitterHeight.AddTo(Disposables);
             FooterSplitterHeight = new ReactivePropertySlim<GridLength>(new GridLength(0));
@@ -127,10 +132,12 @@ namespace wri
 
         public async Task InitAsync(MainWindow window)
         {
-            EntryPoint = new Interface.EntryPoint();
+            EntryPoint = new Interface.EntryPoint(this);
 
             // config初期化
-            await InitConfigAsync();
+            InitConfig();
+            Width.Value = EntryPoint.config.Json.Wri.Width;
+            Height.Value = EntryPoint.config.Json.Wri.Height;
 
             window.Show();
 
@@ -304,10 +311,13 @@ namespace wri
             // WebView2にファイルをDrag&Dropしたとき、
             // WebView2/JavaScript側でe.preventDefault();をしないとNewWindowRequestedが発生する。
             // イベントの順番としてはWebView2/JavaScriptのdropイベント→CoreWebView2_NewWindowRequestedの順で発生する。
-            var uri = new Uri(e.Uri);
-            EntryPoint.droppedFilePath = uri.LocalPath;
-            e.Handled = true;
-            EntryPoint.isDragDropInProgress = false;
+            if (EntryPoint.isDragDropInProgress)
+            {
+                var uri = new Uri(e.Uri);
+                EntryPoint.droppedFilePath = uri.LocalPath;
+                e.Handled = true;
+                EntryPoint.isDragDropInProgress = false;
+            }
         }
 
         private void webView2CoreWebView2InitializationCompleted(object sender, EventArgs e)
@@ -391,7 +401,7 @@ namespace wri
             //MessageBox.Show(s);
         }
 
-        public async Task InitConfigAsync()
+        public void InitConfig()
         {
             // settings.jsonを読みだしてInterface.Configに展開
             // settings.json存在チェック

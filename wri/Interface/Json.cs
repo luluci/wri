@@ -18,6 +18,12 @@ namespace wri.Interface
         }
         public class ConfigWri
         {
+            // 
+            [JsonPropertyName("width")]
+            public int Width { get; set; } = 800;
+            // 
+            [JsonPropertyName("height")]
+            public int Height { get; set; } = 600;
         }
 
 

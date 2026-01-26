@@ -47,13 +47,15 @@ namespace wri.Interface
         public WindowsApi win { get; set; }
         public IO io { get; set; }
         public Config config { get; set; }
+        public Window window { get; set; }
 
-        public EntryPoint()
+        public EntryPoint(MainWindowViewModel vm)
         {
             system = new SystemIf();
             win = new WindowsApi();
             io = new IO();
             config = new Config();
+            window = new Window(vm);
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
