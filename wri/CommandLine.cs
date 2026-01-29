@@ -29,7 +29,7 @@ namespace wri
         static public CommandLineOption Option { get; set; } = new CommandLineOption();
 
         // コンソールモード
-        static Interface.EntryPoint ep = new Interface.EntryPoint(null);
+        static Interface.EntryPoint ep = new Interface.EntryPoint();
         static Type WinApiT = typeof(Interface.WindowsApi);
         // 解析状態
         enum OptionState

@@ -109,7 +109,18 @@ ${ex.Message}
     [ComVisible(true)]
     public class PathIf
     {
-        public string ExeDirectory { get; } = global::System.IO.Path.GetDirectoryName(global::System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        public string ExeDirectoryPath
+        {
+            get
+            {
+                return GlobalData.ExeDirectoryPath;
+            }
+        }
+
+        public string MakeExeDirRelPath(string relpath)
+        {
+            return System.IO.Path.Combine(GlobalData.ExeDirectoryPath, relpath);
+        }
 
         public string Combine(string path, string file)
         {

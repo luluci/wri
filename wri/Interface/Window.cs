@@ -11,17 +11,25 @@ namespace wri.Interface
     [ComVisible(true)]
     public class Window
     {
-        public MainWindowViewModel vm;
-
-        public Window(MainWindowViewModel viewModel)
+        public Window()
         {
-            vm = viewModel;
+        }
+
+        public int Width
+        {
+            get { return (int)GlobalData.vm.Width.Value; }
+            set { GlobalData.vm.Width.Value = (int)value; }
+        }
+        public int Height
+        {
+            get { return (int)GlobalData.vm.Height.Value; }
+            set { GlobalData.vm.Height.Value = (int)value; }
         }
 
         public void SetSize(int width, int height)
         {
-            vm.Width.Value = width;
-            vm.Height.Value = height;
+            GlobalData.vm.Width.Value = width;
+            GlobalData.vm.Height.Value = height;
         }
     }
 }

@@ -11,6 +11,9 @@ namespace wri.Interface
 {
     static public class GlobalData
     {
+        static public string ExeDirectoryPath;
+
+        static public MainWindowViewModel vm;
         static public WebView2 WebView2;
 
         public delegate void SetVisibility(bool isVisible);
@@ -49,13 +52,13 @@ namespace wri.Interface
         public Config config { get; set; }
         public Window window { get; set; }
 
-        public EntryPoint(MainWindowViewModel vm)
+        public EntryPoint()
         {
             system = new SystemIf();
             win = new WindowsApi();
             io = new IO();
             config = new Config();
-            window = new Window(vm);
+            window = new Window();
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);

@@ -56,6 +56,9 @@ namespace wri
             // InitializeComponent()の前にインスタンス化する
             this.window = window;
             RootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            // GlobalData初期化
+            Interface.GlobalData.vm = this;
+            Interface.GlobalData.ExeDirectoryPath = RootPath;
 
             // Log
             Log.Logger.Console.PostProc = () =>
@@ -132,7 +135,7 @@ namespace wri
 
         public async Task InitAsync(MainWindow window)
         {
-            EntryPoint = new Interface.EntryPoint(this);
+            EntryPoint = new Interface.EntryPoint();
 
             // config初期化
             InitConfig();
