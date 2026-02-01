@@ -155,6 +155,8 @@ namespace Utility
             SM_REMOTECONTROL = 0x2001,
         }
 
+        public const uint CTRL_C_EVENT = 0;
+
         public enum SessionEnding : int
         {
             Cancel = FALSE,
@@ -163,6 +165,12 @@ namespace Utility
 
         [DllImport("Kernel32.dll")]
         public static extern bool AttachConsole(int processId);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool FreeConsole();
+
+        [DllImport("kernel32.dll")]
+        public static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
 
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(SystemMetric smIndex);

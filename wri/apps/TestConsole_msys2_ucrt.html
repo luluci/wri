@@ -1,0 +1,350 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+    <script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				console_initialize();
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		const console_state_none = 0;	// コンソール未初期化
+		const console_state_wait_init_1 = 1;		// コンソール初期化中1:環境変数設定完了待ち
+		const console_state_wait_init_2 = 2;		// コンソール初期化中2:bash起動完了待ち
+		const console_state_wait_init_3 = 3;		//
+		const console_state_wait_command = 4;		// コマンド実行待ち
+		const console_state_running_command = 5;	// コマンド実行中
+		let log_disp;
+		let log_elem;
+		let console_state = console_state_none;
+
+		let btn_console_connect;
+		let btn_console_exec;
+		let btn_manual_command_exec;
+		let btn_sigint_exec;
+
+		const console_initialize = () => {
+			try {
+				wri.window.ShowFooter(true);
+
+				window.chrome.webview.addEventListener('message', (e) => {
+					if (e.data.type == "console") {
+						switch (e.data.status) {
+							case "running":
+								// nothing
+								break;
+
+							case "exit":
+								// コマンド終了通知
+								// 終了コード
+								on_console_command_exit(e.data.code);
+								break;
+						}
+					}
+				});
+
+				btn_console_connect = document.getElementById("test_console_start");
+				btn_console_connect.addEventListener("click", async () => {
+					btn_console_exec.disabled = true;
+
+					// バッチファイルで起動する場合
+					// wri.system.Console.Start("C:\\msys64\\msys2_shell.cmd", " -ucrt64 -defterm -no-start -here", false);
+					// 手動でbash起動する場合
+					// wri.system.Console.SetEnv("PATH", "C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\local\\bin;C:\\msys64\\usr\\bin;C:\\msys64\\bin");
+					// wri.system.Console.SetEnv("LOGINSHELL", "bash");
+					wri.system.Console.SetEnv("MSYSTEM", "UCRT64");
+					// wri.system.Console.SetEnv("MSYSCON", "defterm");
+					wri.system.Console.SetEnv("CHERE_INVOKING", "enabled_from_arguments");
+					wri.system.Console.SetEnv("MSYS2_NOSTART", "yes");
+					let ret = wri.system.Console.Start("C:\\msys64\\usr\\bin\\bash.exe", " -l", false);
+					if (!ret) {
+						// コマンド実行に失敗
+						alert("接続に失敗しました : " + console.ErrorMessage);
+						console_state = console_state_none;
+						return;
+					}
+					//
+					console_state = console_state_wait_init_3;
+					on_console_command_exit(0);
+					document.getElementById("process_id").value = wri.system.Console.ProcessId;
+
+					// ret = wri.system.Console.ExecCmd([
+					// 	"set PATH=C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\local\\bin;C:\\msys64\\usr\\bin;C:\\msys64\\bin;%PATH%",
+					// 	"set MSYSTEM=UCRT64"
+					// ]);
+					// if (ret) {
+					// 	// コマンド実行に成功
+					// 	console_state = console_state_wait_init_1;
+					// } else {
+					// 	// コマンド実行に失敗
+					// 	alert("コマンド実行に失敗しました : " + console.ErrorMessage);
+					// 	console_state = console_state_none;
+					// 	return;
+					// }
+				});
+
+				btn_console_exec = document.getElementById("test_console_exec");
+				btn_console_exec.disabled = true;
+				btn_console_exec.addEventListener("click", async () => {
+					btn_console_exec.disabled = true;
+
+					// return new Promise(resolve => {
+					// 	wri.system.Console.ExecCmdAsync("sleep 2; echo test");
+					// }).then(val => {
+					// 	const ret = wri.system.Console.Result;
+					// 	alert(ret[0]);
+					// }).catch((err) => {
+					// 	alert(err);
+					// });
+					//await wri_async.system.Console.ExecCmdAsync("sleep 5");;
+					// const ret1 = wri.system.Console.test(0);
+					// const ret2 = wri.system.Console.test(1);
+					// const task = wri.system.Console.ExecCmd("sleep 5");
+					const ret = wri.system.Console.ExecCmd("ls");
+					// const ret = wri.system.Console.Result;
+					// alert(ret[0]);
+					// alert("test");
+					if (ret) {
+						// コマンド実行に成功
+						console_state = console_state_running_command;
+					} else {
+						// コマンド実行に失敗
+						alert("実行失敗しました : " + console.ErrorMessage);
+						console_state = console_state_wait_command;
+					}
+				});
+
+				// command1
+				btn_manual_command_exec = document.getElementById("manual_command_exec");
+				btn_manual_command_exec.addEventListener("click", () => {
+					const input = document.getElementById("manual_command");
+
+					const ret = wri.system.Console.ExecCmd([input.value]);
+					if (ret) {
+						// コマンド実行に成功
+						console_state = console_state_running_command;
+					} else {
+						// コマンド実行に失敗
+						alert("実行失敗しました : " + console.ErrorMessage);
+						console_state = console_state_wait_command;
+					}
+				});
+				// command2
+				const btn_manual_command_2_exec = document.getElementById("manual_command_2_exec");
+				btn_manual_command_2_exec.addEventListener("click", () => {
+					const input = document.getElementById("manual_command_2");
+
+					const ret = wri.system.Console.ExecCmd([input.value]);
+					if (ret) {
+						// コマンド実行に成功
+						console_state = console_state_running_command;
+					} else {
+						// コマンド実行に失敗
+						alert("実行失敗しました : " + console.ErrorMessage);
+						console_state = console_state_wait_command;
+					}
+				});
+
+				btn_sigint_exec = document.getElementById("sigint_exec");
+				btn_sigint_exec.addEventListener("click", () => {
+					wri.system.Console.SendCtrlC();
+				});
+
+			} catch (msg) {
+				alert(msg);
+				return false;
+			}
+			return true;
+		}
+
+		const on_console_command_exit = (code) => {
+			try {
+				switch (console_state) {
+					case console_state_wait_init_1:
+						//
+						if (code != 0) {
+							alert("終了コードが異常？  ExitCode=" + code);
+						}
+						// 終了コードを取得するため、bashの終了コード変数をセット
+						wri.system.Console.SetExitCodeStr("$?");
+						// コンソールとしてbashを起動
+						const ret = wri.system.Console.ExecCmd("bash");
+						if (ret) {
+							// コマンド実行に成功
+							console_state = console_state_wait_init_2;
+						} else {
+							// コマンド実行に失敗
+							alert("接続失敗しました : " + console.ErrorMessage);
+							console_state = console_state_none;
+						}
+						break;
+
+					case console_state_wait_init_2:
+						//
+						if (code != 0) {
+							alert("終了コードが異常？  ExitCode=" + code);
+						}
+						console_state = console_state_wait_command;
+						btn_console_exec.disabled = false;
+						break;
+
+					case console_state_wait_init_3:
+						//
+						if (code != 0) {
+							alert("終了コードが異常？  ExitCode=" + code);
+						}
+						// 終了コードを取得するため、bashの終了コード変数をセット
+						wri.system.Console.SetExitCodeStr("$?");
+						console_state = console_state_wait_command;
+						btn_console_exec.disabled = false;
+						break;
+
+					case console_state_wait_command:
+						// ありえない？
+						alert("コマンド未実行のはずなのにコマンド完了通知を受信");
+						btn_console_exec.disabled = false;
+						break;
+
+					case console_state_running_command:
+						console_state = console_state_wait_command;
+						btn_console_exec.disabled = false;
+						break;
+
+					default:
+						console_state = console_state_none;
+						break;
+				}
+
+			} catch (msg) {
+				alert(msg);
+			}
+		}
+
+    </script>
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			background-color:rgb(239, 255, 213);
+			display: flex;
+			flex-direction: column;
+			height: 100vh;
+			width: 100vw;
+		}
+
+		#body {
+			flex: 1;
+			overflow-y: auto;
+		}
+		#console {
+			width: 100%;
+			height: 30vh;
+			background-color: #606060;
+			display: flex;
+			flex-direction: column;
+
+			& .header {
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: row;
+
+				& .tab {
+					width: 100px;
+					background-color: #202020;
+					margin: 5px 2px 0 2px;
+					border-top-left-radius: 5px;
+					border-top-right-radius: 5px;
+					color: #f0f0f0;
+					font-size: 0.9em;
+					padding: 2px;
+					text-align: center;
+				}
+
+				& button {
+					padding: 0 10px;
+					margin: 5px 0 2px 10px;
+				}
+			}
+			& .body {
+				flex-grow: 1;
+				margin: 0 2px 2px 2px;
+				padding: 5px;
+				background-color: #202020;
+				height: auto;
+				overflow-y: auto;
+				color: #f0f0f0;
+			}
+		}
+
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+	<div id="body">
+		<div class="body_pane">
+			<div class="main_pane">
+				<div class="container">
+					<div class="c_header">
+						<div class="item">
+							header1
+						</div>
+						<div class="item">
+							<button id="test_console_start">接続</button>
+							<button id="test_console_exec">実行</button>
+						</div>
+					</div>
+					<div class="c_item">
+						<div class="header">
+							Console
+						</div>
+						<div class="form">
+							<div>
+								<span>コマンド1</span>
+								<input id="manual_command" />
+								<button id="manual_command_exec">実行</button>
+							</div>
+							<div>
+								<span>コマンド2</span>
+								<input id="manual_command_2" />
+								<button id="manual_command_2_exec">実行</button>
+							</div>
+							<div>
+								<span>Ctrl+C / SIGINT</span>
+								<button id="sigint_exec">実行</button>
+							</div>
+						</div>
+						<div class="body">
+							<div>
+								プロセスID:<input id="process_id" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="side_pane">
+				<div class="side_item_list" >
+					<ul>
+						<li>item1</li>
+						<li>item2</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

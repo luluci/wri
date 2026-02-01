@@ -58,14 +58,16 @@
 .container .c_item .body {
     border: 2px dotted #FFFFFF;
     border-radius: 10px;
+    margin: 0 5px;
     padding: 1px 10px;
     background-color: #FFFFFF;
+    color: #000;
 }
 
 .container .c_item .form {
     border: 1px dashed rgba(163, 169, 177, 0.918);
     border-radius: 10px;
-    margin: 0 10px;
+    margin: 0 5px;
     padding: 5px 10px;
     background-color: rgba(11, 51, 97, 0.918);
 }
@@ -73,7 +75,7 @@
 .container .c_item .dropzone {
     border: 2px dashed rgba(163, 169, 177, 1);
     border-radius: 15px;
-    margin: 0 10px;
+    margin: 0 5px;
     padding: 5px 10px;
     background-color: rgba(11, 51, 97, 1);
     transition: all 0.1s;

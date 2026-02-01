@@ -73,6 +73,11 @@ namespace wri.Interface
 
         public bool TransferStdoutToWebView2 { get; set; }
 
+        public int ProcessId
+        {
+            get { return console.ProcessId; }
+        }
+
         public ConsoleIf()
         {
             console = new Console();
@@ -80,14 +85,32 @@ namespace wri.Interface
             TransferStdoutToWebView2 = false;
         }
 
-        public bool Start(bool transStdout = false)
+        public void ClearEnv()
+        {
+            console.ClearEnv();
+        }
+        public void SetEnv(string key, string value)
+        {
+            console.SetEnv(key, value);
+        }
+
+        public bool Start(string cmd, string args, bool transStdout = false)
         {
             TransferStdoutToWebView2 = transStdout;
             if (!transStdout)
             {
                 Interface.GlobalData.SetFooterVisibility(true);
             }
-            return console.Start(OnStdout, OnExit);
+            return console.Start(cmd, args, OnExec, OnStdout, OnExit);
+        }
+        public bool StartCmd(bool transStdout = false)
+        {
+            TransferStdoutToWebView2 = transStdout;
+            if (!transStdout)
+            {
+                Interface.GlobalData.SetFooterVisibility(true);
+            }
+            return console.StartCmd(OnExec, OnStdout, OnExit);
         }
         public void SetBash()
         {
@@ -98,6 +121,21 @@ namespace wri.Interface
             console.Close();
         }
 
+        private void OnExec(string cmd)
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                if (TransferStdoutToWebView2)
+                {
+                    //var json = Json.MakeJsonStringConsoleExec(output);
+                    //GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                else
+                {
+                    Log.Logger.Console.Add($"> {cmd}");
+                }
+            }));
+        }
         private void OnStdout(string stdout)
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
@@ -115,7 +153,17 @@ namespace wri.Interface
         }
         private void OnExit(int code)
         {
-            //ExitCode = console.ExitCode;
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                if (TransferStdoutToWebView2)
+                {
+                    //ExitCode = console.ExitCode;
+                }
+                else
+                {
+                    Log.Logger.Console.Add($"< Exit (Result: {code})");
+                }
+            }));
         }
 
         public int ExitCode { get; set; } = 0;
@@ -173,6 +221,11 @@ namespace wri.Interface
                 var json = Json.MakeJsonStringConsoleExit(ExitCode);
                 GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
+        }
+
+        public void SendCtrlC()
+        {
+            console.SendCtrlC();
         }
     }
 }

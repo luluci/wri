@@ -31,5 +31,14 @@ namespace wri.Interface
             GlobalData.vm.Width.Value = width;
             GlobalData.vm.Height.Value = height;
         }
+
+        public void ShowHeader(bool show)
+        {
+            GlobalData.SetHeaderVisibility(show);
+        }
+        public void ShowFooter(bool show)
+        {
+            GlobalData.SetFooterVisibility(show);
+        }
     }
 }

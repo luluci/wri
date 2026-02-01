@@ -6,16 +6,34 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using wri.Interface;
 using static Utility.Console;
 
 namespace Utility
 {
+    using winapi = Utility.WindowsApi;
+
     internal class Console
     {
+        // プロセス情報
+        public int ProcessId
+        {
+            get
+            {
+                if (process != null && !process.HasExited)
+                {
+                    return process.Id;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
         // 実行結果
         public int ExitCode = 0;
         public string ErrorMessage = string.Empty;
-
         //
         private Process process;
         private bool IsCmdRunning;
@@ -25,6 +43,7 @@ namespace Utility
         private string _exitCodeStr = string.Empty;
         private string _promptMarkerCmd;
         private Regex _promptMarkerRegex;
+        private Dictionary<string, string> _env;
         // コマンド実行用
         private string[] dummyCmds;
 
@@ -33,6 +52,7 @@ namespace Utility
             IsCmdRunning = false;
             _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeCmd}";
             _promptMarkerRegex = new Regex($@"^{_promptMarker} (.+)");
+            _env = new Dictionary<string, string>();
             dummyCmds = new string[] {""};
         }
 
@@ -44,15 +64,70 @@ namespace Utility
             }
         }
 
+        // コマンド実行
+        public delegate void CallbackExec(string output);
+        // 標準出力取得
         public delegate void CallbackStdout(string output);
+        // 終了検知
         public delegate void CallbackExit(int code);
+        private CallbackExec callbackExec;
         private CallbackStdout callbackStdout;
         private CallbackExit callbackExit;
 
-        public bool Start(CallbackStdout stdout, CallbackExit exit)
+        public void ClearEnv()
+        {
+            _env.Clear();
+        }
+        public void SetEnv(string key, string value)
+        {
+            if (_env.ContainsKey(key))
+            {
+                _env[key] = value;
+            }
+            else
+            {
+                _env.Add(key, value);
+            }
+        }
+
+        public bool StartCmd(CallbackExec exec, CallbackStdout stdout, CallbackExit exit)
         {
             try
             {
+                //Console.StartInfo.Arguments = "--login -i";
+                var result = Start("cmd.exe", "", exec, stdout, exit);
+                if (result)
+                {
+                    process.StandardInput.WriteLine("@echo off");
+                }
+                return result;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public bool StartMsys2Ucrt64(CallbackExec exec, CallbackStdout stdout, CallbackExit exit)
+        {
+            string cmd = ".\\msys2_shell.cmd";
+            string arg = " -ucrt64 -defterm -no-start -here";
+
+            //if (Start(stdout, exit))
+            //{
+            //    var msys2Ucrt64Cmds = new string[] {
+            //        "set PATH=C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\local\\bin;C:\\msys64\\usr\\bin;C:\\msys64\\bin;%PATH%",
+            //        "set MSYSTEM=UCRT64",
+            //        "bash"
+            //    };
+            //    return ExecCmd(msys2Ucrt64Cmds);
+            //}
+            return Start(cmd, arg, exec, stdout, exit);
+        }
+        public bool Start(string filename, string args, CallbackExec exec, CallbackStdout stdout, CallbackExit exit)
+        {
+            try
+            {
+                callbackExec = exec;
                 callbackStdout = stdout;
                 callbackExit = exit;
 
@@ -65,8 +140,20 @@ namespace Utility
                 }
 
                 process = new Process();
-                process.StartInfo.FileName = "cmd.exe";
-                //Console.StartInfo.Arguments = "--login -i";
+                process.StartInfo.FileName = filename;
+                process.StartInfo.Arguments = args;
+                // 環境変数設定
+                foreach (var kvp in _env)
+                {
+                    if (process.StartInfo.EnvironmentVariables.ContainsKey(kvp.Key))
+                    {
+                        process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value + ";" + process.StartInfo.EnvironmentVariables[kvp.Key];
+                    }
+                    else
+                    {
+                        process.StartInfo.EnvironmentVariables.Add(kvp.Key, kvp.Value);
+                    }
+                }
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
@@ -76,7 +163,6 @@ namespace Utility
                 process.OutputDataReceived += CmdProcess_OutputDataReceived;
                 process.ErrorDataReceived += CmdProcess_OutputDataReceived;
                 process.Start();
-                process.StandardInput.WriteLine("@echo off");
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
@@ -98,8 +184,9 @@ namespace Utility
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                ErrorMessage = ex.Message;
                 return false;
             }
         }
@@ -119,6 +206,32 @@ namespace Utility
             if (process != null)
             {
                 process.Close();
+            }
+        }
+
+        public bool SendCtrlC()
+        {
+            try
+            {
+                if (process != null && !process.HasExited)
+                {
+                    //if (winapi.AttachConsole((int)process.Id))
+                    //{
+                    //    // 2. Ctrl+Cを送信
+                    //    winapi.GenerateConsoleCtrlEvent(winapi.CTRL_C_EVENT, 0);
+
+                    //    // 3. コンソールをデタッチ
+                    //    winapi.FreeConsole();
+                    //}
+                    //process.StandardInput.WriteLine("\x3");
+                    winapi.GenerateConsoleCtrlEvent(winapi.CTRL_C_EVENT, (uint)process.Id);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                return false;
             }
         }
 
@@ -209,6 +322,7 @@ namespace Utility
                 // 入力されたコマンドをすべてstdinに流す
                 foreach (var cmd in cmds)
                 {
+                    callbackExec(cmd);
                     process.StandardInput.WriteLine(cmd);
                 }
                 // コマンド実行完了を検知するためのダミーコマンド実行
