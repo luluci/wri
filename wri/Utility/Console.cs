@@ -49,11 +49,18 @@ namespace Utility
 
         public Console()
         {
+            Init();
+        }
+
+        public void Init()
+        {
+            ExitCode = 0;
+            ErrorMessage = string.Empty;
             IsCmdRunning = false;
             _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeCmd}";
             _promptMarkerRegex = new Regex($@"^{_promptMarker} (.+)");
             _env = new Dictionary<string, string>();
-            dummyCmds = new string[] {""};
+            dummyCmds = new string[] { "" };
         }
 
         public bool IsRunning
@@ -133,10 +140,7 @@ namespace Utility
 
                 if (!(process is null))
                 {
-                    process.Close();
-                    _promptMarkerCmd = $"echo {_promptMarker} {_exitCodeCmd}";
-                    ExitCode = 0;
-                    ErrorMessage = string.Empty;
+                    Close();
                 }
 
                 process = new Process();
@@ -205,7 +209,14 @@ namespace Utility
         {
             if (process != null)
             {
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                    process.WaitForExit(10*1000);
+                }
                 process.Close();
+                process = null;
+                Init();
             }
         }
 
