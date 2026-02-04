@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using Utility;
 
 namespace wri.Interface
 {
@@ -39,7 +40,7 @@ namespace wri.Interface
         {
             try
             {
-                var xml = new Utility.XmlLoader();
+                var xml = new XmlLoader();
                 xml.Load(path);
                 return xml.GetView();
             }

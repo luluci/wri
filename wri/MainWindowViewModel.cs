@@ -12,12 +12,10 @@ using System.Threading.Tasks;
 namespace wri
 {
     using Microsoft.Web.WebView2.WinForms;
-    using System.Data.SqlTypes;
     using System.Text.Encodings.Web;
     using System.Text.Json;
     using System.Text.Unicode;
     using System.Windows;
-    using System.Windows.Controls;
     using Utility;
 
     public class MainWindowViewModel : BindableBase, IDisposable
@@ -59,6 +57,15 @@ namespace wri
             // GlobalData初期化
             Interface.GlobalData.vm = this;
             Interface.GlobalData.ExeDirectoryPath = RootPath;
+            Interface.GlobalData.DefaultSettingsPath = System.IO.Path.Combine(RootPath, "settings.json");
+            Interface.GlobalData.DefaultConfig = new Interface.Json.Config
+            {
+                Wri = new Interface.Json.ConfigWri
+                {
+                    Width = 800,
+                    Height = 600
+                }
+            };
 
             // Log
             Log.Logger.Console.PostProc = () =>
@@ -109,8 +116,6 @@ namespace wri
             WindowTitle.AddTo(Disposables);
 
             // index.htmlへのパスを作成
-            //string rootPath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-            //string SettingPath = rootPath + @"\Script";
             // コマンドライン引数から初期起動ファイルを決定する
             string uristr;
             if (CommandLine.Option.LaunchFile is null)
@@ -330,18 +335,25 @@ namespace wri
 
         private void webView_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
-            var uri = new Uri(e.Uri);
-            switch (uri.Scheme)
+            try
             {
-                case "data":
-                case "file":
-                    // これらのスキームは許可する
-                    break;
-                default:
-                    // それ以外のスキームは拒否する
-                    SourcePath.Value = uriBlank;
-                    e.Cancel = true;
-                    return;
+                var uri = new Uri(e.Uri);
+                switch (uri.Scheme)
+                {
+                    case "data":
+                    case "file":
+                        // これらのスキームは許可する
+                        break;
+                    default:
+                        // それ以外のスキームは拒否する
+                        SourcePath.Value = uriBlank;
+                        e.Cancel = true;
+                        return;
+                }
+            }
+            catch (Exception)
+            {
+                //
             }
             //if (uri.Scheme != "file")
             //{
@@ -406,32 +418,56 @@ namespace wri
 
         public void InitConfig()
         {
-            // settings.jsonを読みだしてInterface.Configに展開
-            // settings.json存在チェック
-            var settings_path = System.IO.Path.Combine(RootPath, "settings.json");
-            // settings.jsonが存在しなければ終了
-            if (!System.IO.File.Exists(settings_path))
+            // settings.json
+            var result = LoadConfig(Interface.GlobalData.DefaultSettingsPath);
+            if (!result)
             {
-                return;
+                // 読み込み失敗時はデフォルト値を設定
+                EntryPoint.config.Json = Interface.GlobalData.DefaultConfig;
+                EntryPoint.config.JsonText = string.Empty;
             }
-            // settings.json読み出し
-            EntryPoint.config.JsonText = System.IO.File.ReadAllText(settings_path, Encoding.UTF8);
-            // JSONパース
-            // JSON読み込みオプション
-            var jsonOptions = new JsonSerializerOptions
+        }
+        public bool LoadConfig(string path)
+        {
+            try
             {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                //Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                //NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            };
-            //using (var stream = new System.IO.FileStream(settings_path, System.IO.FileMode.Open, System.IO.FileAccess.Read))
-            //{
-            //    // jsonファイルパース
-            //    var json = await JsonSerializer.DeserializeAsync<Interface.Json.Config>(stream, jsonOptions);
-            //}
-            EntryPoint.config.Json = JsonSerializer.Deserialize<Interface.Json.Config>(EntryPoint.config.JsonText, jsonOptions);
+                // settings.jsonを読みだしてInterface.Configに展開
+                // 読み出しに失敗したときは現状を変えない
+                // settings.jsonが存在しなければ終了
+                if (!System.IO.File.Exists(path))
+                {
+                    return false;
+                }
 
-            // settings.jsonへの書き出しは必要になったらここからdelegateを登録する
+                // settings.json読み出し
+                var str = System.IO.File.ReadAllText(path, Encoding.UTF8);
+                // JSONパース
+                // JSON読み込みオプション
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    //Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    //NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                };
+                //using (var stream = new System.IO.FileStream(settings_path, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                //{
+                //    // jsonファイルパース
+                //    var json = await JsonSerializer.DeserializeAsync<Interface.Json.Config>(stream, jsonOptions);
+                //}
+                var json = JsonSerializer.Deserialize<Interface.Json.Config>(str, jsonOptions);
+                // データがすべて揃ったら反映
+                EntryPoint.config.JsonText = str;
+                EntryPoint.config.Json = json;
+
+                // settings.jsonへの書き出しは必要になったらここからdelegateを登録する
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "設定ファイル読み込みエラー");
+                return false;
+            }
         }
 
 

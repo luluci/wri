@@ -12,13 +12,15 @@ namespace wri.Interface
     static public class GlobalData
     {
         static public string ExeDirectoryPath;
+        static public string DefaultSettingsPath;
+        static public Interface.Json.Config DefaultConfig;
 
         static public MainWindowViewModel vm;
         static public WebView2 WebView2;
 
         public delegate void SetVisibility(bool isVisible);
         static public SetVisibility SetHeaderVisibility = (isVisible) => {};
-        static public SetVisibility SetFooterVisibility = (isVisible) => { };
+        static public SetVisibility SetFooterVisibility = (isVisible) => {};
     }
 
     /// <summary>
@@ -71,7 +73,7 @@ namespace wri.Interface
 
         public void MessageBox(string msg)
         {
-            global::System.Windows.MessageBox.Show(msg);
+            System.Windows.MessageBox.Show(msg);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace wri.Interface
                 var process = global::System.Diagnostics.Process.GetProcessById(pid);
                 process.Kill();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Handle exception if needed
             }
@@ -211,13 +211,14 @@ namespace wri.Interface
                 }
                 ErrorMessage = console.ErrorMessage;
                 ExitCode = console.ExitCode;
-                var json = Json.MakeJsonStringConsoleExit(ExitCode);
-                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
                 ExitCode = -1;
+            }
+            finally
+            {
                 var json = Json.MakeJsonStringConsoleExit(ExitCode);
                 GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }

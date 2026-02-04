@@ -12,7 +12,7 @@ namespace wri.Interface
     public class Config
     {
         public string JsonText { get; set; } = null;
-        public Interface.Json.Config Json;
+        public Interface.Json.Config Json = new Interface.Json.Config();
 
         public Config()
         {
@@ -23,6 +23,11 @@ namespace wri.Interface
         public string GetConfig()
         {
             return JsonText;
+        }
+
+        public bool LoadConfig(string path)
+        {
+            return GlobalData.vm.LoadConfig(path);
         }
     }
 }

@@ -14,6 +14,9 @@ namespace Utility
 {
     using winapi = Utility.WindowsApi;
 
+    /// <summary>
+    /// cmd.exeやbashを起動したプロセスを保持してパイプでコマンド実行と結果を受け取るクラス
+    /// </summary>
     internal class Console
     {
         // プロセス情報
