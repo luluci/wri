@@ -12,10 +12,12 @@ using System.Threading.Tasks;
 namespace wri
 {
     using Microsoft.Web.WebView2.WinForms;
+    using System.Drawing;
     using System.Text.Encodings.Web;
     using System.Text.Json;
     using System.Text.Unicode;
     using System.Windows;
+    using System.Windows.Media;
     using Utility;
 
     public class MainWindowViewModel : BindableBase, IDisposable
@@ -35,6 +37,8 @@ namespace wri
         public ReactivePropertySlim<GridLength> FooterSplitterHeight { get; set; }
         public ReactivePropertySlim<Visibility> HeaderVisibility { get; set; }
         public ReactivePropertySlim<Visibility> FooterVisibility { get; set; }
+        public ReactivePropertySlim<SolidColorBrush> FooterBackground { get; set; }
+        public ReactivePropertySlim<SolidColorBrush> FooterForeground { get; set; }
         // WebView2
         public ReactivePropertySlim<Uri> SourcePath { get; set; }
         // WebView2 WebView2CompositionControl
@@ -106,6 +110,11 @@ namespace wri
             HeaderVisibility.AddTo(Disposables);
             FooterVisibility = new ReactivePropertySlim<Visibility>(Visibility.Collapsed);
             FooterVisibility.AddTo(Disposables);
+            //
+            FooterBackground = new ReactivePropertySlim<SolidColorBrush>("#FF202020".ToSolidColorBrush());
+            FooterBackground.AddTo(Disposables);
+            FooterForeground = new ReactivePropertySlim<SolidColorBrush>("#FFFFFFFF".ToSolidColorBrush());
+            FooterForeground.AddTo(Disposables);
 
             // WebView2インスタンスの初期化前に実施する
             // dllをexeファイル内に取り込むのと相性が悪い。
