@@ -21,6 +21,8 @@ namespace wri.Interface
         public delegate void SetVisibility(bool isVisible);
         static public SetVisibility SetHeaderVisibility = (isVisible) => {};
         static public SetVisibility SetFooterVisibility = (isVisible) => {};
+
+        static public string ErrorMessage { get; set; } = null;
     }
 
     /// <summary>
@@ -53,6 +55,7 @@ namespace wri.Interface
         public IO io { get; set; }
         public Config config { get; set; }
         public Window window { get; set; }
+        public Office.Office office { get; set; }
 
         public EntryPoint()
         {
@@ -61,6 +64,7 @@ namespace wri.Interface
             io = new IO();
             config = new Config();
             window = new Window();
+            office = new Office.Office();
 
             // test
             //win.GetLogOnOffEventLogList(win.MachineName);
@@ -74,6 +78,11 @@ namespace wri.Interface
         public void MessageBox(string msg)
         {
             System.Windows.MessageBox.Show(msg);
+        }
+
+        public string ErrorMessage()
+        {
+            return GlobalData.ErrorMessage;
         }
     }
 }

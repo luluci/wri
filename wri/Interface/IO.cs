@@ -139,11 +139,14 @@ ${ex.Message}
     public class DirectoryIf
     {
 
+        public string GetDirectoryName(string path)
+        {
+            return global::System.IO.Path.GetDirectoryName(path);
+        }
 
         public bool Exists(string path)
         {
-            var dir = global::System.IO.Path.GetDirectoryName(path);
-            return global::System.IO.Directory.Exists(dir);
+            return global::System.IO.Directory.Exists(path);
         }
     }
 
@@ -157,6 +160,11 @@ ${ex.Message}
         {
             FileDescQueue = new LinkedList<FileDescriptorIf>();
             //global::System.Console.WriteLine("File construct.");
+        }
+
+        public bool Exists(string path)
+        {
+            return global::System.IO.File.Exists(path);
         }
 
         public string OpenDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*")

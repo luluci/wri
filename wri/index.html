@@ -1,11 +1,11 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
 
 	<!-- <script type="text/javascript" charset="utf-8" src="./script/WindowList.js"></script> -->
 	<script type="text/javascript" charset="utf-8" src="./script/Utility.js"></script>
-    <script language="javascript" type="text/javascript">
+	<script language="javascript" type="text/javascript">
 		// C#側からAPI登録を実行される。
 		// const wri = chrome.webview.hostObjects.sync.wri;
 		// const wri_async = chrome.webview.hostObjects.wri;
@@ -15,12 +15,12 @@
 		const csLoaded = () => {
 			try {
 				// app起動設定を取得
-                config = getConfig();
+				config = getConfig();
 				// パラメータチェック
 				const params = getGetParam();
 				const file = params.get("param1");
-                if (file !== null) {
-                    launchApp(file, document.location.search);
+				if (file !== null) {
+					launchApp(file, document.location.search);
 				}
 
 				//let tag = document.getElementById("init-message");
@@ -29,42 +29,42 @@
 				elem.textContent += " update!";
 
 				//wri.system.Process.Start("https://google.co.jp");
-                //const dirs = wri.io.GlobDirectories("./", "**/*", false);
+				//const dirs = wri.io.GlobDirectories("./", "**/*", false);
 				const apps_elem = document.getElementById("apps_list");
 				const apps = wri.io.GlobFiles("./", "apps/*");
-                for (let i = 0; i < apps.length; i++) {
-                    const elem_div = document.createElement("div");
+				for (let i = 0; i < apps.length; i++) {
+					const elem_div = document.createElement("div");
 					const elem_a = document.createElement("a");
 					elem_a.href = apps[i];
-                    elem_a.textContent = apps[i].split("/").reverse()[0].split('.')[0];
+					elem_a.textContent = apps[i].split("/").reverse()[0].split('.')[0];
 					elem_div.appendChild(elem_a);
-                    apps_elem.appendChild(elem_div);
+					apps_elem.appendChild(elem_div);
 				}
 
-                const dad_elem = document.getElementById("launch_by_dad");
-                dad_elem.addEventListener("dragenter", (e) => {
-                    e.preventDefault();
-                    dad_elem.classList.add("over");
-                });
-                dad_elem.addEventListener("dragleave", (e) => {
-                    e.preventDefault();
-                    dad_elem.classList.remove("over");
-                });
+				const dad_elem = document.getElementById("launch_by_dad");
+				dad_elem.addEventListener("dragenter", (e) => {
+					e.preventDefault();
+					dad_elem.classList.add("over");
+				});
+				dad_elem.addEventListener("dragleave", (e) => {
+					e.preventDefault();
+					dad_elem.classList.remove("over");
+				});
 				dad_elem.addEventListener("dragover", (e) => {
 					e.preventDefault();
 				});
 				dad_elem.addEventListener("drop", async (e) => {
-                    //alert(e);
-                    //         if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
-                    //             e.preventDefault();
-                    //}
-                    //const files = [...e.dataTransfer.items]
-                    //    .map((item) => item.getAsFile())
-                    //    .filter((file) => file);
-                    //wri.Debug(files[0]);
-                    //e.preventDefault();
-                    dad_elem.classList.remove("over");
-                    const file = await getDroppedFilePath(e);
+					//alert(e);
+					//         if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+					//             e.preventDefault();
+					//}
+					//const files = [...e.dataTransfer.items]
+					//    .map((item) => item.getAsFile())
+					//    .filter((file) => file);
+					//wri.Debug(files[0]);
+					//e.preventDefault();
+					dad_elem.classList.remove("over");
+					const file = await getDroppedFilePath(e);
 					//alert(file);
 					launchApp(file);
 				});
@@ -81,15 +81,15 @@
 		var config;
 		//
 		const launchApp = (file, param = null) => {
-            try {
-                const ddptns = config.launch;
-                for (const ptn of ddptns) {
+			try {
+				const ddptns = config.launch;
+				for (const ptn of ddptns) {
 					const re = new RegExp(ptn.pattern);
 					if (re.test(file)) {
 						if (param === null) {
 							location.href = `${ptn.app}?param1=${encodeURIComponent(file)}`;
-                        } else {
-                            location.href = `${ptn.app}${param}`;
+						} else {
+							location.href = `${ptn.app}${param}`;
 						}
 						return;
 					}
@@ -102,16 +102,16 @@
 		}
 
 		// 
-        // F5キーによるreloadを禁止
-        document.addEventListener("keydown", function (e) {
+		// F5キーによるreloadを禁止
+		document.addEventListener("keydown", function (e) {
 			if ((e.which || e.keyCode) == 116) {
 				var result = window.confirm('よろしいですか？');
-                if (result === true) {
-                    e.preventDefault();
+				if (result === false) {
+					e.preventDefault();
 				} else {
 
 				}
-            }
+			}
 		});
 
 		const test_func = () => {
@@ -121,22 +121,13 @@
 		}
 
 		const debug = () => {
-            wri.window.SetSize(200, 200);
+			wri.window.SetSize(200, 200);
 		}
 
-    </script>
+	</script>
 
 	<link rel="stylesheet" type="text/css" href="./styles/default.css" />
 	<style type="text/css">
-		body {
-			margin: 0;
-			padding: 0;
-			background-color:rgb(239, 255, 213);
-			display: flex;
-			flex-direction: column;
-			height: 100vh;
-			width: 100vw;
-		}
 
 		#body {
 			flex: 1;

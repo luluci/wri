@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+	<script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				// パラメータチェック
+				const params = new URLSearchParams(document.location.search);
+				const file = params.get("param1");
+				// 引数が存在したらファイルとみなす
+				if (file !== null) {
+					// ファイル存在チェック
+					const content = wri.io.file.Exists(file);
+					if (content === true) {
+						input_file = file;
+					}
+				}
+
+				//
+				document.addEventListener("dragover", (e) => {
+					if (e.target.id === "input_file_path") {
+						e.dataTransfer.dropEffect = 'link';
+					} else {
+						e.dataTransfer.dropEffect = 'none';
+					}
+					e.preventDefault();
+				});
+				document.addEventListener("drop", async (e) => {
+					if (e.target.id === "input_file_path") {
+						const file = await getDroppedFilePath(e);
+						if (file !== null) {
+							// ファイル存在チェック
+							const content = wri.io.file.Exists(file);
+							if (content === true) {
+								input_file = file;
+								e.target.value = file;
+							}
+						}
+					} else {
+						e.preventDefault();
+					}
+				});
+
+				//
+				const read_file = document.getElementById("read_file")
+				read_file.addEventListener("click", () => {
+					// Read xlsx
+					read_xlsx();
+				});
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		var input_file;
+
+		const read_xlsx = () => {
+			try {
+				const info = document.getElementById("info");
+
+				const wb = wri.office.ClosedXML.Open(input_file);
+				if (wb === null) {
+					alert("bookが存在しません");
+					return;
+				}
+				const ws = wb.Worksheets["data"];
+				if (ws === null) {
+					alert("sheetが存在しません");
+					return;
+				}
+				const rng = ws.RangeUsed;
+				const vals = rng.Get();
+
+				info.innerText = `
+					RowIdx: ${rng.Row}\n
+					ColIdx: ${rng.Column}\n
+					RowCount: ${rng.RowCount}\n
+					ColCount: ${rng.ColumnCount}\n
+					Value: ${vals}
+				`;
+			
+			} catch (err) {
+				alert(err);
+			}
+		}
+
+		const debug = () => {
+		}
+
+	</script>
+	<style type="text/css">
+
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+	<div id="header">
+		<div class="item" id="input_file">
+			<span>File:</span>
+			<span><input id="input_file_path" size="40" placeholder="ファイルをDrag&Drop"/></span>
+			<span><button id="read_file">Read</button></span>
+		</div>
+	</div>
+
+	<div id="body">
+		<div id="info"></div>
+	</div>
+</body>
+</html>
