@@ -35,6 +35,14 @@ namespace wri.Interface
         {
             return new TerminalIf();
         }
+
+        public void AddLog(string msg)
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                Log.Logger.Console.Add(msg);
+            }));
+        }
     }
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
@@ -77,6 +85,8 @@ namespace wri.Interface
     {
         Terminal terminal;
 
+        public bool TransferStdoutToWebView2 { get; set; }
+
         public bool HasExited
         {
             get { return terminal.HasExited; }
@@ -111,14 +121,31 @@ namespace wri.Interface
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
             {
-                Log.Logger.Console.Add(e.Data);
+                if (TransferStdoutToWebView2)
+                {
+                    var json = Json.MakeJsonStringConsoleStdout(e.Data);
+                    GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                }
+                else
+                {
+                    Log.Logger.Console.Add(e.Data);
+                }
             }));
         }
         internal void OnExit(object sender, EventArgs e)
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
             {
-                Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
+                if (TransferStdoutToWebView2)
+                {
+                    //ExitCode = console.ExitCode;
+                }
+                else
+                {
+                    //Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
+                }
+                var json = Json.MakeJsonStringTerminalExit(terminal.ProcessId, ExitCode);
+                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
             }));
         }
 
@@ -134,8 +161,9 @@ namespace wri.Interface
         {
             terminal.SetWorkingDirectory(path);
         }
-        public bool ExecCmd(string cmd, string args)
+        public bool ExecCmd(string cmd, string args, bool transStdout = false)
         {
+            TransferStdoutToWebView2 = transStdout;
             return terminal.ExecCmd(cmd, args);
         }
     }

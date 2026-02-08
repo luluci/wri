@@ -14,20 +14,7 @@ namespace Utility
     public class Terminal
     {
         // プロセス情報
-        public int ProcessId
-        {
-            get
-            {
-                if (process != null && !process.HasExited)
-                {
-                    return process.Id;
-                }
-                else
-                {
-                    return -1;
-                }
-            }
-        }
+        public int ProcessId { get; internal set; } = -1;
         //
         private Process process;
         private ProcessStartInfo psi;
@@ -72,6 +59,7 @@ namespace Utility
                 }
                 process.Dispose();
                 process = null;
+                ProcessId = -1;
             }
         }
 
@@ -155,11 +143,13 @@ namespace Utility
                 process.Start();
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
+                ProcessId = process.Id;
                 return true;
             }
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
+                ProcessId = -1;
                 return false;
             }
         }

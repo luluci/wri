@@ -17,36 +17,8 @@
 
 				wri.window.ShowFooter(true);
 
-				const command_history = document.getElementById("output_list");
-				const input_command_root = document.getElementById("input_command");
-				const input_command = document.getElementById("inp_command");
-				const inp_args = document.getElementById("inp_args");
-				const btn_input_command = input_command_root.querySelector(".button button");
-				btn_input_command.addEventListener("click", () => {
-					const command = input_command.value;
-					const args = inp_args.value;
-					if (command !== "" && terminal !== null) {
-						const result = terminal.ExecCmd(command, args);
-
-						let log;
-						if (result) {
-							log = `${command} ${args}`;
-						} else {
-							log = terminal.ErrorMessage;
-						}
-						const item = document.createElement("div");
-						item.innerText = log;
-						if (command_history.children.length >= 10) {
-							command_history.firstElementChild.remove();
-						}
-						command_history.appendChild(item);
-					}
-				});
-
-				const btn_init_terminal = document.getElementById("init_terminal");
-				btn_init_terminal.addEventListener("click", init_terminal);
-				const btn_close_terminal = document.getElementById("close_terminal");
-				btn_close_terminal.addEventListener("click", close_terminal);
+				init();
+				init_terminal();
 			} catch (msg) {
 				return false;
 			}
@@ -55,9 +27,89 @@
 		}
 		// ↑ロジックを理解した上で変更すること↑
 
+		const terminal_state_none = 0;				// 未初期化
+		const terminal_state_wait_command = 1;		// コマンド実行待ち
+		const terminal_state_running_command = 2;	// コマンド実行中
+
+		let terminal_state = terminal_state_none;
+
 		var terminal;
+		var btn_exec_command;
+
+		const init = () => {
+			try {
+
+				window.chrome.webview.addEventListener('message', (e) => {
+					try {
+						if (e.data?.type == "terminal") {
+							switch (e.data.status) {
+								case "running":
+									// nothing
+									break;
+
+								case "exit":
+									// コマンド終了通知
+									// 終了コード
+									on_terminal_exit(e.data?.process_id, e.data?.code);
+									break;
+							}
+						}
+					} catch (err) {
+						alert(err);
+					}
+				});
+
+				const command_history = document.getElementById("output_list");
+				const input_command_root = document.getElementById("input_command");
+				const input_command = document.getElementById("inp_command");
+				const inp_args = document.getElementById("inp_args");
+				btn_exec_command = input_command_root.querySelector(".button button");
+				btn_exec_command.addEventListener("click", () => {
+					try {
+						btn_exec_command.disabled = true;
+						const command = input_command.value;
+						const args = inp_args.value;
+						if (command !== "" && terminal !== null) {
+							wri.system.AddLog(`> ${command} ${args}`);
+
+							const result = terminal.ExecCmd(command, args);
+
+							let log;
+							if (result) {
+								log = `${command} ${args}`;
+								terminal_state = terminal_state_running_command;
+							} else {
+								log = terminal.ErrorMessage;
+								terminal_state = terminal_state_none;
+							}
+							const item = document.createElement("div");
+							item.innerText = log;
+							if (command_history.children.length >= 10) {
+								command_history.firstElementChild.remove();
+							}
+							command_history.appendChild(item);
+						}
+					} catch (err) {
+						alert(err);
+						btn_exec_command.disabled = false;
+					}
+				});
+
+				const btn_init_terminal = document.getElementById("init_terminal");
+				btn_init_terminal.addEventListener("click", init_terminal);
+				const btn_close_terminal = document.getElementById("close_terminal");
+				btn_close_terminal.addEventListener("click", close_terminal);
+			} catch (err) {
+				alert(err);
+			}
+		}
+
 		const init_terminal = () => {
 			try {
+				if (terminal !== null) {
+					terminal.Close();
+					terminal = null;
+				}
 				terminal = wri.system.CreateTerminal();
 
 				const msys_path = "C:\\msys64";
@@ -74,6 +126,29 @@
 		}
 		const close_terminal = () => {
 			terminal.Close();
+		}
+
+		const on_terminal_exit = (process_id, code) => {
+			wri.system.AddLog(`Exit (Result:${code})`);
+
+			if (process_id != terminal?.ProcessId) {
+				alert("違うProcessから通知？");
+			}
+
+			// 
+			switch (terminal_state) {
+				case terminal_state_running_command:
+					break;
+				case terminal_state_none:
+				case terminal_state_wait_command:
+				default:
+					// ありえない？
+					alert("コマンド未実行のはずなのにコマンド完了通知を受信");
+					break;
+			}
+			// コマンド終了処理
+			terminal_state = terminal_state_wait_command;
+			btn_exec_command.disabled = false;
 		}
 
 	</script>
@@ -114,17 +189,14 @@
 				</div>
 				<div class="c_item">
 					<div class="header">
-						App List
-					</div>
-					<div class="body" id="apps_list">
-						test
+						Command
 					</div>
 					<div class="form">
 						<div class="item input_form" id="input_command">
 							<span class="caption"></span>
 							<span class="input"><input id="inp_command" size="20" placeholder="Command"/></span>
 							<span class="input"><input id="inp_args" size="20" placeholder="Args"/></span>
-							<span class="button"><button>Run</button></span>
+							<span class="button"><button id="exec_command">Run</button></span>
 						</div>
 						<div id="output_list">
 						</div>

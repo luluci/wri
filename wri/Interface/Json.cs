@@ -71,5 +71,33 @@ namespace wri.Interface
             TemplateConsoleStdout.Stdout = stdout;
             return JsonSerializer.Serialize(TemplateConsoleStdout);
         }
+
+        public class TerminalExit
+        {
+            // メッセージタイプ
+            [JsonPropertyName("type")]
+            public string Type { get; set; } = "terminal";
+
+            // ProcessID
+            [JsonPropertyName("process_id")]
+            public int ProcessId { get; set; } = -1;
+
+            // 状態
+            [JsonPropertyName("status")]
+            public string Status { get; set; } = "exit";
+
+            // 終了コード
+            [JsonPropertyName("code")]
+            public int Code { get; set; } = -1;
+        }
+
+        static TerminalExit TemplateTerminalExit = new TerminalExit();
+        static public string MakeJsonStringTerminalExit(int processId, int code)
+        {
+            TemplateTerminalExit.ProcessId = processId;
+            TemplateTerminalExit.Code = code;
+            return JsonSerializer.Serialize(TemplateTerminalExit);
+        }
+
     }
 }
