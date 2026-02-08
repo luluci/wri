@@ -49,13 +49,6 @@
 						e.preventDefault();
 					}
 				});
-
-				//
-				const read_file = document.getElementById("read_file")
-				read_file.addEventListener("click", () => {
-					// Read xlsx
-					read_xlsx();
-				});
 			} catch (msg) {
 				return false;
 			}
@@ -65,36 +58,6 @@
 		// ↑ロジックを理解した上で変更すること↑
 
 		var input_file;
-
-		const read_xlsx = () => {
-			try {
-				const info = document.getElementById("info");
-
-				const wb = wri.office.ClosedXML.Open(input_file);
-				if (wb === null) {
-					alert("bookが存在しません");
-					return;
-				}
-				const ws = wb.Worksheets["data"];
-				if (ws === null) {
-					alert("sheetが存在しません");
-					return;
-				}
-				const rng = ws.RangeUsed;
-				const vals = rng.Get();
-
-				info.innerText = `
-					RowIdx: ${rng.Row}\n
-					ColIdx: ${rng.Column}\n
-					RowCount: ${rng.RowCount}\n
-					ColCount: ${rng.ColumnCount}\n
-					Value: ${vals}
-				`;
-			
-			} catch (err) {
-				alert(err);
-			}
-		}
 
 		const debug = () => {
 		}
@@ -115,7 +78,39 @@
 	</div>
 
 	<div id="body">
-		<div id="info"></div>
+		<div class="main_pane">
+			<div class="container">
+				<!-- <div class="c_header">
+					<div class="item">
+						header
+					</div>
+					<div><button onclick="debug()">Debug</button></div>
+				</div> -->
+				<div class="c_item">
+					<div class="header">
+						App List
+					</div>
+					<div class="body" id="apps_list">
+						test
+					</div>
+					<div class="form">
+						<div class="item input_form" id="xxx_text">
+							<span class="caption">File:</span>
+							<span class="input"><input id="input_text" size="40" placeholder="ファイルをDrag&Drop"/></span>
+							<span class="button"><button id="read_file">Read</button></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="side_pane">
+			<div class="side_item_list" >
+				<ul>
+					<li>item1</li>
+					<li>item2</li>
+				</ul>
+			</div>
+		</div> -->
 	</div>
 </body>
 </html>

@@ -29,37 +29,37 @@ body {
             color: #f0f0f0;
         }
     }
-    & #input_file {
+    & .input_form {
         display: grid;
         gap: 10px;
         grid-template-columns: auto 1fr auto;
 
-        & #input_file_path {
+        & .input input {
             width: 100%;
         }
     }
 }
 
-.body_pane {
+#body {
     display: flex;
     flex-direction: row;
     margin: 0;
     padding: 0;
 }
 
-.body_pane .main_pane {
+#body .main_pane {
     width: 100%;
     margin: 0;
     padding: 0;
 }
 
-.body_pane .side_pane {
+#body .side_pane {
     width: 30%;
     margin: 0;
     padding: 0;
 }
 
-.body_pane .side_pane .side_item_list {
+#body .side_pane .side_item_list {
     border: 0.5px solid burlywood;
 }
 
@@ -110,6 +110,16 @@ body {
     margin: 0 5px;
     padding: 5px 10px;
     background-color: rgba(11, 51, 97, 0.918);
+
+    & .input_form {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: auto 1fr auto;
+
+        & .input input {
+            width: 100%;
+        }
+    }
 }
 
 .container .c_item .dropzone {

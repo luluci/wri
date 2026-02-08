@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+	<script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				terminal = null;
+
+				wri.window.ShowFooter(true);
+
+				const command_history = document.getElementById("output_list");
+				const input_command_root = document.getElementById("input_command");
+				const input_command = document.getElementById("inp_command");
+				const inp_args = document.getElementById("inp_args");
+				const btn_input_command = input_command_root.querySelector(".button button");
+				btn_input_command.addEventListener("click", () => {
+					const command = input_command.value;
+					const args = inp_args.value;
+					if (command !== "" && terminal !== null) {
+						const result = terminal.ExecCmd(command, args);
+
+						let log;
+						if (result) {
+							log = `${command} ${args}`;
+						} else {
+							log = terminal.ErrorMessage;
+						}
+						const item = document.createElement("div");
+						item.innerText = log;
+						if (command_history.children.length >= 10) {
+							command_history.firstElementChild.remove();
+						}
+						command_history.appendChild(item);
+					}
+				});
+
+				const btn_init_terminal = document.getElementById("init_terminal");
+				btn_init_terminal.addEventListener("click", init_terminal);
+				const btn_close_terminal = document.getElementById("close_terminal");
+				btn_close_terminal.addEventListener("click", close_terminal);
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		var terminal;
+		const init_terminal = () => {
+			try {
+				terminal = wri.system.CreateTerminal();
+
+				const msys_path = "C:\\msys64";
+				terminal.SetEnv("PATH", `${msys_path}\\ucrt64\\bin;${msys_path}\\usr\\local\\bin;${msys_path}\\usr\\bin;`);
+				terminal.SetEnv("MSYSTEM", `UCRT64`);
+				terminal.SetWorkingDirectory( wri.io.path.ExeDirectoryPath );
+			} catch (err) {
+				alert(err);
+				if (terminal !== null) {
+					terminal.Close();
+					terminal = null;
+				}
+			}
+		}
+		const close_terminal = () => {
+			terminal.Close();
+		}
+
+	</script>
+	<style type="text/css">
+		.form #output_list {
+			background-color: #202020;
+			border-radius: 10px;
+			margin: 5px 0 0 0;
+			padding: 10px 20px 10px 20px;
+
+			& div {
+				color: #fff;
+			}
+		}
+
+		& #input_command {
+			display: grid;
+			gap: 10px;
+			grid-template-columns: auto 1fr 1fr auto;
+
+			& .input input {
+				width: 100%;
+			}
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+
+	<div id="body">
+		<div class="main_pane">
+			<div class="container">
+				<div class="c_header">
+					<div class="item">
+						<button id="init_terminal">接続</button>
+						<button id="close_terminal">切断</button>
+					</div>
+				</div>
+				<div class="c_item">
+					<div class="header">
+						App List
+					</div>
+					<div class="body" id="apps_list">
+						test
+					</div>
+					<div class="form">
+						<div class="item input_form" id="input_command">
+							<span class="caption"></span>
+							<span class="input"><input id="inp_command" size="20" placeholder="Command"/></span>
+							<span class="input"><input id="inp_args" size="20" placeholder="Args"/></span>
+							<span class="button"><button>Run</button></span>
+						</div>
+						<div id="output_list">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="side_pane">
+			<div class="side_item_list" >
+				<ul>
+					<li>item1</li>
+					<li>item2</li>
+				</ul>
+			</div>
+		</div> -->
+	</div>
+</body>
+</html>

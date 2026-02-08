@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Utility;
 
 namespace wri.Interface
 {
@@ -28,6 +29,11 @@ namespace wri.Interface
         public void GC()
         {
             System.GC.Collect();
+        }
+
+        public TerminalIf CreateTerminal()
+        {
+            return new TerminalIf();
         }
     }
 
@@ -62,6 +68,75 @@ namespace wri.Interface
             {
                 // Handle exception if needed
             }
+        }
+    }
+
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class TerminalIf
+    {
+        Terminal terminal;
+
+        public bool HasExited
+        {
+            get { return terminal.HasExited; }
+        }
+        public int ExitCode
+        {
+            get { return terminal.ExitCode; }
+        }
+        public string ErrorMessage
+        {
+            get { return terminal.ErrorMessage; }
+        }
+        public int ProcessId
+        {
+            get { return terminal.ProcessId; }
+        }
+        public TerminalIf()
+        {
+            terminal = new Terminal();
+            Init();
+        }
+        public void Init()
+        {
+            terminal.Init(OnStdout, OnStdout, OnExit);
+        }
+        public void Close()
+        {
+            terminal.Close();
+        }
+
+        internal void OnStdout(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                Log.Logger.Console.Add(e.Data);
+            }));
+        }
+        internal void OnExit(object sender, EventArgs e)
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
+            }));
+        }
+
+        public void AddEnv(string key, string value)
+        {
+            terminal.AddEnv(key, value);
+        }
+        public void SetEnv(string key, string value)
+        {
+            terminal.SetEnv(key, value);
+        }
+        public void SetWorkingDirectory(string path)
+        {
+            terminal.SetWorkingDirectory(path);
+        }
+        public bool ExecCmd(string cmd, string args)
+        {
+            return terminal.ExecCmd(cmd, args);
         }
     }
 
