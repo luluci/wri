@@ -124,6 +124,18 @@ namespace Utility
         {
             psi.WorkingDirectory = path;
         }
+        public void ChangeWorkingDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(psi.WorkingDirectory) || !path.StartsWith("."))
+            {
+                psi.WorkingDirectory = path;
+            }
+            else
+            {
+                var work = System.IO.Path.Combine(psi.WorkingDirectory, path);
+                psi.WorkingDirectory = System.IO.Path.GetFullPath(work);
+            }
+        }
 
         public bool ExecCmd(string filename, string args)
         {

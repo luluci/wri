@@ -161,6 +161,11 @@ namespace wri.Interface
         {
             terminal.SetWorkingDirectory(path);
         }
+        public void ChangeWorkingDirectory(string path)
+        {
+            terminal.ChangeWorkingDirectory(path);
+        }
+
         public bool ExecCmd(string cmd, string args, bool transStdout = false)
         {
             TransferStdoutToWebView2 = transStdout;

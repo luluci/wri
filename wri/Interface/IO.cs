@@ -132,6 +132,11 @@ ${ex.Message}
         {
             return System.IO.Path.GetExtension(path);
         }
+
+        public string GetFullPath(string path)
+        {
+            return System.IO.Path.GetFullPath(path);
+        }
     }
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
