@@ -325,15 +325,22 @@ namespace wri
 
         private void CoreWebView2_NewWindowRequested(object sender, CoreWebView2NewWindowRequestedEventArgs e)
         {
-            // WebView2にファイルをDrag&Dropしたとき、
-            // WebView2/JavaScript側でe.preventDefault();をしないとNewWindowRequestedが発生する。
-            // イベントの順番としてはWebView2/JavaScriptのdropイベント→CoreWebView2_NewWindowRequestedの順で発生する。
-            if (EntryPoint.isDragDropInProgress)
+            try
             {
-                var uri = new Uri(e.Uri);
-                EntryPoint.droppedFilePath = uri.LocalPath;
-                e.Handled = true;
-                EntryPoint.isDragDropInProgress = false;
+                // WebView2にファイルをDrag&Dropしたとき、
+                // WebView2/JavaScript側でe.preventDefault();をしないとNewWindowRequestedが発生する。
+                // イベントの順番としてはWebView2/JavaScriptのdropイベント→CoreWebView2_NewWindowRequestedの順で発生する。
+                if (EntryPoint.isDragDropInProgress)
+                {
+                    var uri = new Uri(e.Uri);
+                    EntryPoint.droppedFilePath = uri.LocalPath;
+                    e.Handled = true;
+                    EntryPoint.isDragDropInProgress = false;
+                }
+            }
+            catch (Exception)
+            {
+                //
             }
         }
 

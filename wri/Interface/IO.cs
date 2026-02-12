@@ -137,6 +137,10 @@ ${ex.Message}
         {
             return System.IO.Path.GetFullPath(path);
         }
+                public string GetDirectoryName(string path)
+        {
+            return System.IO.Path.GetDirectoryName(path);
+        }
     }
 
     [ClassInterface(ClassInterfaceType.AutoDual)]
@@ -144,14 +148,9 @@ ${ex.Message}
     public class DirectoryIf
     {
 
-        public string GetDirectoryName(string path)
-        {
-            return global::System.IO.Path.GetDirectoryName(path);
-        }
-
         public bool Exists(string path)
         {
-            return global::System.IO.Directory.Exists(path);
+            return System.IO.Directory.Exists(path);
         }
     }
 
@@ -169,7 +168,7 @@ ${ex.Message}
 
         public bool Exists(string path)
         {
-            return global::System.IO.File.Exists(path);
+            return System.IO.File.Exists(path);
         }
 
         public string OpenDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*")
@@ -191,7 +190,7 @@ ${ex.Message}
             }
             catch (Exception ex)
             {
-                global::System.Windows.MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
             return null;
         }
@@ -206,7 +205,7 @@ ${ex.Message}
                     case "utf8":
                     case "utf-8":
                         // BOMなしUTF-8
-                        enc = new global::System.Text.UTF8Encoding(false, false);
+                        enc = new System.Text.UTF8Encoding(false, false);
                         break;
                     case "932":
                     case "cp932":
@@ -219,14 +218,14 @@ ${ex.Message}
                         break;
                 }
 
-                using (var sr = new global::System.IO.StreamReader(path, enc))
+                using (var sr = new System.IO.StreamReader(path, enc))
                 {
                     return sr.ReadToEnd();
                 }
             }
             catch (Exception ex)
             {
-                global::System.Windows.MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
             return null;
         }
@@ -236,10 +235,10 @@ ${ex.Message}
             try
             {
                 // dirチェック
-                var dir = global::System.IO.Path.GetDirectoryName(path);
-                if (!global::System.IO.Directory.Exists(dir))
+                var dir = System.IO.Path.GetDirectoryName(path);
+                if (!System.IO.Directory.Exists(dir))
                 {
-                    global::System.IO.Directory.CreateDirectory(dir);
+                    System.IO.Directory.CreateDirectory(dir);
                 }
                 // file open
                 var fd = new FileDescriptorIf(path);
@@ -251,7 +250,7 @@ ${ex.Message}
             }
             catch (Exception ex)
             {
-                global::System.Windows.MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
             return null;
         }
@@ -260,14 +259,14 @@ ${ex.Message}
         {
             try
             {
-                using (var sw = new global::System.IO.StreamWriter(path, false))//, Encoding.UTF8
+                using (var sw = new System.IO.StreamWriter(path, false))//, Encoding.UTF8
                 {
                     sw.Write(text);
                 }
             }
             catch (Exception ex)
             {
-                global::System.Windows.MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -285,7 +284,7 @@ ${ex.Message}
     [ComVisible(true)]
     public class FileDescriptorIf
     {
-        global::System.IO.FileStream fs;
+        System.IO.FileStream fs;
         public bool IsOpen { get; set; }
 
         public FileDescriptorIf(string path)
@@ -293,7 +292,7 @@ ${ex.Message}
             IsOpen = false;
             try
             {
-                fs = new global::System.IO.FileStream(path, global::System.IO.FileMode.OpenOrCreate);
+                fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
                 IsOpen = true;
             }
             finally
