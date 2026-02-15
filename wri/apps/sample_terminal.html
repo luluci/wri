@@ -115,7 +115,8 @@
 				const msys_path = "C:\\msys64";
 				terminal.SetEnv("PATH", `${msys_path}\\ucrt64\\bin;${msys_path}\\usr\\local\\bin;${msys_path}\\usr\\bin;`);
 				terminal.SetEnv("MSYSTEM", `UCRT64`);
-				terminal.SetWorkingDirectory( wri.io.path.ExeDirectoryPath );
+				terminal.SetWorkingDirectory( wri.ExeDirectoryPath );
+				terminal.ChangeWorkingDirectory("..");
 			} catch (err) {
 				alert(err);
 				if (terminal !== null) {

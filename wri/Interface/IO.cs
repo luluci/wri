@@ -163,13 +163,13 @@ ${ex.Message}
             return System.IO.File.Exists(path);
         }
 
-        public string OpenFileDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*", string workdir = "")
+        public string OpenFileDialog(string filename = "", string workdir = "", string title = "Select File", string filter = "すべてのファイル(*.*)|*.*")
         {
             try
             {
                 var ofd = new OpenFileDialog
                 {
-                    FileName = "",
+                    FileName = filename,
                     InitialDirectory = workdir,
                     Filter = filter,
                     Title = title,
@@ -187,13 +187,13 @@ ${ex.Message}
             return null;
         }
 
-        public string SaveFileDialog(string title = "Save To File", string filter = "すべてのファイル(*.*)|*.*", string workdir = "")
+        public string SaveFileDialog(string filename = "", string workdir = "", string title = "Save To File", string filter = "すべてのファイル(*.*)|*.*")
         {
             try
             {
                 var sfd = new SaveFileDialog
                 {
-                    FileName = "",
+                    FileName = filename,
                     InitialDirectory = workdir,
                     Filter = filter,
                     Title = title,

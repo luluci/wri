@@ -83,7 +83,7 @@
 			}
 		}
 		function save_html() {
-			const select_file = saveAs("html保存先を選択", "htmlファイル(*.html)|*.html", wri.SourceDirectoryPath);
+			const select_file = saveAs("sample_update.html", wri.SourceDirectoryPath, "html保存先を選択", "htmlファイル(*.html)|*.html");
 			if (select_file !== null) {
 				// 表示更新
 				const view = document.getElementById("select_file_path");
