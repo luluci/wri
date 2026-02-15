@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+	<script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				init();
+			} catch (msg) {
+				alert(msg);
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		var json_data;
+
+		function init() {
+			// グローバル変数初期化
+			json_data = {};
+			// htmlから取得トライ
+			const elem_json_data = document.getElementById("json_data");
+			if (elem_json_data?.textContent.length > 0) {
+				const json_text = elem_json_data.textContent;
+
+				try {
+					// parseトライ
+					const json = JSON.parse(json_text);
+					// 成功したらグローバル変数に保持する
+					json_data = json;
+
+					// なんらかのデータを持っているかチェックする場合
+					if (Object.keys(json).length) {
+					}
+					if (json?.data) {
+						const elem_input = document.getElementById("input_text");
+						elem_input.value = json.data;
+					}
+				} catch {
+					// json解析の失敗は無視する
+				}
+			}
+
+			//
+			const view = document.getElementById("json_data_view");
+			if (view) {
+				view.textContent = JSON.stringify(json_data);
+			}
+			//
+			document.getElementById("save_data")?.addEventListener("click", save_json_data);
+			document.getElementById("save_html_file")?.addEventListener("click", save_html);
+		}
+		function save_json_data() {
+			const input = document.getElementById("input_text");
+			if (input !== null) {
+				json_data['data'] = input.value;
+
+				//
+				const json_text = JSON.stringify(json_data);
+				const view = document.getElementById("json_data_view");
+				if (view) {
+					view.textContent = json_text;
+				}
+				let elem_json_data = document.getElementById("json_data");
+				if (elem_json_data === null) {
+					const elem = document.createElement('script');
+					elem.id = 'json_data';
+					elem.type = 'application/json';
+					document.head.appendChild(elem);
+					elem_json_data = elem;
+				}
+				elem_json_data.textContent = `\n${json_text}\n`;
+			}
+		}
+		function save_html() {
+			const select_file = saveAs("html保存先を選択", "htmlファイル(*.html)|*.html", wri.SourceDirectoryPath);
+			if (select_file !== null) {
+				// 表示更新
+				const view = document.getElementById("select_file_path");
+				if (view !== null) {
+					view.value = select_file;
+				}
+			}
+		}
+
+	</script>
+	<script id="json_data" type="application/json">
+{
+	"data": ""
+}
+	</script>
+	<style type="text/css">
+
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+	<div id="header">
+		<div class="item input_form" id="select_file">
+			<span class="caption">File:</span>
+			<span class="input"><input id="select_file_path" size="40" placeholder="ファイルパスを表示" disabled/></span>
+			<span class="button"><button id="save_html_file">Save html</button></span>
+		</div>
+	</div>
+
+	<div id="body">
+		<div class="main_pane">
+			<div class="container">
+				<div class="c_item">
+					<div class="header">
+						JSONデータ
+					</div>
+					<div class="form">
+						<div class="item input_form" id="xxx_text">
+							<span class="caption">JSON data input:</span>
+							<span class="input"><input id="input_text" size="40" placeholder="JSONデータ"/></span>
+							<span class="button"><button id="save_data">Save Input</button></span>
+						</div>
+					</div>
+					<div class="body" id="json_data_view">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -144,6 +144,12 @@ namespace wri.Interface.Office
                             return (object)cell.GetDouble();
                         case ClosedXML.Excel.XLDataType.Text:
                             return (object)cell.GetText();
+                        case ClosedXML.Excel.XLDataType.Error:
+                            return (object)cell.GetError().ToString();
+                        case ClosedXML.Excel.XLDataType.DateTime:
+                            return (object)cell.GetDateTime().ToString();
+                        case ClosedXML.Excel.XLDataType.TimeSpan:
+                            return (object)cell.GetTimeSpan().ToString();
                         default:
                             return (object)cell.ToString();
                     }

@@ -51,8 +51,21 @@ const save = (force = false) => {
     } catch (e) {
         console.error('Error saving file:', e);
     }
-
     return false;
+}
+const saveAs = (title = "Select File", filter = "すべてのファイル(*.*)|*.*", workdir = "") => {
+    // ダイアログを表示して、指定したファイルにhtmlの内容を保存する
+    try {
+        const select_file = wri.io.file.SaveFileDialog(title, filter, workdir);
+        if (select_file !== null) {
+            const dom = getDOM();
+            wri.io.file.SaveTo(select_file, dom);
+            return select_file;
+        }
+    } catch (e) {
+        console.error('Error saving file:', e);
+    }
+    return null;
 }
 
 const wait = async (msec) => {

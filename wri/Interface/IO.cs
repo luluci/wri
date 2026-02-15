@@ -110,14 +110,6 @@ ${ex.Message}
     [ComVisible(true)]
     public class PathIf
     {
-        public string ExeDirectoryPath
-        {
-            get
-            {
-                return GlobalData.ExeDirectoryPath;
-            }
-        }
-
         public string MakeExeDirRelPath(string relpath)
         {
             return System.IO.Path.Combine(GlobalData.ExeDirectoryPath, relpath);
@@ -171,14 +163,14 @@ ${ex.Message}
             return System.IO.File.Exists(path);
         }
 
-        public string OpenDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*")
+        public string OpenFileDialog(string title = "Select File", string filter = "すべてのファイル(*.*)|*.*", string workdir = "")
         {
             try
             {
                 var ofd = new OpenFileDialog
                 {
                     FileName = "",
-                    InitialDirectory = "",
+                    InitialDirectory = workdir,
                     Filter = filter,
                     Title = title,
                     RestoreDirectory = true,
@@ -186,6 +178,30 @@ ${ex.Message}
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     return ofd.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
+            return null;
+        }
+
+        public string SaveFileDialog(string title = "Save To File", string filter = "すべてのファイル(*.*)|*.*", string workdir = "")
+        {
+            try
+            {
+                var sfd = new SaveFileDialog
+                {
+                    FileName = "",
+                    InitialDirectory = workdir,
+                    Filter = filter,
+                    Title = title,
+                    RestoreDirectory = true,
+                };
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    return sfd.FileName;
                 }
             }
             catch (Exception ex)

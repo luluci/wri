@@ -399,7 +399,6 @@ namespace wri
                 //webView.CoreWebView2.PostWebMessageAsString("C#からのデータ送信");
                 WindowTitle.Value = "wri - " + WebView2.Source.ToString();
                 EntryPoint.Source = WebView2.Source;
-                EntryPoint.SourcePath = WebView2.Source.LocalPath;
 
                 // 表示完了時にコールされる。F5による更新時にもコールされる。
                 // このときObjectの登録等も初期化されるため、毎回登録する。

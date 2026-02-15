@@ -39,7 +39,30 @@ namespace wri.Interface
 
         // WebView2側に公開しない変数:プロパティにしなければ見えないはず
         public Uri Source;
-        public string SourcePath { get; set; } = string.Empty;
+        public string SourcePath
+        {
+            get { return GlobalData.WebView2.Source?.LocalPath; }
+        }
+        public string SourceDirectoryPath
+        {
+            get
+            {
+                var path = GlobalData.WebView2.Source?.LocalPath;
+                if (path == null)
+                {
+                    return null;
+                }
+                return System.IO.Path.GetDirectoryName(path);
+            }
+        }
+        public string ExeDirectoryPath
+        {
+            get
+            {
+                return GlobalData.ExeDirectoryPath;
+            }
+        }
+
 
         // アプリ制御フラグ
         public bool preventClose { get; set; } = false; // true:アプリ終了を防ぐ
