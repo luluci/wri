@@ -85,8 +85,8 @@ namespace wri.Interface
     {
         Terminal terminal;
         int buffsize = 100;
-        List<List<string>> stdoutBuff = new List<List<string>>();
-        int tgtBuff = 0;
+        List<string> stdoutBuff;
+        bool isBuffering = false;
 
         public bool TransferStdoutToWebView2 { get; set; }
 
@@ -106,12 +106,16 @@ namespace wri.Interface
         {
             get { return terminal.ProcessId; }
         }
+        public bool LogBuffering
+        {
+            get { return isBuffering; }
+            set { isBuffering = value; }
+        }
+
         public TerminalIf()
         {
             terminal = new Terminal();
-            stdoutBuff.Add(new List<string>(buffsize));
-            stdoutBuff.Add(new List<string>(buffsize));
-            tgtBuff = 0;
+            stdoutBuff = new List<string>();
 
             Init();
         }
@@ -128,35 +132,93 @@ namespace wri.Interface
         {
             if (!(e.Data is null))
             {
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                if (isBuffering)
                 {
-                    if (TransferStdoutToWebView2)
+                    if (stdoutBuff.Count < buffsize)
                     {
-                        var json = Json.MakeJsonStringConsoleStdout(e.Data);
-                        GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                        stdoutBuff.Add(e.Data);
                     }
                     else
                     {
-                        Log.Logger.Console.Add(e.Data);
+                        // 使用バッファ切り替え
+                        var oldBuff = stdoutBuff;
+                        stdoutBuff = new List<string>();
+                        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                        {
+                            var tgt = oldBuff;
+                            if (TransferStdoutToWebView2)
+                            {
+                                // 未実装
+                                //var json = Json.MakeJsonStringConsoleStdout(e.Data);
+                                //GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                            }
+                            else
+                            {
+                                Log.Logger.Console.AddRange(tgt);
+                                tgt.Clear();
+                            }
+                        }));
                     }
-                }));
+                }
+                else
+                {
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        if (TransferStdoutToWebView2)
+                        {
+                            var json = Json.MakeJsonStringConsoleStdout(e.Data);
+                            GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                        }
+                        else
+                        {
+                            Log.Logger.Console.Add(e.Data);
+                            //await Task.Delay(100);
+                        }
+                    }));
+                }
             }
         }
         internal void OnExit(object sender, EventArgs e)
         {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            if (isBuffering)
             {
-                if (TransferStdoutToWebView2)
+                var oldBuff = stdoutBuff;
+                stdoutBuff = new List<string>();
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    //ExitCode = console.ExitCode;
-                }
-                else
+                    if (TransferStdoutToWebView2)
+                    {
+                        //ExitCode = console.ExitCode;
+                    }
+                    else
+                    {
+                        //Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
+                        if (oldBuff.Count > 0)
+                        {
+                            Log.Logger.Console.AddRange(oldBuff);
+                            oldBuff.Clear();
+                        }
+                    }
+                    var json = Json.MakeJsonStringTerminalExit(terminal.ProcessId, ExitCode);
+                    GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                }));
+            }
+            else
+            {
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    //Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
-                }
-                var json = Json.MakeJsonStringTerminalExit(terminal.ProcessId, ExitCode);
-                GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
-            }));
+                    if (TransferStdoutToWebView2)
+                    {
+                        //ExitCode = console.ExitCode;
+                    }
+                    else
+                    {
+                        //Log.Logger.Console.Add($"< Exit (Result: {terminal.ExitCode})");
+                    }
+                    var json = Json.MakeJsonStringTerminalExit(terminal.ProcessId, ExitCode);
+                    GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                }));
+            }
         }
 
         public void AddEnv(string key, string value)
