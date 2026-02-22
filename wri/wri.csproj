@@ -60,6 +60,7 @@
     <Compile Include="Interface\Office\Office.cs" />
     <Compile Include="Interface\Window.cs" />
     <Compile Include="Utility\Color.cs" />
+    <Compile Include="Utility\EncodingHelper.cs" />
     <Compile Include="Utility\Terminal.cs" />
     <Compile Include="Utility\XmlLoader.cs" />
     <Page Include="App.xaml">

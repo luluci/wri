@@ -29,7 +29,11 @@ namespace Utility
         {
         }
 
-        public void Init(DataReceivedEventHandler stdout_, DataReceivedEventHandler stderr_, EventHandler exit_)
+        public void Init(string encoding = null, DataReceivedEventHandler stdout_ = null, DataReceivedEventHandler stderr_ = null, EventHandler exit_ = null)
+        {
+            this.Init(encoding.ToEncoding(), stdout_, stderr_, exit_);
+        }
+        public void Init(Encoding encoding = null, DataReceivedEventHandler stdout_ = null, DataReceivedEventHandler stderr_ = null, EventHandler exit_ = null)
         {
             // Processを実行していたら解放
             Close();
@@ -37,12 +41,13 @@ namespace Utility
             ErrorMessage = string.Empty;
             // Process初期化
             psi = new ProcessStartInfo();
-            psi.RedirectStandardInput = true;
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
+            //psi.RedirectStandardInput = true;
+            psi.RedirectStandardOutput = !(stdout_ is null);
+            psi.RedirectStandardError = !(stderr_ is null);
+            psi.StandardOutputEncoding = encoding ?? Encoding.UTF8;
+            psi.StandardErrorEncoding = encoding ?? Encoding.UTF8;
             psi.UseShellExecute = false;
             psi.CreateNoWindow = true;
-            psi.StandardOutputEncoding = Encoding.UTF8;
             stdout = stdout_;
             stderr = stderr_;
             exit = exit_;
@@ -137,6 +142,15 @@ namespace Utility
             }
         }
 
+        public void SetEncoding(string encoding)
+        {
+            SetEncoding(encoding.ToEncoding());
+        }
+        public void SetEncoding(Encoding encoding)
+        {
+            psi.StandardOutputEncoding = encoding;
+        }
+
         public bool ExecCmd(string filename, string args)
         {
             try
@@ -148,13 +162,17 @@ namespace Utility
                 {
                     StartInfo = psi
                 };
-                process.OutputDataReceived += stdout;
-                process.ErrorDataReceived += stderr;
-                process.EnableRaisingEvents = true;
-                process.Exited += exit;
+                //process.StandardInput.NewLine = "\n";
+                if (!(stdout is null)) process.OutputDataReceived += stdout;
+                if (!(stderr is null)) process.ErrorDataReceived += stderr;
+                if (!(exit is null))
+                {
+                    process.EnableRaisingEvents = true;
+                    process.Exited += exit;
+                }
                 process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                if (!(stdout is null)) process.BeginOutputReadLine();
+                if (!(stderr is null)) process.BeginErrorReadLine();
                 ProcessId = process.Id;
                 return true;
             }

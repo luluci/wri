@@ -34,8 +34,7 @@
 		let terminal_state = terminal_state_none;
 
 		var terminal;
-		var btn_exec_process;
-		var on_exit_handler = null;
+		var btn_exec_command;
 
 		const init = () => {
 			try {
@@ -61,25 +60,21 @@
 				});
 
 				const command_history = document.getElementById("output_list");
-
-				// プロセス実行
-				const input_process_root = document.getElementById("input_process");
-				const input_process = document.getElementById("inp_process");
-				const inp_args = document.getElementById("inp_args");
-				btn_exec_process = input_process_root.querySelector(".button button");
-				btn_exec_process.addEventListener("click", () => {
+				const input_command_root = document.getElementById("input_command");
+				const input_command = document.getElementById("inp_command");
+				btn_exec_command = input_command_root.querySelector(".button button");
+				btn_exec_command.addEventListener("click", () => {
 					try {
-						const command = input_process.value;
-						const args = inp_args.value;
+						const command = input_command.value;
 						if (command !== "" && terminal !== null) {
-							btn_exec_process.disabled = true;
-							wri.system.AddLog(`> ${command} ${args}`);
+							btn_exec_command.disabled = true;
+							wri.system.AddLog(`> bash -c ${command}`);
 
-							const result = terminal.ExecCmd(command, args);
+							const result = terminal.ExecCmd("bash.exe", `-c "${command}"`);
 
 							let log;
 							if (result) {
-								log = `${command} ${args}`;
+								log = `bash -c ${command}`;
 								terminal_state = terminal_state_running_command;
 							} else {
 								log = terminal.ErrorMessage;
@@ -91,59 +86,14 @@
 								command_history.firstElementChild.remove();
 							}
 							command_history.appendChild(item);
-
-							on_exit_handler = () => {
-								btn_exec_process.disabled = false;
-							}
 						}
 					} catch (err) {
 						alert(err);
-						btn_exec_process.disabled = false;
-					}
-				});
-				// コマンドプロンプト実行
-				const input_cmd_root = document.getElementById("input_cmd");
-				const input_cmd = document.getElementById("inp_cmd");
-				document.getElementById("exec_command").addEventListener("click", (e) => {
-					const btn = e.target;
-					try {
-						const command = input_cmd.value;
-						if (command !== "" && terminal !== null) {
-							btn.disabled = true;
-							wri.system.AddLog(`> cmd.exe /c ${command}`);
-
-							const result = terminal.ExecCmd("cmd.exe", `/c "${command}"`);
-
-							let log;
-							if (result) {
-								log = `cmd.exe /c ${command}`;
-								terminal_state = terminal_state_running_command;
-							} else {
-								log = terminal.ErrorMessage;
-								terminal_state = terminal_state_none;
-							}
-							const item = document.createElement("div");
-							item.innerText = log;
-							if (command_history.children.length >= 10) {
-								command_history.firstElementChild.remove();
-							}
-							command_history.appendChild(item);
-
-							on_exit_handler = () => {
-								btn.disabled = false;
-							}
-						}
-					} catch (err) {
-						alert(err);
-						btn.disabled = false;
+						btn_exec_command.disabled = false;
 					}
 				});
 				document.getElementById("clear_command").addEventListener("click", () => {
-					try {
-						input_cmd.value = "";
-					} catch (err) {
-						alert(err);
-					}
+					input_command.value = "";
 				});
 
 				const btn_init_terminal = document.getElementById("init_terminal");
@@ -163,9 +113,13 @@
 				}
 				terminal = wri.system.CreateTerminal();
 
-				terminal.SetEncoding("sjis");
+				const msys_path = "C:\\msys64";
+				terminal.SetEnv("PATH", `${msys_path}\\ucrt64\\bin;${msys_path}\\usr\\local\\bin;${msys_path}\\usr\\bin;`);
+				// terminal.AddEnv("PATH", `${msys_path}\\ucrt64\\bin;${msys_path}\\usr\\local\\bin;${msys_path}\\usr\\bin;`);
+				terminal.SetEnv("MSYSTEM", `UCRT64`);
 				terminal.SetWorkingDirectory( wri.ExeDirectoryPath );
 				// terminal.ChangeWorkingDirectory("..");
+				terminal.SetEncoding("utf8");
 			} catch (err) {
 				alert(err);
 				if (terminal !== null) {
@@ -198,7 +152,7 @@
 			}
 			// コマンド終了処理
 			terminal_state = terminal_state_wait_command;
-			if (on_exit_handler !== null) on_exit_handler();
+			btn_exec_command.disabled = false;
 		}
 
 	</script>
@@ -214,16 +168,7 @@
 			}
 		}
 
-		& #input_process {
-			display: grid;
-			gap: 10px;
-			grid-template-columns: auto 1fr 1fr auto;
-
-			& .input input {
-				width: 100%;
-			}
-		}
-		& #input_cmd {
+		& #input_command {
 			display: grid;
 			gap: 10px;
 			grid-template-columns: auto 1fr auto auto;
@@ -251,15 +196,9 @@
 						Command
 					</div>
 					<div class="form">
-						<div class="item input_form" id="input_process">
-							<span class="caption">プロセス実行</span>
-							<span class="input"><input id="inp_process" size="20" placeholder="Command"/></span>
-							<span class="input"><input id="inp_args" size="20" placeholder="Args"/></span>
-							<span class="button"><button id="exec_process">Run</button></span>
-						</div>
-						<div class="item input_form" id="input_cmd">
-							<span class="caption">コマンドプロンプト</span>
-							<span class="input"><input id="inp_cmd" size="20" placeholder="Command"/></span>
+						<div class="item input_form" id="input_command">
+							<span class="caption"></span>
+							<span class="input"><input id="inp_command" size="20" placeholder="Command"/></span>
 							<span class="button"><button id="exec_command">Run</button></span>
 							<span class="button"><button id="clear_command">Clear</button></span>
 						</div>

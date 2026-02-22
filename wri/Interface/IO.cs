@@ -40,7 +40,7 @@ namespace wri.Interface
         {
             try
             {
-                var xml = new XmlLoader();
+                var xml = new Utility.XmlLoader();
                 xml.Load(path);
                 return xml.GetView();
             }
@@ -215,25 +215,7 @@ ${ex.Message}
         {
             try
             {
-                Encoding enc = Encoding.UTF8;
-                switch (encoding.ToLower())
-                {
-                    case "utf8":
-                    case "utf-8":
-                        // BOMなしUTF-8
-                        enc = new System.Text.UTF8Encoding(false, false);
-                        break;
-                    case "932":
-                    case "cp932":
-                    case "shift_jis":
-                    case "sjis":
-                        enc = Encoding.GetEncoding(932);
-                        break;
-                    default:
-                        enc = Encoding.UTF8;
-                        break;
-                }
-
+                var enc = encoding.ToEncoding();
                 using (var sr = new System.IO.StreamReader(path, enc))
                 {
                     return sr.ReadToEnd();

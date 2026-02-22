@@ -37,6 +37,20 @@ namespace wri.Log
             Log.Add(message);
             PostProc();
         }
+        public void AddRange(IEnumerable<string> messages)
+        {
+            // ログを上限で削除するため、GUIスレッドで実行する必要がある
+            if (Log.Count + messages.Count() > LogMaxCount)
+            {
+                // ログが上限を超えたら古いログを削除
+                int removeCount = Log.Count + messages.Count() - LogMaxCount;
+                for (int i = 0; i < removeCount; i++)
+                {
+                    Log.RemoveAt(0);
+                }
+            }
+            Log.AddRangeOnScheduler(messages);
+        }
 
         public void Clear()
         {

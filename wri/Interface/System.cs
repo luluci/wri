@@ -84,6 +84,9 @@ namespace wri.Interface
     public class TerminalIf
     {
         Terminal terminal;
+        int buffsize = 100;
+        List<List<string>> stdoutBuff = new List<List<string>>();
+        int tgtBuff = 0;
 
         public bool TransferStdoutToWebView2 { get; set; }
 
@@ -106,11 +109,15 @@ namespace wri.Interface
         public TerminalIf()
         {
             terminal = new Terminal();
+            stdoutBuff.Add(new List<string>(buffsize));
+            stdoutBuff.Add(new List<string>(buffsize));
+            tgtBuff = 0;
+
             Init();
         }
-        public void Init()
+        public void Init(string encoding = null)
         {
-            terminal.Init(OnStdout, OnStdout, OnExit);
+            terminal.Init(encoding, OnStdout, OnStdout, OnExit);
         }
         public void Close()
         {
@@ -119,18 +126,21 @@ namespace wri.Interface
 
         internal void OnStdout(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            if (!(e.Data is null))
             {
-                if (TransferStdoutToWebView2)
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    var json = Json.MakeJsonStringConsoleStdout(e.Data);
-                    GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
-                }
-                else
-                {
-                    Log.Logger.Console.Add(e.Data);
-                }
-            }));
+                    if (TransferStdoutToWebView2)
+                    {
+                        var json = Json.MakeJsonStringConsoleStdout(e.Data);
+                        GlobalData.WebView2.CoreWebView2.PostWebMessageAsJson(json);
+                    }
+                    else
+                    {
+                        Log.Logger.Console.Add(e.Data);
+                    }
+                }));
+            }
         }
         internal void OnExit(object sender, EventArgs e)
         {
@@ -164,6 +174,11 @@ namespace wri.Interface
         public void ChangeWorkingDirectory(string path)
         {
             terminal.ChangeWorkingDirectory(path);
+        }
+
+        public void SetEncoding(string encoding)
+        {
+            terminal.SetEncoding(encoding);
         }
 
         public bool ExecCmd(string cmd, string args, bool transStdout = false)

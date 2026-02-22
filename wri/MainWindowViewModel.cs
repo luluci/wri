@@ -318,6 +318,7 @@ namespace wri
 
             // WebView2コア初期化
             await WebView2.EnsureCoreWebView2Async();
+            WebView2.CoreWebView2.Settings.UserAgent += " wri/1.0";
             WebView2.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
 
             //WebView2.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
@@ -492,7 +493,7 @@ namespace wri
             while (await WebView2.ExecuteScriptAsync(handler) != "true")
             {
                 limit++;
-                if (limit > 50)
+                if (limit > 5)
                 {
                     throw new Exception("WebView2の初期化に失敗したようです。");
                 }
