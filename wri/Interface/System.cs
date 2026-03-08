@@ -17,11 +17,13 @@ namespace wri.Interface
     [ComVisible(true)]
     public class SystemIf
     {
+        public ThreadIf Thread { get; set; }
         public ConsoleIf Console { get; set; }
         public ProcessIf Process { get; set; }
 
         public SystemIf()
         {
+            Thread = new ThreadIf();
             Console = new ConsoleIf();
             Process = new ProcessIf();
         }
@@ -42,6 +44,30 @@ namespace wri.Interface
             {
                 Log.Logger.Console.Add(msg);
             }));
+        }
+    }
+
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class ThreadIf
+    {
+        public ThreadIf()
+        {
+        }
+
+        public async Task Delay(int milliseconds)
+        {
+            await Task.Delay(milliseconds);
+        }
+
+        public async Task DelayAsync(int milliseconds)
+        {
+            await Task.Delay(milliseconds);
+        }
+
+        public void Sleep(int milliseconds)
+        {
+            System.Threading.Thread.Sleep(milliseconds);
         }
     }
 

@@ -228,6 +228,23 @@ ${ex.Message}
             return null;
         }
 
+        public async Task<string> ReadAsync(string path, string encoding)
+        {
+            try
+            {
+                var enc = encoding.ToEncoding();
+                using (var sr = new System.IO.StreamReader(path, enc))
+                {
+                    return await sr.ReadToEndAsync();
+                }
+            }
+            catch (Exception)
+            {
+                //System.Windows.MessageBox.Show(ex.Message);
+                return null;
+            }
+        }
+
         public FileDescriptorIf Open(string path)
         {
             try
@@ -253,18 +270,39 @@ ${ex.Message}
             return null;
         }
 
-        public void SaveTo(string path, string text)
+        public bool SaveTo(string path, string text, string encoding = "utf8")
         {
             try
             {
-                using (var sw = new System.IO.StreamWriter(path, false))//, Encoding.UTF8
+                var enc = encoding.ToEncoding();
+                using (var sw = new System.IO.StreamWriter(path, false, enc))
                 {
                     sw.Write(text);
                 }
+                return true;
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> SaveToAsync(string path, string text, string encoding)
+        {
+            try
+            {
+                var enc = encoding.ToEncoding();
+                using (var sw = new System.IO.StreamWriter(path, false, enc))
+                {
+                    await sw.WriteAsync(text);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                GlobalData.ErrorMessage = ex.Message;
+                return false;
             }
         }
 
