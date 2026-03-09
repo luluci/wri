@@ -55,7 +55,7 @@ namespace wri.Interface
         {
         }
 
-        public async Task Delay(int milliseconds)
+        public async void Delay(int milliseconds)
         {
             await Task.Delay(milliseconds);
         }

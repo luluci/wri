@@ -52,9 +52,9 @@
 
 				//
 				const read_file = document.getElementById("read_file")
-				read_file.addEventListener("click", () => {
+				read_file.addEventListener("click", async () => {
 					// Read xlsx
-					read_xlsx();
+					await read_xlsx_async();
 				});
 			} catch (msg) {
 				return false;
@@ -88,6 +88,44 @@
 					ColIdx: ${rng.Column}\n
 					RowCount: ${rng.RowCount}\n
 					ColCount: ${rng.ColumnCount}\n
+					Value: ${vals}
+				`;
+			
+			} catch (err) {
+				alert(err);
+			}
+		}
+		const read_xlsx_async = async () => {
+			try {
+				const info = document.getElementById("info");
+
+				// C#側からasyncで取得したオブジェクトを使用する場合、
+				// そのオブジェクト自体も非同期オブジェクトになるため、
+				// アクセスする際にはawaitが必須
+				const wb = await wri_async.office.ClosedXML.OpenAsync(input_file);
+				// C#側でasync定義されていない関数はawaitでアクセスしてもスレッドブロッキングで処理される
+				// const wb = await wri_async.office.ClosedXML.Open(input_file);
+				if (wb === null) {
+					alert("bookが存在しません");
+					return;
+				}
+				const ws = wb.Worksheets["data"];
+				if (ws === null) {
+					alert("sheetが存在しません");
+					return;
+				}
+				const rng = await ws.RangeUsed;
+				// const vals = await rng.Get();
+				const vals = await rng.GetAsync();
+				const vals_arr = await rng.Get2DArray();
+				const r1 = await vals_arr[0];
+				const r2 = await vals_arr[1];
+
+				info.innerText = `
+					RowIdx: ${await rng.Row}\n
+					ColIdx: ${await rng.Column}\n
+					RowCount: ${await rng.RowCount}\n
+					ColCount: ${await rng.ColumnCount}\n
 					Value: ${vals}
 				`;
 			

@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+
+	<script type="text/javascript" charset="utf-8" src="../script/Utility.js"></script>
+	<script language="javascript" type="text/javascript">
+		// C#側からAPI登録を実行される。
+		// const wri = chrome.webview.hostObjects.sync.wri;
+		// const wri_async = chrome.webview.hostObjects.wri;
+
+		// C# -> WebView2 Event Handler
+		// C#側からWebView2の初期化が完了したらJavaScriptの初期化としてコールされる
+		const csLoaded = () => {
+			try {
+				init();
+			} catch (msg) {
+				return false;
+			}
+			//Utility.Log("<WebView2/JavaScript Loaded.>");
+			return true;
+		}
+		// ↑ロジックを理解した上で変更すること↑
+
+		var command_history;
+
+		const init = () => {
+			try {
+				command_history = document.getElementById("output_list");
+
+				const sleep_exec = document.getElementById("sleep_exec");
+				sleep_exec.addEventListener("click", async () => {
+					const e_time = document.getElementById("sleep_time");
+					const time = parseInt(e_time.value);
+
+					add_log(`Start Delay(${time})`);
+					await wri_async.system.Thread.Sleep(time);
+					add_log(`End   Delay(${time})`);
+				});
+
+				const delay_exec = document.getElementById("delay_exec");
+				delay_exec.addEventListener("click", async () => {
+					const e_time = document.getElementById("delay_time");
+					const time = parseInt(e_time.value);
+
+					// C＃側でasync定義した関数をコールしてawaitで待機可能
+					// このとき、chrome.webview.hostObjects.sync.wriを使ってawaitすると異常発生する
+					// C#側のasync関数はイベントハンドラではない(?)ため、Taskを返す必要あり。
+					// C#側から渡されたTaskをJavascript側のawaitで待機可能
+					add_log(`Start Delay(${time})`);
+					// await wri_async.system.Thread.Delay(time);
+					// await wri.system.Thread.Delay(time);
+					// wri.system.Thread.Delay(time);
+					// const task = await wri.system.Thread.Delay(time);
+					// const task = await wri_async.system.Thread.Delay(time);
+					const task = await wri_async.system.Thread.DelayAsync(time);
+					add_log(`End   Delay(${time})`);
+				});
+
+				const read_file_exec = document.getElementById("read_file_exec");
+				read_file_exec.addEventListener("click", async () => {
+					const input = document.getElementById("read_file");
+					const path = input.value;
+					if (path?.length > 0) {
+						add_log(`Start Read(${path})`);
+						const data = await wri_async.io.file.ReadAsync(path, "utf8");
+						add_log(data);
+						add_log(`End   Read`);
+					}
+				});
+
+				// chrome.webview.hostObjects.options.forceAsyncMethodMatches = [/Async$/];
+
+			} catch (err) {
+				alert(err);
+			}
+		}
+
+		function add_log(log) {
+
+			const item = document.createElement("div");
+			item.innerText = log;
+			if (command_history.children.length >= 10) {
+				command_history.firstElementChild.remove();
+			}
+			command_history.appendChild(item);
+		}
+
+
+	</script>
+	<style type="text/css">
+
+	</style>
+	<link rel="stylesheet" type="text/css" href="../styles/default.css" />
+</head>
+<body>
+
+	<div id="body">
+		<div class="main_pane">
+			<div class="container">
+				<div class="c_header">
+				</div>
+				<div class="c_item">
+					<div class="header">
+						Command
+					</div>
+					<div class="form">
+						<div class="item input_form">
+							<span class="caption">Sleep</span>
+							<span class="input"><input id="sleep_time" size="20" placeholder="millisec" value="1000"/></span>
+							<span class="button"><button id="sleep_exec">Run</button></span>
+						</div>
+						<div class="item input_form">
+							<span class="caption">Task.Delay</span>
+							<span class="input"><input id="delay_time" size="20" placeholder="millisec" value="1000"/></span>
+							<span class="button"><button id="delay_exec">Run</button></span>
+						</div>
+						<div class="item input_form">
+							<span class="caption">Read File</span>
+							<span class="input"><input id="read_file" size="20" placeholder="file path" value=""/></span>
+							<span class="button"><button id="read_file_exec">Run</button></span>
+						</div>
+						<div id="output_list">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="side_pane">
+			<div class="side_item_list" >
+				<ul>
+					<li>item1</li>
+					<li>item2</li>
+				</ul>
+			</div>
+		</div> -->
+	</div>
+</body>
+</html>
