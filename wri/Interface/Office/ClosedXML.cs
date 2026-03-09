@@ -8,6 +8,33 @@ using System.Threading.Tasks;
 
 namespace wri.Interface.Office
 {
+    static internal class ClosedXMLUtility
+    {
+
+        static public object Cell2Object(ClosedXML.Excel.IXLCell cell)
+        {
+            switch (cell.DataType)
+            {
+                case ClosedXML.Excel.XLDataType.Blank:
+                    return (object)null;
+                case ClosedXML.Excel.XLDataType.Boolean:
+                    return (object)cell.GetBoolean();
+                case ClosedXML.Excel.XLDataType.Number:
+                    return (object)cell.GetDouble();
+                case ClosedXML.Excel.XLDataType.Text:
+                    return (object)cell.GetText();
+                case ClosedXML.Excel.XLDataType.Error:
+                    return (object)cell.GetError().ToString();
+                case ClosedXML.Excel.XLDataType.DateTime:
+                    return (object)cell.GetDateTime().ToString();
+                case ClosedXML.Excel.XLDataType.TimeSpan:
+                    return (object)cell.GetTimeSpan().ToString();
+                default:
+                    return (object)cell.ToString();
+            }
+        }
+    }
+
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ComVisible(true)]
     public class ClosedXMLIf
@@ -34,6 +61,12 @@ namespace wri.Interface.Office
                 GlobalData.ErrorMessage = ex.Message;
                 return null;
             }
+        }
+
+        public async Task<XLWorkbookIf> OpenAsync(string path)
+        {
+            if (path is null) return null;
+            return await Task.Run(() => Open(path));
         }
     }
 
@@ -78,6 +111,13 @@ namespace wri.Interface.Office
             worksheet = ws;
         }
 
+        public XLRangeIf UsedRange
+        {
+            get
+            {
+                return RangeUsed;
+            }
+        }
         public XLRangeIf RangeUsed
         {
             get
@@ -132,28 +172,7 @@ namespace wri.Interface.Office
         {
             try
             {
-                var result = range.Cells().Select(cell =>
-                {
-                    switch (cell.DataType)
-                    {
-                        case ClosedXML.Excel.XLDataType.Blank:
-                            return (object)null;
-                        case ClosedXML.Excel.XLDataType.Boolean:
-                            return (object)cell.GetBoolean();
-                        case ClosedXML.Excel.XLDataType.Number:
-                            return (object)cell.GetDouble();
-                        case ClosedXML.Excel.XLDataType.Text:
-                            return (object)cell.GetText();
-                        case ClosedXML.Excel.XLDataType.Error:
-                            return (object)cell.GetError().ToString();
-                        case ClosedXML.Excel.XLDataType.DateTime:
-                            return (object)cell.GetDateTime().ToString();
-                        case ClosedXML.Excel.XLDataType.TimeSpan:
-                            return (object)cell.GetTimeSpan().ToString();
-                        default:
-                            return (object)cell.ToString();
-                    }
-                }).ToArray();
+                var result = range.Cells().Select(cell => ClosedXMLUtility.Cell2Object(cell)).ToArray();
                 return result;
             }
             catch (Exception ex)
@@ -163,28 +182,78 @@ namespace wri.Interface.Office
             }
         }
 
-        // Ramgeの値を2次元配列で取得する
-        public object[,] Get2DArray()
+        public Task<object[]> GetAsync()
         {
+            return Task.Run(() => Get());
+        }
+
+        // Ramgeの値を2次元配列で取得する
+        public ClosedXML2DArray Get2DArray()
+        {
+            // C#からjavascriptに引き渡すときに、object[,]および(object[])[](objectの配列にobject[]を代入)はjavascriptオブジェクトに意図通りに変換されない
+
             try
             {
-                int rows = range.RowCount();
-                int cols = range.ColumnCount();
-                object[,] result = new object[rows, cols];
-                for (int r = 0; r < rows; r++)
-                {
-                    for (int c = 0; c < cols; c++)
-                    {
-                        var cell = range.Cell(r + 1, c + 1);
-                        result[r, c] = cell.Value;
-                    }
-                }
-                return result;
+                return new ClosedXML2DArray(range);
             }
             catch (Exception ex)
             {
                 GlobalData.ErrorMessage = ex.Message;
                 return null;
+            }
+        }
+    }
+
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class ClosedXML2DArray
+    {
+        object[] array;
+
+        public int RowCount
+        {
+            get; private set;
+        }
+        public int ColumnCount
+        {
+            get; private set;
+        }
+
+        public ClosedXML2DArray(ClosedXML.Excel.IXLRange range)
+        {
+            int rows = range.RowCount();
+            int cols = range.ColumnCount();
+            RowCount = rows;
+            ColumnCount = cols;
+            array = new object[rows];
+            if (rows == 0)
+            {
+                return;
+            }
+
+            for (int r = 0; r < rows; r++)
+            {
+                var col_list = new object[cols];
+                array[r] = col_list;
+
+                for (int c = 0; c < cols; c++)
+                {
+                    var cell = range.Cell(r + 1, c + 1);
+                    col_list[c] = ClosedXMLUtility.Cell2Object(cell);
+                }
+            }
+        }
+
+        [System.Runtime.CompilerServices.IndexerName("Items")]
+        public object[] this[int row]
+        {
+            get
+            {
+                if (row < 0 || row >= array.Length)
+                {
+                    return null;
+                }
+                return (object[])array[row];
             }
         }
     }
